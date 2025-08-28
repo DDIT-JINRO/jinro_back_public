@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					history.back();
 			    }
 			);
+			return;
 		}
 	}
 
@@ -26,9 +27,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 				}
 			);
-		} else {
-			location.href = "/empt/ivfb/insertInterViewFeedbackView.do";
+			return;
 		}
+		
+		location.href = "/empt/ivfb/insertInterViewFeedbackView.do";	
 	})
 
 	const cardHeaders = document.querySelectorAll(".accordion-list__item-header");
@@ -54,9 +56,9 @@ document.addEventListener('DOMContentLoaded', function() {
 			if (dataMemId != memId) {
 				showConfirm2("허용되지 않은 접근입니다.","",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			location.href = `/empt/ivfb/updateInterviewFeedbackView.do?irId=${irId}`;
 		});
@@ -223,7 +225,6 @@ function deleteInterviewFeedback(irId) {
 			    } else {
 					showConfirm2("삭제 중 오류가 발생했습니다.","", 
 					   () => {
-							return;
 					    }
 					);
 			    }
@@ -232,7 +233,6 @@ function deleteInterviewFeedback(irId) {
 			    console.error('Error:', error);
 				showConfirm2("삭제 중 오류가 발생했습니다.","다시 시도해주세요.", 
 				   () => {
-						return;
 				    }
 				);
 			});
