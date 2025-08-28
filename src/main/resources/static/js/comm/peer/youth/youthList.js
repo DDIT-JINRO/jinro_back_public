@@ -16,9 +16,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 					}
 				);
-			} else {
-				location.href = '/comm/peer/youth/youthDetail.do?boardId=' + this.dataset.tbdId;
+				return;
 			}
+			
+			location.href = '/comm/peer/youth/youthDetail.do?boardId=' + this.dataset.tbdId;
 		})
 	})
 
@@ -34,9 +35,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 				}
 			);
-		} else {
-			location.href = "/comm/peer/youth/youthInsert.do";
+			return;
 		}
+
+		location.href = "/comm/peer/youth/youthInsert.do";
 	})
 
 	const toggleButton = document.querySelector('.search-filter__accordion-header');
