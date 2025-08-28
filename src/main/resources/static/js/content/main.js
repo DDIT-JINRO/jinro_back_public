@@ -350,7 +350,7 @@ const fn_TopsWidget = () =>{
 	
 	document.addEventListener('click', (e) => {
 	    if (!e.target.closest('.trend-widget')) {
-	       closePanel()
+	       panel.classList.add('hidden');
 	    }
 	});
 }
