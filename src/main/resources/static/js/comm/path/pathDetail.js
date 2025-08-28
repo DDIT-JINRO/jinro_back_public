@@ -1,7 +1,3 @@
-/**
- *
- */
-
 document.addEventListener('DOMContentLoaded', function() {
 
 	document.addEventListener('click', function (event) {
@@ -51,65 +47,60 @@ document.addEventListener('DOMContentLoaded', function() {
 			const boardContainer = document.querySelector('.boardEtcContainer');
 			const boardId = boardContainer?.dataset.boardId;
 
-			if (boardId) {
-				// 폼 생성
-				const form = document.createElement('form');
-				form.method = 'POST';
-				form.action = '/comm/path/pathBoardUpdate.do'; // 컨트롤러 매핑 주소
+			if (!boardId) {
+                showConfirm2('게시글 ID를 불러올 수 없습니다.', "", () => {});
+                return; // 게시글 ID가 없으면 함수를 즉시 종료
+            }
 
-				// boardId 파라미터 추가
-				const input = document.createElement('input');
-				input.type = 'hidden';
-				input.name = 'boardId';
-				input.value = boardId;
-				form.appendChild(input);
-
-				document.body.appendChild(form);
-				form.submit();
-			} else {
-				showConfirm2('게시글 ID를 불러올 수 없습니다.',"",
-						() => {
-					    return;
-					}
-				);
-			}
-		})
+            // 폼 생성 및 전송 로직은 올바르므로 그대로 둡니다.
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/comm/path/pathBoardUpdate.do';
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'boardId';
+            input.value = boardId;
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+		});
 	}
 
 	// 게시글 삭제 버튼 클릭 시 삭제 요청 이벤트. 성공 시 목록으로
 	const boardDeleteBtn = document.getElementById('boardDeleteBtn');
 	if (boardDeleteBtn) {
-		boardDeleteBtn.addEventListener('click', function() {
-			const boardId = boardDeleteBtn.closest('.boardEtcContainer').dataset.boardId;
-			const data = { boardId, memId };
-			fetch('/comm/peer/teen/deleteteenBoard.do', {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json"
-				},
-				body: JSON.stringify(data)
-			})
-				.then(resp => {
+        boardDeleteBtn.addEventListener('click', function() {
+            const boardId = boardDeleteBtn.closest('.boardEtcContainer').dataset.boardId;
+            const data = { boardId, memId };
 
-					if (!resp.ok) throw new Error('에러');
-					else {
-						showConfirm2("성공적으로 삭제되었습니다.","",
-							() => {
-								window.location.href = "/comm/peer/teen/teenList.do";
-							}
-						);
-					}
-				})
-				.catch(err => {
-					console.log(err);
-					showConfirm2('삭제도중 문제가 발생했습니다.',"관리자측 문의바랍니다.",
-							() => {
-						    return;
-						}
-					);
-				})
-		})
-	}
+            // 삭제 확인 팝업
+            showConfirm("정말로 이 게시글을 삭제하시겠습니까?", "삭제된 게시글은 복구할 수 없습니다.",
+                () => { // 확인 버튼을 눌렀을 때만 실행
+                    fetch('/comm/peer/teen/deleteteenBoard.do', {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(data)
+                    })
+                    .then(resp => {
+                        if (!resp.ok) throw new Error('에러');
+                        return resp.json();
+                    })
+                    .then(() => {
+                        showConfirm2("성공적으로 삭제되었습니다.", "", () => {
+                            window.location.href = "/comm/peer/teen/teenList.do";
+                        });
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        showConfirm2('삭제 도중 문제가 발생했습니다.', "관리자측에 문의 바랍니다.", () => {});
+                    });
+                },
+                () => { // 취소 버튼을 눌렀을 때 아무것도 하지 않음
+                    return;
+                }
+            );
+        });
+    }
 
 	// 게시글에 달린 더보기 버튼 클릭 이벤트. 더보기 박스의 내용물은 jsp 단에서 채워져있음
 	const boardEtcBtn = document.getElementById('boardEtcBtn');
@@ -184,6 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 					}
 				);
+				return;
 			}
 			const targetId = boardReportBtn.closest('.boardEtcContainer').dataset.boardId;
 			const formData = new FormData();
@@ -191,17 +183,21 @@ document.addEventListener('DOMContentLoaded', function() {
 			formData.append('memId', memId);
 			formData.append('targetType', 'G10001');
 			// @@@@@@@@@ fetch()로 해당 게시글 신고한적 있는지 체크하고 신고한적 있으면 confirm 이미 신고한 게시물
-			const resp = await fetch('/api/report/selectReport', { method: 'POST', body: formData });
-			if (resp.status == 200) {
-				showConfirm2("이미 신고한 게시글입니다","",
-					() => {
-						return;
-					}
-				);
-			} else {
-				setReportModal(targetId, 'G10001');
-				openModal();
-			}
+			try {
+                const resp = await fetch('/api/report/selectReport', { method: 'POST', body: formData });
+                if (resp.status === 200) {
+                    showConfirm2("이미 신고한 게시글입니다", "", () => {});
+                    return;
+                }
+                
+                // 신고 이력이 없으면 모달을 열어줍니다.
+                setReportModal(targetId, 'G10001');
+                openModal();
+
+            } catch(error) {
+                console.error("신고 이력 확인 중 오류 발생:", error);
+                showConfirm2("오류가 발생했습니다.", "다시 시도해주세요.", () => {});
+            }
 		})
 	}
 })
@@ -212,8 +208,6 @@ function confirmReport() {
 	const targetType = document.getElementById('report-target-type').value;
 	const reportReason = document.getElementById('report-content-input').value;
 	const reportFileEl = document.getElementById('report-file');
-	const FILE_MAX_M = 1;
-	const FILE_MAX_SIZE = FILE_MAX_M * 1024;
 
 	const formData = new FormData();
 	if (reportFileEl.files.length > 0) {
@@ -230,20 +224,23 @@ function confirmReport() {
 		method: 'POST',
 		body: formData
 	})
-		.then(resp => {
-			if (!resp.ok) throw new Error('신고 전송도중 에러 발생');
-			return resp.json();
-		})
-		.then(result => {
-			if (result) {
-				showConfirm2("신고 완료","",
-					() => {
-						// 신고 완료 시 새로고침
-						location.reload();
-					}
-				);
-			}
-		})
+	.then(resp => {
+		if (!resp.ok) throw new Error('신고 전송도중 에러 발생');
+		return resp.json();
+	})
+	.then(result => {
+		if (result) {
+			showConfirm2("신고 완료","",
+				() => {
+					location.reload();
+				}
+			);
+		}
+	})
+	.catch(err => {
+        console.log(err);
+        showConfirm2("신고 도중 오류가 발생했습니다.", "관리자에게 문의 바랍니다.", () => {});
+    });
 }
 
 function setReportModal(targetId, targetType) {
@@ -473,12 +470,10 @@ function eventEtcContainerClicked(e) {
 	if (!e.target.closest('.etc-container')) return;
 	const el = e.target;
 	if (!el.textContent.trim()) return;
-	console.log(el.textContent.trim());
 	if (el.classList.contains('reply-child-container')) return;
 	if (!e.target.classList.contains('etc-act-btn')) return;
 
 	const action = el.textContent.trim();
-	if (!confirm(`이 댓글을 정말로 ${action} 하시겠습니까?`)) return;
 	if (!memId || memId == 'anonymousUser') {
 		showConfirm("로그인 후 이용 가능합니다.", "로그인하시겠습니까?",
 			() => {
@@ -489,89 +484,96 @@ function eventEtcContainerClicked(e) {
 
 			}
 		);
+		return;
 	}
-	const targetReply = el.closest('.reply-box');
-	const targetReplyChildBox = targetReply.nextElementSibling;
-	const targetReplyId = targetReply.id.split('-')[2];
-	const data = { "replyId": targetReplyId };
-
+	
 	if (action == '삭제') {
-		fetch('/comm/peer/teen/deleteTeenReply.do', {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify(data)
-		})
-			.then(resp => {
-				if (!resp.ok) throw new Error('에라');
-				return resp.json();
-			})
-			.then(result => {
-				if (result) {
-					if (!targetReply.classList.contains('reply-child')) {
-						targetReplyChildBox.remove();
-					} else {
-						const parentId = targetReply.closest('.reply-child-container').dataset.parentId
-						const boardId = document.querySelector('.boardEtcContainer').dataset.boardId;
-						const parentReplyEl = document.querySelector(`#reply-${boardId}-${parentId}`);
-						const childCntEl = parentReplyEl.querySelector('.child-count');
-						let childCnt = childCntEl.textContent.trim();
-						childCntEl.textContent = parseInt(childCnt) - 1 > 0 ? parseInt(childCnt) - 1 : '';
-					}
+        const targetReply = el.closest('.reply-box');
+        const targetReplyId = targetReply.id.split('-')[2];
+        const data = { "replyId": targetReplyId };
 
-					targetReply.remove();
-					setTimeout(() => {
-						showConfirm2("삭제되었습니다.","",
-							() => {
-								return;
-							}
-						);
-					})
-				}
-			})
-			.catch(err => {
-				console.log(err);
-			})
-	}
+        showConfirm("이 댓글을 정말로 삭제하시겠습니까?", "",
+            () => { // 확인
+                fetch('/comm/peer/teen/deleteTeenReply.do', {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                })
+                .then(resp => {
+                    if (!resp.ok) throw new Error('에러');
+                    return resp.json();
+                })
+                .then(result => {
+                    if (result) {
+                        if (!targetReply.classList.contains('reply-child')) {
+                            const targetReplyChildBox = targetReply.nextElementSibling;
+                            targetReplyChildBox.remove();
+                        } else {
+                            const parentId = targetReply.closest('.reply-child-container').dataset.parentId;
+                            const boardId = document.querySelector('.boardEtcContainer').dataset.boardId;
+                            const parentReplyEl = document.querySelector(`#reply-${boardId}-${parentId}`);
+                            const childCntEl = parentReplyEl.querySelector('.child-count');
+                            if (childCntEl) {
+                                let childCnt = childCntEl.textContent.trim();
+                                childCntEl.textContent = parseInt(childCnt) - 1 > 0 ? parseInt(childCnt) - 1 : '';
+                            }
+                        }
+                        targetReply.remove();
+                        showConfirm2("삭제되었습니다.", "", () => {});
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showConfirm2('삭제 도중 문제가 발생했습니다.', "다시 시도해주세요.", () => {});
+                });
+            },
+            () => { // 취소
+                return;
+            }
+        );
+    }
 
 	if (action == '신고') {
-		(async function() {
-			const formData = new FormData();
-			formData.append('memId', memId);
-			formData.append('targetId', targetReplyId);
-			formData.append('targetType', 'G10002');
-			const resp = await fetch('/api/report/selectReport', { method: 'POST', body: formData });
-			if (resp.status == 200) {
-				showConfirm2("이미 신고한 댓글입니다.","",
-					() => {
-						return;
-					}
-				);
-			} else {
-				setReportModal(targetReplyId, 'G10002');
-				document.body.classList.add('scroll-lock');
-				document.querySelector('#report-modal-overlay').classList.add('show');
-			}
-		}).apply();
-	}
+        const targetReply = el.closest('.reply-box');
+        const targetReplyId = targetReply.id.split('-')[2];
+        
+        (async function() {
+            const formData = new FormData();
+            formData.append('memId', memId);
+            formData.append('targetId', targetReplyId);
+            formData.append('targetType', 'G10002');
+            
+            try {
+                const resp = await fetch('/api/report/selectReport', { method: 'POST', body: formData });
+                if (resp.status === 200) {
+                    showConfirm2("이미 신고한 댓글입니다.", "", () => {});
+                    return;
+                }
+                // 신고 이력이 없으면 모달 열기
+                setReportModal(targetReplyId, 'G10002');
+                document.body.classList.add('scroll-lock');
+                document.querySelector('#report-modal-overlay').classList.add('show');
+            } catch(error) {
+                console.error("신고 이력 확인 중 오류 발생:", error);
+                showConfirm2("오류가 발생했습니다.", "다시 시도해주세요.", () => {});
+            }
+        }).apply();
+    }
 
 	if (action == '수정') {
-		// 열려있는 수정 창들 찾아서 취소버튼 클릭해주기.
-
-		const targetReplyContent = targetReply.querySelector('.reply-content').textContent;
-		const modifyForm = `
-		<div class="reply-content">
-		    <textarea class="reply-modify-input" placeholder="${targetReplyContent.trim()}">${targetReplyContent.trim()}</textarea>
-			<span class="char-count" id="char-count">${targetReplyContent.length} / 300</span>
-		    <div class="button-group">
-		        <button class="modify-btn" id="modifyBtn">등록</button>
-		        <button class="cancel-btn" id="cancelBtn">취소</button>
-		    </div>
-		</div>
-		`;
-		targetReply.querySelector('.reply-content').innerHTML = modifyForm;
-	}
+        const targetReply = el.closest('.reply-box');
+        const targetReplyContent = targetReply.querySelector('.reply-content').textContent.trim();
+        const modifyForm = `
+            <div class="reply-content">
+                <textarea class="reply-modify-input" maxlength="300" placeholder="${targetReplyContent}">${targetReplyContent}</textarea>
+                <span class="char-count" id="char-count">${targetReplyContent.length} / 300</span>
+                <div class="button-group">
+                    <button class="modify-btn" id="modifyBtn">등록</button>
+                    <button class="cancel-btn" id="cancelBtn">취소</button>
+                </div>
+            </div>`;
+        targetReply.querySelector('.reply-content').innerHTML = modifyForm;
+    }
 }
 
 // 이벤트 함수 8 boardEtcContainer바깥 클릭시 닫기 ; click
