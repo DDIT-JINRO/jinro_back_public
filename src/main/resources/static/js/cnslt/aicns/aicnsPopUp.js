@@ -23,7 +23,8 @@ document.addEventListener('DOMContentLoaded',function(){
 			() => {
 				closeOrFallback(); 
 			}
-		); 
+		);
+		return;
 	}
 
 	if(errorB.dataset.message && errorB.dataset.message!=''){
@@ -33,6 +34,7 @@ document.addEventListener('DOMContentLoaded',function(){
 				closeOrFallback(); 
 			}
 		);
+		return;
 	}else{
 		// 오류없으면 페이지 로그 기록 및 상담시작문구 출력
 		const defaultChat_MIND = `

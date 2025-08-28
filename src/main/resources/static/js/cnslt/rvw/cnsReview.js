@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				    history.back();
 				}
 			);
+			return;
 		}
 	}
 
@@ -26,9 +27,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 				}
 			);
-		} else {
-			location.href = "/cnslt/rvw/insertCnsReviewView.do";
-		}
+			return;
+		} 
+		
+		location.href = "/cnslt/rvw/insertCnsReviewView.do";
 	})
 
 	const cardHeaders = document.querySelectorAll(".accordion-list__item-header");
@@ -58,11 +60,10 @@ document.addEventListener('DOMContentLoaded', function() {
 			if (dataMemId != memId) {
 				showConfirm2("허용되지 않은 접근입니다.","",
 					() => {
-					return;
 					}
 				);
+				return;
 			}
-
 			location.href = `/cnslt/rvw/updateCnsReviewView.do?crId=${crId}`
 		})
 	})
@@ -123,7 +124,6 @@ function deleteCounselingReview(crId) {
 						console.error("Error ", data.message);
 						showConfirm2("삭제 중 오류가 발생했습니다","",
 								() => {
-							    return;
 							}
 						);
 		           }

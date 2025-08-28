@@ -8,25 +8,25 @@ document.addEventListener("DOMContentLoaded", function() {
 		if (!crId) {
 			showConfirm2("과거상담내역을 선택해 주세요.","",
 				() => {
-					return;
 				}
 			);
+			return;
 		}
 
 		if (crRate === 0) {
 			showConfirm2("상담 평가를 선택해 주세요.","",
 				() => {
-					return;
 				}
 			);
+			return;
 		}
 
 	    if (!crContent) {
 			showConfirm2("상담 후기를 입력해 주세요.","",
 				() => {
-					return;
 				}
 			);
+			return;
 	    }
 
 	    // FormData 생성
@@ -54,7 +54,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	            } else {
 					showConfirm2("등록에 실패했습니다.","",
 							() => {
-						    return;
 						}
 					);
 	            }
@@ -65,7 +64,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	        console.error("등록 중 오류:", error);
 			showConfirm2("등록에 실패했습니다.","",
 					() => {
-				    return;
 				}
 			);
 	    }
@@ -274,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				showConfirm2(data.message,"",
 					() => {
 						closeModal();
-						return;
+						return [];
 					}
 				);
 				
