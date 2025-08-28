@@ -301,8 +301,8 @@
 	        SELECT PL_TITLE AS plTitle, COUNT(*) AS userCount
 	        FROM PAGE_LOG pl
 	        JOIN MEMBER m ON pl.MEM_ID = m.MEM_ID
-	        WHERE PL_CREATED_AT >= TO_DATE(#{startDate})
-	          AND PL_CREATED_AT < TO_DATE(#{endDate})
+	        WHERE PL_CREATED_AT >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+	          AND PL_CREATED_AT < TO_DATE(#{endDate}, 'YYYY-MM-DD')
 	    ]]>
 	        <if test="gender != null and gender eq 'G11001'">
 	            <![CDATA[ AND m.MEM_GEN = 'G11001' ]]>
