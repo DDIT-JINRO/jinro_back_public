@@ -1,0 +1,232 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   1:1문의 작성 페이지 전용 스타일 (userCommon.css 클래스 확장)
+   ========================================================================== */
+
+/* 폼 컨테이너 */
+.form-container {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	max-width: 800px;
+	margin: 0 auto;
+}
+
+/* 폼 그룹 */
+.form-group {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+/* 폼 라벨 */
+.form-label {
+	font-size: 14px;
+	font-weight: 600;
+	color: #374151;
+	margin-bottom: 4px;
+}
+
+/* 폼 입력 필드 - 현대적이고 부드러운 스타일 */
+.form-input {
+	width: 100%;
+	height: 50px;
+	padding: 0 16px;
+	font-size: 16px;
+	border: 2px solid #e5e7eb;
+	border-radius: 12px;
+	background: linear-gradient(135deg, #fff 0%, #f9fafb 100%);
+	color: #374151;
+	box-sizing: border-box;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.form-input:focus {
+	outline: none;
+	border-color: #7881f5;
+	background: #fff;
+	box-shadow: 0 0 0 3px rgba(120, 129, 245, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05);
+	transform: translateY(-1px);
+}
+
+.form-input::placeholder {
+	color: #9ca3af;
+	font-weight: 400;
+}
+
+/* 텍스트에어리어 */
+.form-textarea {
+	width: 100%;
+	min-height: 200px;
+	padding: 16px;
+	font-size: 16px;
+	line-height: 1.6;
+	border: 2px solid #e5e7eb;
+	border-radius: 12px;
+	background: linear-gradient(135deg, #fff 0%, #f9fafb 100%);
+	color: #374151;
+	resize: vertical;
+	box-sizing: border-box;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+	font-family: inherit;
+}
+
+.form-textarea:focus {
+	outline: none;
+	border-color: #7881f5;
+	background: #fff;
+	box-shadow: 0 0 0 3px rgba(120, 129, 245, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.form-textarea::placeholder {
+	color: #9ca3af;
+	font-weight: 400;
+}
+
+/* 액션 버튼들 - userCommon.css의 detail__actions 스타일 확장 */
+.detail__actions {
+	display: flex;
+	justify-content: space-between;
+	gap: 16px;
+	margin-top: 32px;
+	flex-wrap: wrap;
+}
+
+.detail__action-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	padding: 12px 32px;
+	background: #7881f5;
+	color: #fff;
+	border: none;
+	border-radius: 12px;
+	text-decoration: none;
+	font-size: 15px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	min-width: 100px;
+	box-shadow: 0 4px 12px rgba(120, 129, 245, 0.3);
+}
+
+.detail__action-button:hover {
+    background-color: #5c68d9;
+}
+
+.detail__action-button:active {
+	transform: translateY(0);
+	box-shadow: 0 2px 8px rgba(120, 129, 245, 0.3);
+}
+
+.detail__action-button--secondary {
+	background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+	color: #6c757d;
+	border: 2px solid #e5e7eb;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.detail__action-button--secondary:hover {
+	background-color: #e8eaed;
+    transform: scale(1.03);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 에러 상태 스타일 */
+.form-group.error .form-label {
+	color: #dc2626;
+}
+
+.form-group.error .form-input,
+.form-group.error .form-textarea {
+	border-color: #dc2626;
+	background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+	box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.error-message {
+	display: block;
+	margin-top: 4px;
+	font-size: 12px;
+	color: #dc2626;
+	font-weight: 500;
+}
+
+/* 성공 상태 스타일 */
+.form-group.success .form-input,
+.form-group.success .form-textarea {
+	border-color: #10b981;
+	background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+	box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* 로딩 상태 */
+.detail__action-button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	transform: none;
+	box-shadow: none;
+}
+
+.detail__action-button:disabled:hover {
+	transform: none;
+	box-shadow: none;
+}
+
+/* ==========================================================================
+   반응형 스타일
+   ========================================================================== */
+@media (max-width: 768px) {
+	.form-container {
+		gap: 20px;
+	}
+	
+	.form-input {
+		height: 45px;
+		font-size: 15px;
+		padding: 0 12px;
+	}
+	
+	.form-textarea {
+		min-height: 150px;
+		padding: 12px;
+		font-size: 14px;
+	}
+	
+	.detail__actions {
+		flex-direction: column;
+		gap: 12px;
+		margin-top: 24px;
+	}
+	
+	.detail__action-button {
+		width: 100%;
+		padding: 12px 24px;
+		font-size: 14px;
+	}
+	
+	.form-label {
+		font-size: 13px;
+	}
+}
+
+/* 추가 시각적 향상 */
+@keyframes shimmer {
+	0% {
+		background-position: -1000px 0;
+	}
+	100% {
+		background-position: 1000px 0;
+	}
+}
+
+.form-input:focus,
+.form-textarea:focus {
+	background-image: linear-gradient(90deg, transparent, rgba(120, 129, 245, 0.03), transparent);
+	background-size: 1000px 100%;
+	animation: shimmer 2s infinite;
+}

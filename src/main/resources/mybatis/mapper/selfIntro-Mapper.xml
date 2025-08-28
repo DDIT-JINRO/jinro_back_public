@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.cdp.sint.service.impl.SelfIntroMapper">
+<!-- 리스트 조회 쿼리 -->
+<select id="selectSelfIntroQList" parameterType="kr.or.ddit.cdp.sint.service.SelfIntroVO" resultType="kr.or.ddit.cdp.sint.service.SelfIntroQVO">
+    SELECT * FROM (
+        SELECT ROWNUM AS RNUM, B.*
+        FROM (
+            SELECT SIQ_ID, SIQ_JOB, SIQ_CONTENT
+            FROM SELF_INTRO_Q
+            <where>
+                SIQ_JOB IS NOT NULL
+                <if test="keyword != null and keyword != ''">
+                    AND SIQ_CONTENT LIKE '%' || #{keyword} || '%'
+                </if>
+                <if test="siqJobFilter != null and siqJobFilter.size() > 0">
+                    AND SIQ_JOB IN
+                    <foreach item="item" collection="siqJobFilter" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+            </where>
+            ORDER BY SIQ_ID
+        ) B
+        WHERE ROWNUM <![CDATA[<]]> = #{endRow}
+    )
+    WHERE RNUM <![CDATA[>]]> #{startRow}
+</select>
+
+
+
+<!-- 갯수 조회 하기  -->
+<select id="selectSelfIntroQCount" parameterType="kr.or.ddit.cdp.sint.service.SelfIntroQVO" resultType="int">
+    SELECT COUNT(*)
+    FROM SELF_INTRO_Q
+    <where>
+    	SIQ_JOB IS NOT NULL
+        <if test="keyword != null and keyword != ''">
+            AND SIQ_CONTENT LIKE '%' || #{keyword} || '%'
+        </if>
+         <if test="siqJobFilter != null and siqJobFilter.size() > 0">
+             AND SIQ_JOB IN
+             <foreach item="item" collection="siqJobFilter" open="(" close=")" separator=",">
+                 #{item}
+             </foreach>
+         </if>
+    </where>
+</select>
+
+<!-- 자소서 직종 공통코드 가져오기 -->
+<select id="selectSelfIntroComCodeList" resultType="kr.or.ddit.com.ComCodeVO">
+	SELECT CC_ID, CL_CODE, CC_NAME
+	FROM COM_CODE
+	WHERE CL_CODE ='G36'
+	ORDER BY 1
+</select>
+
+<select id="selectMaxIntroId" resultType="int">
+	SELECT NVL(MAX(SI_ID),0)+1 FROM SELF_INTRO
+</select>
+
+<!-- 카트 선택한 질문들 자소서 작성에 띄워주기 위해 저장 -->
+<insert id="insertIntro" parameterType="kr.or.ddit.cdp.sint.service.SelfIntroVO">
+  INSERT INTO SELF_INTRO (
+      SI_ID,
+      MEM_ID,
+      SI_TITLE,
+      SI_STATUS
+  ) VALUES (
+      #{siId},
+      #{memId},
+      #{siTitle,jdbcType=VARCHAR},
+      <choose>
+        <when test="siStatus != null and siStatus != ''">
+          #{siStatus}
+        </when>
+        <otherwise>
+          '작성중'
+        </otherwise>
+      </choose>
+  )
+</insert>
+
+
+
+<select id="selectMaxSICId" resultType="int">
+		SELECT NVL(MAX(SIC_ID),0)+1 FROM SELF_INTRO_CONTENT
+</select>
+
+<!-- 자소서 항목별 저장 -->
+<insert id="insertContent" parameterType="kr.or.ddit.cdp.sint.service.SelfIntroContentVO">
+  INSERT INTO SELF_INTRO_CONTENT
+  <trim prefix="(" suffix=")" suffixOverrides=",">
+    SIC_ID,
+    SI_ID,
+    SIQ_ID,
+    <!-- 값이 있을 때만 컬럼 포함 -->
+    <if test="sicContent != null and sicContent != ''">
+      SIC_CONTENT,
+    </if>
+    SIC_LIMIT,
+    SIC_ORDER
+  </trim>
+  VALUES
+  <trim prefix="(" suffix=")" suffixOverrides=",">
+    #{sicId},
+    #{siId},
+    #{siqId},
+    <!-- 값이 있으면 바인딩, 없으면 NULL 리터럴 -->
+      <if test="sicContent != null and sicContent != ''">
+        #{sicContent},
+    </if>
+    #{sicLimit},
+    #{sicOrder}
+  </trim>
+</insert>
+
+<!-- 항목별 자소서내용가져오기 -->
+<select id="selectBySelfIntroContentIdList" parameterType="kr.or.ddit.cdp.sint.service.SelfIntroVO" resultType="kr.or.ddit.cdp.sint.service.SelfIntroContentVO">
+	SELECT SIC_ID, SI_ID, SIQ_ID, SIC_CONTENT,
+	SIC_LIMIT, SIC_COUNT,SIC_ORDER
+	FROM SELF_INTRO_CONTENT
+	WHERE SI_ID = #{siId}
+	ORDER
+	BY SIC_ORDER
+</select>
+
+<!-- 자소서 질문 가져오기 -->
+<select id="selectBySelfIntroQId" parameterType="kr.or.ddit.cdp.sint.service.SelfIntroContentVO" resultType="kr.or.ddit.cdp.sint.service.SelfIntroQVO">
+	select SIQ_ID, SIQ_JOB, SIQ_CONTENT
+	from SELF_INTRO_Q
+	where SIQ_ID = #{siqId}
+</select>
+<!-- 자소서 정보 가져오기 -->
+<select id="selectBySelfIntroId" parameterType="kr.or.ddit.cdp.sint.service.SelfIntroVO" resultType="kr.or.ddit.cdp.sint.service.SelfIntroVO">
+	SELECT SI_ID, MEM_ID, SI_TITLE, SI_STATUS
+	FROM SELF_INTRO
+	WHERE SI_ID= #{siId}
+</select>
+
+<!-- 자소서 Id별로 선택한 질문가져오기 -->
+<select id="selectQuestionsBySiId"
+        parameterType="int"
+        resultType="kr.or.ddit.cdp.sint.service.SelfIntroQVO">
+  SELECT q.SIQ_ID
+       , q.SIQ_JOB
+       , q.SIQ_CONTENT
+  FROM SELF_INTRO_CONTENT c
+  INNER JOIN SELF_INTRO_Q q ON c.SIQ_ID = q.SIQ_ID
+  WHERE c.SI_ID = #{siId}
+  ORDER BY c.SIC_ORDER
+</select>
+<!-- 공통 질문 가져오기 -->
+<select id="selectCommonQuestions" resultType="kr.or.ddit.cdp.sint.service.SelfIntroQVO">
+  SELECT SIQ_ID, SIQ_JOB, SIQ_CONTENT
+  FROM SELF_INTRO_Q
+  WHERE SIQ_JOB IS NULL
+  ORDER BY SIQ_ID
+</select>
+
+ <update id="updateIntro" parameterType="kr.or.ddit.cdp.sint.service.SelfIntroVO">
+    UPDATE SELF_INTRO
+    <set>
+      <if test="siTitle != null">
+        SI_TITLE = #{siTitle},
+      </if>
+      <if test="siStatus != null">
+        SI_STATUS = #{siStatus},
+      </if>
+    	SI_UPDATED_AT = sysdate
+    </set>
+    WHERE SI_ID  = #{siId}
+      AND MEM_ID = #{memId}
+  </update>
+
+  <!-- 2-2) 콘텐츠 한 행 업데이트 -->
+  <update id="updateContent" parameterType="map">
+    UPDATE SELF_INTRO_CONTENT
+       SET SIQ_ID      = #{siqId},
+           SIC_CONTENT = #{sicContent},
+           SIC_ORDER   = #{sicOrder}
+     WHERE SIC_ID     = #{sicId}
+  </update>
+
+  <select id="selectSelfIntroBymemId" parameterType="kr.or.ddit.cdp.sint.service.SelfIntroVO" resultType="kr.or.ddit.cdp.sint.service.SelfIntroVO">
+	SELECT * FROM (
+		SELECT ROWNUM AS RNUM, B.*
+		FROM (
+			SELECT
+				SI_ID,
+				SI_TITLE,
+				SI_STATUS,
+				SI_UPDATED_AT
+			FROM
+				SELF_INTRO
+			WHERE
+				MEM_ID = #{memId}
+				<if test="keyword != null and keyword != ''">
+					AND SI_TITLE LIKE '%' || #{keyword} || '%'
+				</if>
+				<if test="status != null and status != ''">
+					AND SI_STATUS = #{status}
+				</if>
+			ORDER BY
+			<choose>
+				<when test="sortOrder=='updatedAtDesc'">
+				SI_UPDATED_AT DESC
+				</when>
+				<when test="sortOrder=='updatedAtAsc'">
+				SI_UPDATED_AT ASC
+				</when>
+				<otherwise>
+				SI_UPDATED_AT DESC
+				</otherwise>
+			</choose>
+			) B
+		WHERE ROWNUM <![CDATA[<]]>= #{endNo}
+	)
+	WHERE RNUM<![CDATA[>]]> #{startNo}
+  </select>
+
+<delete id="deleteSelfIntro" parameterType="kr.or.ddit.cdp.sint.service.SelfIntroVO">
+	DELETE FROM SELF_INTRO
+	WHERE SI_ID = #{siId}
+</delete>
+
+<delete id="deleteSelfIntroContent" parameterType="kr.or.ddit.cdp.sint.service.SelfIntroVO">
+	DELETE FROM SELF_INTRO_CONTENT
+	WHERE SI_ID = #{siId}
+</delete>
+
+<select id="selectSelfIntroTotalBymemId" parameterType="kr.or.ddit.cdp.sint.service.SelfIntroVO" resultType="int">
+	SELECT COUNT(*)
+	FROM SELF_INTRO
+	WHERE MEM_ID = #{memId}
+	<if test="keyword != null and keyword != ''">
+		AND SI_TITLE LIKE '%' || #{keyword} || '%'
+	</if>
+	<if test="status != null and status != ''">
+		AND SI_STATUS = #{status}
+	</if>
+	
+</select>
+</mapper>

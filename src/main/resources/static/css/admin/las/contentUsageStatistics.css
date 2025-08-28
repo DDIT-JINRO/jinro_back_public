@@ -1,0 +1,539 @@
+@charset "UTF-8";
+
+.roadmapAndWorldCupSpace {
+	height: 580px;
+}
+
+.contentUsage-1-1 {
+	margin-bottom: 20px;
+}
+
+.contentUsage-1-1-1 {
+	margin-bottom: 20px;
+}
+
+.constentUsage-1-2-1-title {
+	color: white;
+}
+
+.constentUsage-1-2-1 {
+	width: 386.25px;
+	height: 250px;
+	margin-bottom: 20px;
+}
+
+.trophyImg {
+	width: 60px;
+	margin-right: 20px;
+}
+
+.constentUsage-1-2-1-p {
+	margin-top: 20px;
+}
+
+.constentUsage-1-2-1-p p {
+	color: white;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.circleDiv {
+	position: absolute;
+	bottom: 2.2rem;
+	right: 1.2rem;
+}
+
+.circleDsImg {
+	width: 120px;
+}
+
+.roadmapStepCount {
+	height: 480px;
+}
+
+.roadmapStepCount-stepCount {
+	margin-top: 10px;
+}
+
+.roadmapStepCount-step {
+	margin-left: 15px;
+}
+
+.roadmapStepCount-step-cnt {
+	margin-left: 25px;
+}
+
+.roadmapStepCount-stepTitle {
+	font-size: 14px;
+	font-weight: bold;
+	color: #6C757D;
+}
+
+.roadmapStepCount-stepCnt {
+	margin-top: 5px;
+	font-size: 13px;
+	font-weight: bold;
+	color: #919D9F;
+}
+
+.borderBottom {
+	margin-top: 10px;
+	border-bottom: 1px solid #eeeeee;
+}
+
+.commOnceView-box {
+	margin-top: 20px;
+	padding: 10px;
+	border: 1px solid #EEF2F7;
+}
+
+.commOnceView {
+	width: 800px;
+}
+
+.commOnceView-box {
+	justify-content: space-between;
+	padding: 20px;
+}
+
+.commOnceView-box-title {
+	font-size: 14px;
+	font-weight: bold;
+	color: #808080;
+}
+
+.commOnceView-box-cnt {
+	margin-top: 10px;
+	font-size: 24px;
+	font-weight: bold;
+}
+
+.commOnceViewImg {
+	margin-top: 5px;
+}
+
+.newBodrdList {
+	width: 390px;
+}
+
+.roadPercentSpace {
+	margin-top: 5px;
+}
+
+.commOnceView-1 {
+	justify-content: space-between;
+}
+
+.newCommListTableTbody tr {
+	opacity: 0;
+	transform: translateY(20px);
+	transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+}
+
+.newCommListTableTbody tr.visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.newCommListTableTbody.fade-out tr {
+	opacity: 0;
+	transform: translateY(20px);
+	transition: opacity 0.3s ease-in, transform 0.3s ease-in;
+}
+
+.newCommListTitle {
+	/* 1. 최대 너비 지정 (가장 중요!) */
+	max-width: 100px; /* 이 너비는 실제 레이아웃에 맞게 조절하세요 */
+	/* 2. 아래 3개 속성은 세트로 사용합니다 */
+	white-space: nowrap; /* 텍스트가 길어져도 줄바꿈을 하지 않음 */
+	overflow: hidden; /* 지정된 너비를 넘어가는 내용을 숨김 */
+	text-overflow: ellipsis; /* 숨겨진 부분에 ... 을 표시 */
+}
+
+.commOnceView-left-box {
+	width: 50%;
+}
+
+.commOnceView-right-box {
+	width: 50%;
+}
+
+.commOnceView-rate {
+	margin-top: 10px;
+}
+
+/* ──────────────────────────────────────────────────────────
+   컨테이너 & 패널 공통
+──────────────────────────────────────────────────────────*/
+.template-container {
+	display: flex;
+	gap: 24px;
+	height: 90vh; /* 화면 높이에 맞춰 컨테이너 높이 설정 */
+	box-sizing: border-box;
+}
+
+/* 좌측 컬럼: 두 개의 패널을 수직으로 쌓기 위한 컨테이너 */
+.left-column {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	flex: 1;
+}
+
+/* 우측 컬럼: 패널들을 수직으로 배치 */
+.right-column {
+	display: flex;
+	flex-direction: column; /* 패널을 세로로 쌓도록 지정 */
+	gap: 24px; /* 패널 사이의 세로 간격 */
+	flex: 1;
+}
+
+/* 좌측/우측 컬럼 내부의 패널: 수직 공간을 균등하게 분배 */
+.left-column .template-panel, .right-column .template-panel {
+	flex: 1;
+}
+
+/* ──────────────────────────────────────────────────────────
+   패널 헤더
+──────────────────────────────────────────────────────────*/
+.panel-header {
+	background: #07223D;
+	color: #fff;
+	font-size: 18px;
+	font-weight: 600;
+	padding: 12px 16px;
+	border-radius: 8px 8px 0 0;
+	margin: -20px -20px 16px;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.panel-header button {
+	background: #fff;
+	color: #07223D;
+	border: none;
+	padding: 5px 10px;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 14px;
+	font-weight: 500;
+	transition: background 0.2s, color 0.2s;
+}
+
+.panel-header button:hover {
+	background: #f0f0f0;
+}
+
+.panel-header #memberCount {
+	margin-left: 5px;
+	font-weight: 700;
+}
+
+/* ──────────────────────────────────────────────────────────
+   차트 스타일
+──────────────────────────────────────────────────────────*/
+.chart {
+	flex: 1; /* 남은 공간을 모두 차지하도록 설정 */
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding: 10px;
+}
+
+/* 차트 캔버스가 패널 높이에 맞게 조절되도록 설정 */
+.template-panel canvas {
+	max-width: 100%;
+	max-height: 90%;
+}
+
+#dailyUserInquiry, #monthUserInquiry {
+	display: none; /* Initial state handled by JS */
+}
+
+/* ──────────────────────────────────────────────────────────
+   리스트 테이블
+──────────────────────────────────────────────────────────*/
+.table-wrapper {
+	flex: 1;
+	overflow-y: auto; /* 테이블 내용만 스크롤되도록 설정 */
+	margin-top: 8px;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+}
+
+.template-panel table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 14px;
+}
+
+.template-panel th, .template-panel td {
+	padding: 12px;
+	text-align: left;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.template-panel thead th {
+	background: #fafafa;
+	font-weight: 600;
+	position: sticky;
+	top: 0;
+	z-index: 10;
+}
+
+.template-panel tbody tr {
+	transition: background 0.2s;
+}
+
+.template-panel tbody tr:hover {
+	background: #f0f8ff;
+}
+
+.template-panel tbody tr:nth-child(odd) {
+	background: #fff;
+}
+
+.template-panel tbody tr:nth-child(even) {
+	background: #fcfcfc;
+}
+
+.template-panel tbody td {
+	word-break: break-all;
+}
+
+/* ──────────────────────────────────────────────────────────
+   하단 페이지네이션 고정
+──────────────────────────────────────────────────────────*/
+.card-footer {
+	margin-top: auto;
+}
+
+.panel-footer.pagination {
+	display: flex;
+	flex-wrap: nowrap;
+	list-style: none;
+	gap: 0.5rem;
+	justify-content: center;
+	align-items: center;
+	padding: 1rem 0;
+}
+
+.panel-footer.pagination a {
+	padding: 0.4rem 0.75rem;
+	border-radius: 5px;
+	text-decoration: none;
+	color: black;
+	font-weight: 500;
+}
+
+.panel-footer.pagination a:hover {
+	background-color: #f0f0f0;
+}
+
+.panel-footer.pagination .active {
+	background-color: #2C2C2C;
+	color: white;
+	pointer-events: none;
+}
+
+.panel-footer.pagination .disabled {
+	color: #757575;
+	pointer-events: none;
+}
+
+/* 상단 필터 바 */
+.filter-bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin: 6px 0 16px;
+	gap: 12px;
+}
+
+.filter-left {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.filter-right {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.date-label {
+	font-size: 13px;
+	color: #555;
+}
+
+.btn {
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 14px;
+}
+
+.btn-range {
+	background: #fff;
+	color: #07223D;
+	border: 1px solid #cfd8dc;
+	padding: 6px 10px;
+}
+
+.btn-apply {
+	background: #07223D;
+	color: #fff;
+	padding: 6px 12px;
+}
+
+.btn-reset {
+	background: #E0E0E0;
+	color: #2C2C2C;
+	padding: 6px 12px;
+}
+
+select.compact {
+	padding: 6px 8px;
+	font-size: 13px;
+}
+
+/* 패널 헤더 내부 버튼 */
+.btn-group {
+	margin-left: auto;
+	display: flex;
+	gap: 6px;
+}
+
+.btn-tab, .btn-toggle {
+	background: #fff;
+	color: #07223D;
+	border: 1px solid #cfd8dc;
+	padding: 6px 10px;
+	border-radius: 6px;
+}
+
+/* 우하단 두 칸 레이아웃 */
+.two-col {
+	display: flex;
+	gap: 12px;
+	width: 100%;
+}
+
+.two-col .cell {
+	flex: 1;
+	min-width: 0;
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	border: 0;
+}
+
+.table-wrap {
+	margin-top: 12px;
+	background: #fff;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	padding: 8px;
+}
+
+.table-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	justify-content: flex-end;
+	margin-bottom: 6px;
+}
+
+.rank-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.rank-table th, .rank-table td {
+	padding: 8px 10px;
+	border-bottom: 1px solid #f0f2f5;
+	font-size: 13px;
+}
+
+.rank-table thead th {
+	background: #f7f9fc;
+	color: #07223D;
+}
+
+.newCommListTable {
+	margin-top: 20px;
+}
+
+.newCommListTableTbody tr {
+	height: 70px;
+}
+
+.newCommListTableTbody tr {
+	cursor: pointer;
+}
+
+.commUsageChartSelectGroup {
+	justify-content: flex-end;
+}
+
+.commUsageChartSpace {
+	width: 800px;
+}
+
+.public-countCard {
+	width: 386.25px;
+}
+
+.contentUsage-2 {
+	margin-bottom: 20px;
+}
+
+.bookmarkCateChartSpace {
+	width: 792.84px;
+	height: 475px;
+}
+
+.roadmapAndWorldSelectGroupChart {
+	display: flex;
+	margin-top: auto;
+	height: 500px;
+	flex-direction: column-reverse;
+}
+
+.commChartUsageHeader {
+	display: flex;
+	justify-content: space-between;
+}
+
+.commUsageChartDraw {
+	display: flex;
+	flex-direction: column-reverse;
+	margin-top: auto;
+}
+
+.bookmarkCategoryChartDraw {
+	height: 400px; display : flex;
+	flex-direction: column-reverse;
+	margin-top: auto;
+	display: flex;
+}
+
+.bookmarkTopChartSpace {
+	height: 500px;
+	display: flex;
+	flex-direction: column-reverse;
+	margin-top: auto;
+}
+
+/* panel-header에 이미 쓰는 active 톤과 동일하게 */

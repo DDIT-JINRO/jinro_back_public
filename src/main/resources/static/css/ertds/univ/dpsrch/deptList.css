@@ -1,0 +1,325 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   페이지 레이아웃: Content List 7열 구조 재정의
+   ========================================================================== */
+.content-list__header, .content-list__item {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+}
+
+.content-list__col {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+}
+
+/* --- 각 컬럼 너비 지정 --- */
+.content-list__col--dept-name {
+	flex: 1.8;
+	justify-content: flex-start;
+	text-align: left;
+}
+
+.content-list__col--field {
+	flex: 0.8;
+	justify-content: flex-start;
+}
+
+.content-list__col--admission {
+	flex: 0.8;
+    justify-content: right;
+}
+
+.content-list__col--employment {
+	flex: 0.8;
+    justify-content: right;
+}
+
+.content-list__col--salary {
+	flex: 0.8;
+    justify-content: right;
+}
+
+.content-list__col--bookmark {
+	flex: 0 0 70px;
+}
+
+.content-list__col--compare {
+	flex: 0 0 80px;
+}
+
+/* ==========================================================================
+   직업 비교 버튼
+   ========================================================================== */
+.compare-button {
+	display: inline-flex;
+	cursor: pointer;
+	width: 75px;
+}
+.compare-button span:hover {
+	background-color: #f0f0ff;
+}
+.compare-button input {
+	display: none;
+}
+.compare-button span {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	padding: 6px 14px;
+	background-color: #f3f4f6;
+	color: #374151;
+	border: 1px solid #d1d5db;
+	border-radius: 25px;
+	font-size: 0.8rem;
+	font-weight: 600;
+	cursor: pointer;
+}
+.compare-button input:checked+span {
+	background-color: #eef2ff;
+	border-color: #818cf8;
+	color: #4338ca;
+	font-weight: 500;
+}
+.compare-button svg {
+	margin-top: 1px;
+}
+
+/* ==========================================================================
+   비교 팝업
+   ========================================================================== */
+.compare-popup {
+	position: fixed;
+	top: 0;
+	right: 0;
+	width: 380px;
+	height: 100vh;
+	background-color: #f8f9fa;
+	box-shadow: -4px 0 20px rgba(0, 0, 0, 0.08);
+	display: flex;
+	flex-direction: column;
+	z-index: 1000;
+	transform: translateX(100%);
+	transition: transform 0.3s ease-in-out;
+}
+.compare-popup.is-open {
+	transform: translateX(0);
+}
+.compare-popup__header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 16px 20px;
+	background: #D3F8FF;
+	color: #7881f5;
+	flex-shrink: 0;
+}
+.compare-popup__title-group {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+.compare-popup__logo {
+	width: 32px;
+	height: 32px;
+}
+.compare-popup__title {
+	font-size: 1.1rem;
+	font-weight: 700;
+	margin: 0;
+}
+.compare-popup__close-button {
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+	color: white;
+}
+.compare-popup__content {
+	flex: 1;
+	overflow-y: auto;
+	padding: 20px;
+}
+.compare-popup__list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+.compare-popup__footer {
+	display: flex;
+	gap: 12px;
+	padding: 20px;
+	background-color: #fff;
+	border-top: 1px solid #e9ecef;
+	flex-shrink: 0;
+}
+.compare-popup__button {
+	flex: 1;
+	padding: 14px;
+	border-radius: 10px;
+	font-size: 0.95rem;
+	font-weight: 700;
+	cursor: pointer;
+	border: none;
+}
+.compare-popup__button--clear {
+	background-color: #fcebeb;
+	color: #dd3e3e;
+}
+.compare-popup__button--submit {
+	background-color: #d0f0fd;
+	color: #1992d4;
+}
+
+/* --- Compare Card (in popup) --- */
+.compare-card {
+	background-color: #fff;
+	border-radius: 16px;
+	padding: 20px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+.compare-card__header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 16px;
+}
+.compare-card__title {
+	font-size: 1.05rem;
+	font-weight: 600;
+	margin: 0;
+}
+.compare-card__remove-button {
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: #adb5bd;
+}
+.compare-card__metrics {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	gap: 16px;
+}
+.compare-card__metric {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 5px;
+}
+.compare-card__metric-icon {
+	width: 28px;
+	height: 28px;
+	flex-shrink: 0;
+}
+.compare-card__metric-text {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+.compare-card__metric-label {
+	font-size: 0.85rem;
+	color: #868e96;
+}
+.compare-card__metric-value {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: #212529;
+}
+
+/* ==========================================================================
+   비교 플로팅 버튼
+   ========================================================================== */
+.compare-float-button__button {
+	background-color: #7881f5;
+	color: white;
+	border: 1px solid transparent;
+	padding: 6px 18px;
+	border-radius: 25px;
+	cursor: pointer;
+	font-weight: 500;
+	font-size: 0.8rem;
+	transition: all 0.3s ease;
+	width: 64px;
+}
+.compare-float-button__button:hover {
+	transform: scale(1.03);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	background-color: #5c68d9;
+}
+
+.compare-float-button__count {
+	background-color: white;
+	color: #7881f5;
+	border-radius: 50%;
+	width: 24px;
+	height: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.9rem;
+	font-weight: bold;
+}
+/* ==========================================================================
+   반응형 스타일
+   ========================================================================== */
+@media ( max-width : 768px) {
+	.content-list__header {
+		display: none;
+	}
+	.content-list__item {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+	}
+	.content-list__col {
+		width: 100%;
+		justify-content: flex-start;
+		padding: 5px 0;
+		border-bottom: 1px dashed #eee;
+	}
+	.content-list__item .content-list__col:last-child {
+		border-bottom: none;
+	}
+	.content-list__col::before {
+		content: attr(data-label);
+		font-weight: 600;
+		color: #6b7280;
+		width: 100px;
+		flex-shrink: 0;
+	}
+	.content-list__col--dept-name::before {
+		display: none;
+	}
+	.content-list__col--dept-name {
+		border-bottom: none;
+		padding-bottom: 0;
+	}
+	.content-list__col--bookmark, .content-list__col--compare {
+		padding-top: 10px;
+		justify-content: center; /* 버튼들은 중앙 정렬 */
+	}
+	.content-list__col--bookmark::before, .content-list__col--compare::before
+		{
+		display: none;
+	}
+	
+	.compare-float-button__button {
+	    width: 50px;
+	    font-size: 0.7rem;
+	    padding: 5px;
+	}
+	
+	/* 비교 팝업 */
+	.compare-popup {
+		width: 95%; 
+		max-width: 380px;
+	}
+}

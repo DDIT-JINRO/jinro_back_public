@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.csc.faq.service.impl.FaqMapper">
+
+	<select id="getUserFaqList" resultType="kr.or.ddit.csc.faq.service.FaqVO">
+	SELECT FAQ_ID,FAQ_TITLE,FAQ_CONTENT,FAQ_UPDATED_AT,FILE_GROUP_NO
+	FROM FAQ
+	<where>
+		FAQ_ID IS NOT NULL
+		AND FAQ_DEL_YN = 'N'
+		<if test="keyword != null and keyword != ''">
+			AND FAQ_TITLE LIKE '%' || #{keyword} || '%'
+		</if>
+	</where>
+	</select>
+	
+	<select id="getAdminFaqList" resultType="kr.or.ddit.csc.faq.service.FaqVO">
+	    SELECT * FROM (
+	        SELECT B.*, ROWNUM RNUM
+	        FROM (
+	            SELECT FAQ_ID, FAQ_TITLE, FAQ_CONTENT, FAQ_UPDATED_AT, FILE_GROUP_NO
+	            FROM FAQ
+	            <where>
+	                FAQ_ID IS NOT NULL
+	                AND FAQ_DEL_YN = 'N'
+	                <if test="keyword != null and keyword != ''">
+	                    AND FAQ_TITLE LIKE '%' || #{keyword} || '%'
+	                </if>
+	                <if test="status != null and status!= '선택하세요.'">
+	                    AND TO_CHAR(FAQ_UPDATED_AT, 'YYYY') = #{status}
+	                </if>
+	            </where>
+	            ORDER BY FAQ_ID 
+	        ) B
+	        WHERE ROWNUM &lt;= #{endNo}
+	    )
+	    WHERE RNUM &gt;= #{startNo}
+	</select>
+
+	
+	<select id="getAllFaq" resultType="int">
+		SELECT COUNT(FAQ_ID)
+		FROM FAQ
+		<where>
+			FAQ_ID IS NOT NULL
+			AND FAQ_DEL_YN = 'N'
+			<if test="keyword != null and keyword != ''">
+				AND FAQ_TITLE LIKE '%' || #{keyword} || '%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="getAdminFaqDetail" resultType="kr.or.ddit.csc.faq.service.FaqVO">
+		SELECT FAQ_ID, FAQ_TITLE, FAQ_CONTENT, FAQ_UPDATED_AT, FILE_GROUP_NO, FAQ_DEL_YN
+		FROM FAQ
+		WHERE FAQ_ID = #{faqId}
+	</select>
+	
+	<insert id="insertFaq" parameterType="kr.or.ddit.csc.faq.service.FaqVO">
+		INSERT INTO FAQ(FAQ_ID, FAQ_TITLE, FAQ_CONTENT, FAQ_CREATED_AT, FILE_GROUP_NO, FAQ_DEL_YN) 
+		VALUES( (SELECT NVL(MAX(FAQ_ID), 0) + 1 FROM FAQ), #{faqTitle}, #{faqContent}, SYSDATE, #{fileGroupNo},'N')
+	</insert>
+	
+	<update id="updateFaq" parameterType="kr.or.ddit.csc.faq.service.FaqVO">
+		UPDATE FAQ
+		SET FAQ_ID= #{faqId}, 
+		    FAQ_TITLE = #{faqTitle}, 
+		    FAQ_CONTENT = #{faqContent},
+		    FAQ_CREATED_AT= SYSDATE
+		WHERE FAQ_ID = #{faqId}
+	</update>
+	
+	<update id="deleteFaq" parameterType="int">
+		UPDATE FAQ
+		SET FAQ_DEL_YN = 'Y'
+		WHERE FAQ_ID = #{faqId}
+	</update>
+	
+		
+	<update id="updateFaqFileGroupID">
+		UPDATE FAQ
+		SET FILE_GROUP_NO =#{newGroupId}
+		WHERE FAQ_ID = #{faqId}
+	</update>
+</mapper>

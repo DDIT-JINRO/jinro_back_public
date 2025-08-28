@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.empt.enp.service.impl.EnterprisePostingMapper">
+
+	<select id="selectCompanyListCount" parameterType="kr.or.ddit.empt.enp.service.CompanyVO" resultType="int">
+		SELECT COUNT(*)
+		FROM (
+			SELECT
+				a.cp_id
+			FROM company a
+			LEFT JOIN com_code b ON a.cp_scale = b.cc_id
+			LEFT JOIN (SELECT DISTINCT cp_id FROM hire) c ON a.cp_id = c.cp_id
+			WHERE 1=1
+				<if test="keyword != null and keyword != ''">
+					AND a.cp_name LIKE '%' || #{keyword} || '%'
+				</if>
+				 <if test="scaleId != null and scaleId.size() > 0">
+                AND a.cp_scale IN
+                <foreach collection="scaleId" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            	</if>
+
+	            <if test="regionId != null and regionId.size() > 0">
+	                AND (
+	                <foreach collection="regionId" item="id" separator="OR">
+	                    a.cp_region LIKE (SELECT cc_etc || '%' FROM com_code WHERE cc_id = #{id})
+	                </foreach>
+	                )
+	            </if>
+
+	            <if test="hiringStatus != null and hiringStatus.size() > 0">
+	                AND (CASE
+	                    WHEN c.cp_id IS NOT NULL THEN 'Y'
+	                    ELSE 'N'
+	                END) IN
+	                <foreach collection="hiringStatus" item="status" open="(" separator="," close=")">
+	                    #{status}
+	                </foreach>
+	            </if>
+		)
+	</select>
+
+
+	<select id="selectCompanyList" parameterType="kr.or.ddit.empt.enp.service.CompanyVO" resultType="kr.or.ddit.empt.enp.service.CompanyVO">
+		SELECT *
+			FROM (
+			    SELECT sub.*, ROWNUM AS RNUM
+			    FROM (
+			        SELECT
+			            a.cp_id,
+			            a.cp_name,
+			            b.cc_name,
+			            a.cp_description,
+			            a.cp_website,
+			            a.cp_busino,
+			            a.cp_img_url,
+			            a.cp_region,
+			            (
+					    SELECT
+					        COUNT(*)
+					    FROM
+					        INTERVIEW_REVIEW
+					    WHERE
+					        IR_TYPE = 'G02002'
+					    AND
+					        TARGET_ID = A.CP_ID
+						)  AS REVIEW_CNT,
+			            (
+					    SELECT
+					        AVG(IR_RATING)
+					    FROM
+					        INTERVIEW_REVIEW
+					    WHERE
+					        IR_TYPE = 'G02002'
+					    AND
+					        TARGET_ID = A.CP_ID
+						) AS REVIEW_AVG,
+			            CASE
+			                WHEN c.cp_id IS NOT NULL THEN 'Y'
+			                ELSE 'N'
+			            END AS cp_hiring_status,
+			            CASE
+		                	WHEN i.target_id IS NOT NULL THEN 1
+		                	ELSE 0
+		            	END AS has_review
+		            	<if test="memId != null and memId != ''">
+		            	,d.BM_ID
+		            	</if>
+			        FROM company a
+			        LEFT JOIN com_code b ON a.cp_scale = b.cc_id
+			        LEFT JOIN (SELECT DISTINCT cp_id FROM hire) c ON a.cp_id = c.cp_id
+			        <if test="memId != null and memId != ''">
+			        LEFT JOIN (SELECT BM_ID, BM_TARGET_ID FROM BOOKMARK WHERE BM_CATEGORY_ID='G03002' AND MEM_ID=#{memId})d ON a.cp_id = d.BM_TARGET_ID
+			        </if>
+			        LEFT JOIN (SELECT DISTINCT target_id FROM INTERVIEW_REVIEW WHERE ir_type = 'G02002') i ON a.cp_id = i.target_id
+			        WHERE 1=1
+			            <if test="keyword != null and keyword != ''">
+						    AND a.cp_name LIKE '%' || #{keyword} || '%'
+						</if>
+			            <if test="scaleId != null and scaleId.size() > 0">
+				            AND a.cp_scale IN
+				            <foreach collection="scaleId" item="id" open="(" separator="," close=")">
+				                #{id}
+				            </foreach>
+				        </if>
+
+				        <if test="regionId != null and regionId.size() > 0">
+				            AND (
+				            <foreach collection="regionId" item="id" separator="OR">
+				                a.cp_region LIKE (SELECT cc_etc || '%' FROM com_code WHERE cc_id = #{id})
+				            </foreach>
+				            )
+				        </if>
+
+				        <if test="hiringStatus != null and hiringStatus.size() > 0">
+				            AND (CASE
+				                WHEN c.cp_id IS NOT NULL THEN 'Y'
+				                ELSE 'N'
+				            END) IN
+				            <foreach collection="hiringStatus" item="status" open="(" separator="," close=")">
+				                #{status}
+				            </foreach>
+			        	</if>
+			        ORDER BY
+			        <if test="memId != null and memId != ''">
+			        d.BM_ID,
+			        </if>
+			         has_review DESC
+			         <choose>
+			         	<when test="sortOrder == 'reviewCntDesc' ">
+			         		,REVIEW_CNT DESC ,REVIEW_AVG DESC
+			         	</when>
+			         	<when test="sortOrder == 'reviewAvgDesc' ">
+			         		,REVIEW_AVG DESC ,REVIEW_CNT DESC
+			         	</when>
+			         </choose>
+			         ,a.cp_id 
+			    ) sub
+			    WHERE ROWNUM <![CDATA[<]]>= #{endNo}
+			)
+			WHERE RNUM <![CDATA[>]]> #{startNo}
+	</select>
+
+	<select id="selectCodeVOCompanyScaleList" resultType="kr.or.ddit.com.ComCodeVO">
+		select CC_ID, CL_CODE, CC_NAME, CC_ETC
+		from COM_CODE
+		where CL_CODE = 'G30'
+	</select>
+
+	<select id="selectCodeVORegionList" resultType="kr.or.ddit.com.ComCodeVO">
+		select CC_ID, CL_CODE, CC_NAME, CC_ETC
+		from COM_CODE
+		where CL_CODE = 'G23'
+	</select>
+
+	<update id="updateEnterprisePosting" parameterType="kr.or.ddit.empt.enp.service.CompanyVO">
+		 MERGE INTO COMPANY c
+	    USING DUAL
+	    ON (c.CP_ID = #{cpId})
+	    WHEN MATCHED THEN
+	        UPDATE
+	        <set>
+	            <if test="cpName != null">
+	                c.CP_NAME = #{cpName},
+	            </if>
+	            <if test="cpScale != null">
+	                c.CP_SCALE = #{cpScale},
+	            </if>
+	            <if test="cpDescription != null">
+	                c.CP_DESCRIPTION = #{cpDescription},
+	            </if>
+   	            <if test="cpWebsite != null">
+	                c.CP_WEBSITE = #{cpWebsite},
+	            </if>
+   	            <if test="cpBusino != null">
+	                c.CP_BUSINO = #{cpBusino},
+	            </if>
+   	            <if test="cpImgUrl != null">
+	                c.CP_IMG_URL = #{cpImgUrl},
+	            </if>
+   	            <if test="cpRegion != null">
+	                c.CP_REGION = #{cpRegion},
+	            </if>
+       		</set>
+
+    WHEN NOT MATCHED THEN
+        INSERT (CP_ID, CP_NAME
+            <if test="cpScale != null and cpScale != ''">, CP_SCALE</if>
+            <if test="cpDescription != null and cpDescription != ''">, CP_DESCRIPTION</if>
+            <if test="cpWebsite != null and cpWebsite != ''">, CP_WEBSITE</if>
+            <if test="cpRegion != null and cpRegion != ''">, CP_REGION</if>
+            <if test="cpBusino != null and cpBusino != ''">, CP_BUSINO</if>
+            <if test="cpImgUrl != null and cpImgUrl != ''">, CP_IMG_URL</if>
+        )
+        VALUES (#{cpId}, #{cpName}
+            <if test="cpScale != null and cpScale != ''">, #{cpScale}</if>
+            <if test="cpDescription != null and cpDescription != ''">, #{cpDescription}</if>
+            <if test="cpWebsite != null and cpWebsite != ''">, #{cpWebsite}</if>
+            <if test="cpRegion != null and cpRegion != ''">, #{cpRegion}</if>
+            <if test="cpBusino != null and cpBusino != ''">, #{cpBusino}</if>
+            <if test="cpImgUrl != null and cpImgUrl != ''">, #{cpImgUrl}</if>
+        )
+	</update>
+
+	<select id="checkCompanyByCpId" parameterType="kr.or.ddit.empt.enp.service.CompanyVO" resultType="kr.or.ddit.empt.enp.service.CompanyVO">
+		select *
+		from company
+		where CP_ID = #{cpId}
+	</select>
+
+	<select id="getMaxCpId" resultType="int">
+		SELECT NVL(MAX(CP_ID),0)+1
+		FROM COMPANY
+	</select>
+
+	<delete id="deleteEnterprisePosting" parameterType="kr.or.ddit.empt.enp.service.CompanyVO">
+		DELETE COMPANY
+		WHERE CP_ID = #{cpId}
+	</delete>
+
+	<select id="selectBookMarkVO" parameterType="kr.or.ddit.mpg.mat.bmk.service.BookMarkVO" resultType="kr.or.ddit.mpg.mat.bmk.service.BookMarkVO">
+		select BM_ID, MEM_ID, BM_CATEGORY_ID, BM_TARGET_ID
+		from BOOKMARK
+		where MEM_ID = #{memId}
+		and BM_CATEGORY_ID =#{bmCategoryId}
+	</select>
+
+	<select id="selectEnpInterviewReview" parameterType="kr.or.ddit.empt.enp.service.InterviewReviewVO" resultType="kr.or.ddit.empt.enp.service.InterviewReviewVO">
+		SELECT
+			A.IR_ID
+			, A.MEM_ID
+			, A.IR_TYPE
+			, A.TARGET_ID
+			, A.IR_CONTENT
+			, A.IR_CREATED_AT
+			, A.IR_RATING
+			, B.MEM_NICKNAME
+		FROM (
+		    SELECT
+		        IR_ID
+		        , MEM_ID
+		        , IR_TYPE
+		        , TARGET_ID
+		        , IR_CONTENT
+		        , IR_CREATED_AT
+		        , IR_RATING
+		    FROM
+		        INTERVIEW_REVIEW
+		    WHERE
+		        IR_TYPE = #{irType}
+		    AND
+		        TARGET_ID = #{targetId}
+		) A
+		LEFT JOIN
+			MEMBER B ON A.MEM_ID = B.MEM_ID
+		ORDER BY
+			IR_CREATED_AT DESC
+		FETCH FIRST 2 ROWS ONLY
+	</select>
+</mapper>

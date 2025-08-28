@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.you.service.impl.YoutubeMapper">
+
+	<select id="getKeyword" resultType="HashMap" parameterType="int">
+		SELECT rk.RK_NAME AS result, jc.JOB_CODE AS jobCode, rk.RK_NAME AS JOB
+		FROM recommend_keyword rk
+		JOIN JOBS jc
+		    ON rk.RK_NAME = jc.JOB_NAME
+		WHERE rk.MEM_ID = #{id}
+		ORDER BY rk.RK_CREATED_AT ASC
+		FETCH FIRST 1 ROWS ONLY
+	</select>
+
+</mapper>

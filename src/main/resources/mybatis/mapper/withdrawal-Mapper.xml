@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mpg.mif.whdwl.service.impl.WithdrawalMapper">
+
+	<select id="selectMdcategoryList" resultType="kr.or.ddit.com.ComCodeVO"> 
+		SELECT
+			CC_ID
+			, CC_NAME
+		FROM
+			COM_CODE
+		WHERE
+			CL_CODE = 'S02'
+	</select>
+	
+	<select id="selectDelYN" parameterType="int" resultType="kr.or.ddit.main.service.MemberVO">
+		SELECT
+			DEL_YN
+			, MEM_ID
+			, MEM_EMAIL
+		FROM
+			MEMBER
+		WHERE
+			MEM_ID = #{memId}
+	</select>
+	
+	<select id="selectMemDel" parameterType="int" resultType="kr.or.ddit.account.lgn.service.MemDelVO">
+		SELECT
+			MD_DELETED_AT
+		FROM
+			MEM_DEL
+		WHERE
+			MEM_ID = #{memDel} 
+	</select>
+	
+	<update id="updateMemDelYN" parameterType="int">
+		UPDATE
+			MEMBER
+		SET
+			DEL_YN = 'Y'
+		WHERE
+			MEM_ID = #{memId}
+	</update>
+
+	<insert id="insertMemDelete" parameterType="kr.or.ddit.account.lgn.service.MemDelVO">
+		INSERT
+			INTO
+			MEM_DEL
+		(
+				MD_ID
+				, MEM_ID
+				, MEM_EMAIL
+				, MD_REASON
+				, MD_REQ_AT
+				, MD_STATUS
+				, MD_CATEGORY
+			)
+		VALUES((SELECT NVL(MAX(MD_ID), 0)+ 1 FROM MEM_DEL), #{memId}, #{memEmail}, #{mdReason}, SYSDATE , 'S01001', #{mdCategory})
+	</insert>
+	
+</mapper>

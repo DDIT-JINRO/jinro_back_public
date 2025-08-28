@@ -1,0 +1,104 @@
+@charset "UTF-8";
+    :root{
+      --bg:#f6f8fa; --card:#ffffff; --ink:#202427; --sub:#5a6570;
+      --line:#e8ecef; --brand:#848efb; --brand-weak:#d3f8ff;
+      --mine:#e9f6ff; --ai:#f3f5f7; --danger:#ff4d4f;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;background:var(--bg); color:var(--ink);
+      font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,Arial,sans-serif;
+    }
+
+    /* ===== Shell ===== */
+    .wrap{ height:100%; display:flex; flex-direction:column; }
+    .header{
+      background:linear-gradient(180deg,rgba(132,142,251,.08),rgba(211,248,255,.08));
+      border-bottom:1px solid var(--line);
+      padding:14px 18px; display:flex; align-items:center; gap:14px;
+    }
+    .title{ font-weight:800; font-size:16px; margin-right:auto; }
+    .badge{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px; border-radius:999px; font-weight:700;
+      background:var(--brand-weak); color:#4489a0; border:1px solid #bfeef7;
+    }
+    .note{ color:var(--sub); font-size:12px; }
+    .sep{ width:1px; height:22px; background:var(--line); margin:0 10px; }
+    .btn-ghost{
+      appearance:none; border:1px solid var(--line); background:#fff; color:var(--ink);
+      border-radius:10px; padding:8px 12px; cursor:pointer; font-weight:700;
+    }
+    .btn-ghost:hover{ box-shadow:0 2px 10px rgba(0,0,0,.06) }
+
+    /* ===== Chat ===== */
+    .chat{
+      flex:1; overflow:auto; padding:18px;
+      display:flex; flex-direction:column; gap:14px;
+    }
+    .sys{
+      align-self:center; background:#fff; border:1px dashed var(--line);
+      color:var(--sub); font-size:12px; padding:8px 12px; border-radius:10px;
+    }
+    .row{ display:flex; gap:10px; align-items:flex-end; }
+    .row.mine{ justify-content:flex-end; }
+    .avatar{
+      width:32px; height:32px; border-radius:12px; background:#eef2f6;
+      display:grid; place-items:center; font-size:16px; flex:0 0 32px;
+      border:1px solid var(--line);
+    }
+    .bubble{
+      max-width:min(525px, 78vw);
+      padding:10px 12px; border-radius:16px; background:var(--ai);
+      border:1px solid var(--line); box-shadow:0 2px 8px rgba(0,0,0,.03);
+      position:relative;
+    }
+    .mine .bubble{ background:var(--mine); }
+    .meta{
+      font-size:12px; color:var(--sub); margin-top:6px; display:flex; gap:8px; align-items:center;
+    }
+    .tools{ display:none; gap:6px; }
+    .row:hover .tools{ display:flex; }
+    .tool{
+      border:none; background:transparent; cursor:pointer; font-size:12px; color:#65707b;
+      padding:4px 6px; border-radius:6px;
+    }
+    .tool:hover{ background:#eef2f6; }
+
+    /* typing */
+    .typing{ display:inline-flex; gap:4px; }
+    .dot{ width:6px; height:6px; border-radius:50%; background:#c0c7cf; animation:blink 1s infinite ease-in-out; }
+    .dot:nth-child(2){ animation-delay:.15s } .dot:nth-child(3){ animation-delay:.3s }
+    @keyframes blink{ 0%,80%,100%{opacity:.25} 40%{opacity:1} }
+
+    /* ===== Composer ===== */
+    .composer{
+      border-top:1px solid var(--line); background:#fff;
+      padding:10px 12px; display:flex; gap:10px; align-items:flex-end;
+    }
+    .ta{
+      flex:1; min-height:44px; max-height:160px; resize:none; outline:none;
+      border:1px solid var(--line); border-radius:12px; padding:10px 12px; line-height:1.5;
+    }
+    .btn{
+      appearance:none; border:none; border-radius:12px; padding:10px 14px;
+      background:var(--ink); color:#fff; font-weight:800; cursor:pointer;
+      box-shadow:0 4px 14px rgba(0,0,0,.08);
+    }
+    .btn:disabled{ background:#cfd6db; color:#8b97a3; cursor:not-allowed; box-shadow:none; }
+    .errorbar{
+      background:#ffecec; color:#b50000; padding:8px 12px; border:1px solid #ffd6d6; border-left:4px solid var(--danger);
+      margin:0 18px 8px; border-radius:8px;
+      display:none;
+    }
+    .newmsg{
+      position:sticky; bottom:8px; align-self:center; display:none;
+      padding:6px 12px; border-radius:999px; background:#fff; border:1px solid var(--line); cursor:pointer; font-weight:700;
+      box-shadow:0 4px 12px rgba(0,0,0,.08);
+    }
+
+    @media (max-width: 640px){
+      .badge{ display:none }
+      .title{ font-size:15px }
+    }

@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.ertds.univ.dpsrch.service.impl.UnivDeptMapper">
+
+    <!-- 기존 목록 조회 쿼리 (UnivDeptVO 그대로 사용) -->
+    <select id="selectUnivDeptList" parameterType="kr.or.ddit.ertds.univ.dpsrch.service.UnivDeptVO" resultType="kr.or.ddit.ertds.univ.dpsrch.service.UnivDeptVO">
+        SELECT *
+        FROM (
+            SELECT sub.*, ROWNUM AS RNUM
+            FROM (
+                SELECT
+                    UD.UDD_ID
+                    , COALESCE(CC1.CC_NAME, UDD_L_CLASS) AS UDD_L_CLASS
+                    , COALESCE(CC2.CC_NAME, UDD_M_CLASS) AS UDD_M_CLASS
+                    , UDD_SUM
+                    , UDD_INTEREST
+                    , UDD_PROPERTY
+                    , UDD_JOB_LIST
+                    , UDD_LI_LIST
+                    , UDS.UDS_ADMISSION_RATE AS admissionRate
+                    , UDS.UDS_EMPLOYMENT_RATE_TOTAL AS empRate
+                    , TO_NUMBER(SUBSTR(LPAD(UDS_ADMISSION_RATE,6,'0'),1,4)) AS sortRate
+                    , CASE
+                        WHEN (UDS.UDS_SALARY_0_150_RATE + UDS.UDS_SALARY_151_200_RATE + UDS.UDS_SALARY_201_250_RATE + UDS.UDS_SALARY_251_300_RATE + UDS.UDS_SALARY_301_PLUS_RATE) > 0
+                        THEN ROUND(
+                            (UDS.UDS_SALARY_0_150_RATE * 75 +
+                             UDS.UDS_SALARY_151_200_RATE * 175 +
+                             UDS.UDS_SALARY_201_250_RATE * 225 +
+                             UDS.UDS_SALARY_251_300_RATE * 275 +
+                             UDS.UDS_SALARY_301_PLUS_RATE * 350) /
+                            (UDS.UDS_SALARY_0_150_RATE + UDS.UDS_SALARY_151_200_RATE + UDS.UDS_SALARY_201_250_RATE + UDS.UDS_SALARY_251_300_RATE + UDS.UDS_SALARY_301_PLUS_RATE), 0
+                        )
+                        ELSE NULL
+                      END AS avgSalary
+                    <if test="memId != null and memId != ''">
+                    	, B.BM_ID
+                    </if>
+                FROM UNIV_DEPT_DETAIL UD
+                <if test="memId != null and memId != ''">
+                LEFT JOIN (SELECT BM_ID, BM_TARGET_ID FROM BOOKMARK WHERE BM_CATEGORY_ID='G03006' AND MEM_ID=#{memId})B ON UD.UDD_ID = B.BM_TARGET_ID
+                </if>
+                LEFT JOIN COM_CODE CC1 ON UD.UDD_L_CLASS = CC1.CC_ID
+                LEFT JOIN COM_CODE CC2 ON UD.UDD_M_CLASS = CC2.CC_ID
+                INNER JOIN UNIV_DEPT_STAT UDS ON UD.UDD_ID = UDS.UDD_ID
+                <where>
+                    <if test="keyword != null and keyword != ''">
+                        AND COALESCE(CC2.CC_NAME, UD.UDD_M_CLASS) LIKE '%' || #{keyword} || '%'
+                    </if>
+                    <if test="lClassIds != null and lClassIds.size() > 0">
+                        AND (
+                        <foreach collection="lClassIds" item="id" separator="OR">
+                            UD.UDD_L_CLASS = #{id}
+                        </foreach>
+                        )
+                    </if>
+                </where>
+                ORDER BY
+                <if test="memId != null and memId != ''">
+                B.BM_ID,
+                </if>
+                <choose>
+                	<when test="sortOrder == 'admissionDesc'">
+                	sortRate desc nulls last,UD.UDD_ID
+                	</when>
+                	<when test="sortOrder == 'admissionAsc'">
+                	sortRate asc nulls last,UD.UDD_ID
+                	</when>
+                	<when test="sortOrder == 'employmentDesc'">
+                	empRate desc nulls last,UD.UDD_ID
+                	</when>
+                	<when test="sortOrder == 'employmentAsc'">
+                	empRate asc nulls last,UD.UDD_ID
+                	</when>
+                	<when test="sortOrder == 'salaryDesc'">
+                	avgSalary desc nulls last,UD.UDD_ID
+                	</when>
+                	<when test="sortOrder == 'salaryAsc'">
+                	avgSalary asc nulls last,UD.UDD_ID
+                	</when>
+                	<otherwise>
+	                UD.UDD_ID
+                	</otherwise>
+                </choose>
+            ) sub
+            WHERE ROWNUM <![CDATA[<=]]> #{endNo}
+        )
+        WHERE RNUM <![CDATA[>]]> #{startNo}
+    </select>
+
+    <!-- 🆕 새로 추가: 학과 상세 정보 조회 -->
+    <select id="selectDeptDetail" parameterType="int" resultType="kr.or.ddit.ertds.univ.dpsrch.service.UnivDeptDetailVO">
+        SELECT
+            <!-- 기본 정보 (UNIV_DEPT_DETAIL에서) -->
+            UD.UDD_ID as uddId,
+            COALESCE(CC1.CC_NAME, UD.UDD_L_CLASS) as uddLClass,
+            COALESCE(CC2.CC_NAME, UD.UDD_M_CLASS) as uddMClass,
+            UD.UDD_SUM as uddSum,
+            UD.UDD_INTEREST as uddInterest,
+            UD.UDD_PROPERTY as uddProperty,
+            UD.UDD_JOB_LIST as uddJobList,
+            UD.UDD_LI_LIST as uddLiList,
+
+            <!-- 통계 정보 ID -->
+            US.UDS_ID as udsId,
+
+            <!-- 지원자 및 입학 관련 -->
+            US.UDS_TOTAL_APPLICANTS as udsTotalApplicants,
+            US.UDS_TOTAL_ADMITTED as udsTotalAdmitted,
+            US.UDS_MALE_ADMISSION_RATE as udsMaleAdmissionRate,
+            US.UDS_FEMALE_ADMISSION_RATE as udsFemaleAdmissionRate,
+            US.UDS_ADMISSION_RATE as udsAdmissionRate,
+
+            <!-- 취업률 관련 -->
+            US.UDS_EMPLOYMENT_RATE_TOTAL as udsEmploymentRateTotal,
+            US.UDS_EMPLOYMENT_RATE_MALE as udsEmploymentRateMale,
+            US.UDS_EMPLOYMENT_RATE_FEMALE as udsEmploymentRateFemale,
+
+            <!-- 급여 분포 관련 -->
+            US.UDS_SALARY_0_150_RATE as udsSalary0150Rate,
+            US.UDS_SALARY_151_200_RATE as udsSalary151200Rate,
+            US.UDS_SALARY_201_250_RATE as udsSalary201250Rate,
+            US.UDS_SALARY_251_300_RATE as udsSalary251300Rate,
+            US.UDS_SALARY_301_PLUS_RATE as udsSalary301PlusRate,
+
+            <!-- 취업 분야 관련 -->
+            US.UDS_FIELD_CONSTRUCTION_RATE as udsFieldConstructionRate,
+            US.UDS_FIELD_MANAGEMENT_RATE as udsFieldManagementRate,
+            US.UDS_FIELD_EDUCATION_RATE as udsFieldEducationRate,
+            US.UDS_FIELD_BEAUTY_RATE as udsFieldBeautyRate,
+            US.UDS_FIELD_WELFARE_RATE as udsFieldWelfareRate,
+            US.UDS_FIELD_RESEARCH_RATE as udsFieldResearchRate,
+            US.UDS_FIELD_TRANSPORT_RATE as udsFieldTransportRate,
+            US.UDS_FIELD_ART_RATE as udsFieldArtRate,
+            US.UDS_FIELD_PRODUCT_RATE as udsFieldProductRate,
+            US.UDS_FIELD_FARMER_RATE as udsFieldFarmerRate,
+
+            <!-- 만족도 관련 -->
+            US.UDS_SATISFACTION_VERY_DISSATISFIED as udsSatisfactionVeryDissatisfied,
+            US.UDS_SATISFACTION_DISSATISFIED as udsSatisfactionDissatisfied,
+            US.UDS_SATISFACTION_NEUTRAL as udsSatisfactionNeutral,
+            US.UDS_SATISFACTION_SATISFIED as udsSatisfactionSatisfied,
+            US.UDS_SATISFACTION_VERY_SATISFIED as udsSatisfactionVerySatisfied
+
+        FROM UNIV_DEPT_DETAIL UD
+        LEFT JOIN COM_CODE CC1 ON UD.UDD_L_CLASS = CC1.CC_ID
+        LEFT JOIN COM_CODE CC2 ON UD.UDD_M_CLASS = CC2.CC_ID
+        LEFT JOIN UNIV_DEPT_STAT US ON UD.UDD_ID = US.UDD_ID
+        WHERE UD.UDD_ID = #{uddId}
+    </select>
+
+    <!-- 기존 총 개수 조회 쿼리 -->
+    <select id="selectUniversityTotalCount" resultType="int" parameterType="kr.or.ddit.ertds.univ.uvsrch.service.UniversityVO">
+        SELECT COUNT(*)
+        FROM UNIV_DEPT_DETAIL UD
+        LEFT JOIN COM_CODE CC2 ON UD.UDD_M_CLASS = CC2.CC_ID
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND COALESCE(CC2.CC_NAME, UD.UDD_M_CLASS) LIKE '%' || #{keyword} || '%'
+            </if>
+            <if test="lClassIds != null and lClassIds.size() > 0">
+                AND (
+                <foreach collection="lClassIds" item="id" separator="OR">
+                    UD.UDD_L_CLASS = #{id}
+                </foreach>
+                )
+            </if>
+        </where>
+    </select>
+
+    <!-- 기존 북마크 조회 쿼리 -->
+    <select id="selectBookMarkVO" parameterType="kr.or.ddit.mpg.mat.bmk.service.BookMarkVO" resultType="kr.or.ddit.mpg.mat.bmk.service.BookMarkVO">
+        SELECT BM_ID, MEM_ID, BM_CATEGORY_ID, BM_TARGET_ID
+        FROM BOOKMARK
+        WHERE MEM_ID = #{memId}
+        AND BM_CATEGORY_ID = #{bmCategoryId}
+    </select>
+
+    <!-- 기존 코드 조회 쿼리 -->
+    <select id="selectCodeVOUnivDeptLClassList" resultType="kr.or.ddit.com.ComCodeVO">
+        SELECT CC_ID, CL_CODE, CC_NAME, CC_ETC
+        FROM COM_CODE
+        WHERE CL_CODE = 'G18'
+    </select>
+
+    <!-- 학과 비교 데이터 조회 -->
+	<select id="selectDeptCompareList" parameterType="list" resultType="kr.or.ddit.ertds.univ.dpsrch.service.UnivDeptCompareVO">
+	    SELECT
+	        uds.UDD_ID as uddId,
+	        lc.CC_NAME as uddLClass,
+	        mc.CC_NAME as uddMClass,
+
+	        -- 기존 데이터에서 가져오기
+	        COALESCE(uds.UDS_ADMISSION_RATE, '정보없음') as admissionRate,
+	        CONCAT(ROUND(uds.UDS_EMPLOYMENT_RATE_TOTAL, 1), '') as empRate,
+
+	        -- 평균 급여 계산 (급여 구간별 중간값으로 추정)
+	        CASE
+	            WHEN (UDS.UDS_SALARY_0_150_RATE + UDS.UDS_SALARY_151_200_RATE + UDS.UDS_SALARY_201_250_RATE + UDS.UDS_SALARY_251_300_RATE + UDS.UDS_SALARY_301_PLUS_RATE) > 0
+	            THEN ROUND(
+	                (UDS.UDS_SALARY_0_150_RATE * 75 +
+	                 UDS.UDS_SALARY_151_200_RATE * 175 +
+	                 UDS.UDS_SALARY_201_250_RATE * 225 +
+	                 UDS.UDS_SALARY_251_300_RATE * 275 +
+	                 UDS.UDS_SALARY_301_PLUS_RATE * 350) /
+	                (UDS.UDS_SALARY_0_150_RATE + UDS.UDS_SALARY_151_200_RATE + UDS.UDS_SALARY_201_250_RATE + UDS.UDS_SALARY_251_300_RATE + UDS.UDS_SALARY_301_PLUS_RATE), 0
+	            )
+	            ELSE NULL
+	          END AS avgSalary,
+
+	        -- 전국 평균 등록금 계산
+	        (SELECT ROUND(AVG(dept.UD_TUITION), 0)
+	         FROM UNIV_DEPT dept
+	         WHERE dept.UDD_ID = uds.UDD_ID
+	         AND dept.UD_TUITION IS NOT NULL) AS AVG_TUITION,
+
+	        -- 전국 평균 장학금 계산
+	        (SELECT ROUND(AVG(dept.UD_SCHOLAR), 0)
+	         FROM UNIV_DEPT dept
+	         WHERE dept.UDD_ID = uds.UDD_ID
+	         AND dept.UD_SCHOLAR IS NOT NULL) AS AVG_SCHOLAR,
+
+	        -- 만족도 가중평균 계산 (1~5점)
+	        ROUND(
+	            (COALESCE(uds.UDS_SATISFACTION_VERY_DISSATISFIED, 0) * 1 +
+	             COALESCE(uds.UDS_SATISFACTION_DISSATISFIED, 0) * 2 +
+	             COALESCE(uds.UDS_SATISFACTION_NEUTRAL, 0) * 3 +
+	             COALESCE(uds.UDS_SATISFACTION_SATISFIED, 0) * 4 +
+	             COALESCE(uds.UDS_SATISFACTION_VERY_SATISFIED, 0) * 5) /
+	            NULLIF(
+	                COALESCE(uds.UDS_SATISFACTION_VERY_DISSATISFIED, 0) +
+	                COALESCE(uds.UDS_SATISFACTION_DISSATISFIED, 0) +
+	                COALESCE(uds.UDS_SATISFACTION_NEUTRAL, 0) +
+	                COALESCE(uds.UDS_SATISFACTION_SATISFIED, 0) +
+	                COALESCE(uds.UDS_SATISFACTION_VERY_SATISFIED, 0), 0
+	            ), 1
+	        ) AS satisfactionAvg
+
+	    FROM UNIV_DEPT_STAT uds
+	    JOIN UNIV_DEPT_DETAIL udd ON uds.UDD_ID = udd.UDD_ID
+	    LEFT JOIN COM_CODE lc ON udd.UDD_L_CLASS = lc.CC_ID
+	    LEFT JOIN COM_CODE mc ON udd.UDD_M_CLASS = mc.CC_ID
+	    WHERE uds.UDD_ID IN
+	    <foreach collection="list" item="uddId" open="(" separator="," close=")">
+	        #{uddId}
+	    </foreach>
+	    ORDER BY udd.UDD_M_CLASS
+	</select>
+
+</mapper>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.com.report.service.impl.ReportMapper">
+
+	<insert id="insertReport" parameterType="kr.or.ddit.com.report.service.ReportVO" >
+		<selectKey keyProperty="reportId" order="BEFORE" resultType="int">
+			SELECT NVL(MAX(REPORT_ID),0)+1 FROM REPORT
+		</selectKey>
+
+		INSERT INTO report (
+		    REPORT_ID
+		    , TARGET_TYPE
+		    , TARGET_ID
+		    , REPORT_REASON
+		    , REPORT_STATUS
+		    , REPORT_CREATED_AT
+		    , REPORT_COMPLETE_AT
+		    , REPORT_COMPLETE_ID
+		    , MEM_ID
+		    <if test="fileGroupNo > 0">
+		    , FILE_GROUP_NO
+		    </if>
+		) VALUES (
+		    #{reportId}
+		    , #{targetType}
+		    , #{targetId}
+		    , #{reportReason}
+		    , 'S03001'
+		    , SYSDATE
+		    , NULL
+		    , NULL
+		    , #{memId}
+		    <if test="fileGroupNo > 0">
+		    , #{fileGroupNo}
+		    </if>
+		)
+	</insert>
+
+	<select id="selectReportByMemIdAndTargetTypeAndTargetId" parameterType="kr.or.ddit.com.report.service.ReportVO">
+		SELECT REPORT_ID
+			 , TARGET_TYPE
+			 , TARGET_ID
+			 , REPORT_REASON
+			 , REPORT_STATUS
+			 , REPORT_CREATED_AT
+			 , REPORT_COMPLETE_AT
+			 , REPORT_COMPLETE_ID
+			 , MEM_ID
+			 , FILE_GROUP_NO
+		  FROM REPORT
+		 WHERE MEM_ID = #{memId}
+		   AND TARGET_TYPE = #{targetType}
+		   AND TARGET_ID = #{targetId}
+	</select>
+
+</mapper>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.util.alarm.service.impl.AlarmMapper">
+
+  <!-- Insert new Alarm, using sequence for ALARM_ID -->
+  <insert id="insertAlarm" parameterType="kr.or.ddit.util.alarm.service.AlarmVO">
+    <selectKey keyProperty="alarmId" resultType="int" order="BEFORE">
+      SELECT NVL(MAX(ALARM_ID),0)+1 AS ALARM_ID FROM ALARM
+    </selectKey>
+    INSERT INTO ALARM (
+        ALARM_ID
+      , MEM_ID
+      , ALARM_TARGET_TYPE
+      , ALARM_CONTENT
+      , ALARM_IS_READ
+      , ALARM_CREATED_AT
+      , ALARM_TARGET_ID
+      , ALARM_TARGET_URL
+    ) VALUES (
+        #{alarmId}
+      , #{memId}
+      , #{alarmTargetType}
+      , #{alarmContent}
+      , #{alarmIsRead}
+      , SYSDATE
+      , #{alarmTargetId}
+      , #{alarmTargetUrl}
+    )
+  </insert>
+
+  <!-- 멤버 번호로 안읽은 알림들 조회 -->
+  <select id="selectAllByMember" parameterType="int" resultType="kr.or.ddit.util.alarm.service.AlarmVO">
+	SELECT
+	       ALARM_IS_READ
+	     , ALARM_CREATED_AT
+	     , ALARM_TARGET_ID
+	     , ALARM_TARGET_URL
+	     , ALARM_ID
+	     , MEM_ID
+	     , ALARM_TARGET_TYPE
+	     , ALARM_CONTENT
+	  FROM ALARM
+	 WHERE MEM_ID = #{memId}
+	 ORDER BY ALARM_CREATED_AT
+  </select>
+
+  <!-- 단일 알림건 읽음 처리 (알림ID) -->
+  <update id="updateMarkRead" parameterType="int">
+    UPDATE ALARM
+       SET ALARM_IS_READ = 'Y'
+     WHERE ALARM_ID = #{alarmId}
+  </update>
+
+  <!-- 단일 알림건 삭제 처리 (알림ID) -->
+  <delete id="deleteById" parameterType="int">
+    DELETE FROM ALARM
+     WHERE ALARM_ID = #{alarmId}
+  </delete>
+
+  <!-- 전체 알림건 삭제 처리 (멤버ID) -->
+  <delete id="deleteAllByMember" parameterType="int">
+    DELETE FROM ALARM
+     WHERE MEM_ID = #{memId}
+  </delete>
+
+  <!-- 게시글에 새 댓글 알림받을 대상 챙겨오기 -->
+  <select id="getReplyToBoardTargetMemId" parameterType="kr.or.ddit.util.alarm.service.AlarmVO" resultType="int">
+	SELECT
+	       B.MEM_ID
+	  FROM BOARD B
+	  JOIN REPLY R ON B.BOARD_ID = R.BOARD_ID
+	 WHERE R.REPLY_ID = #{alarmTargetId}
+  </select>
+
+  <!-- 댓글에 새 댓글 알림받을 대상 챙겨오기 -->
+  <select id="getReplyToReplyTargetMemId" parameterType="kr.or.ddit.util.alarm.service.AlarmVO" resultType="int">
+	SELECT
+	       R1.MEM_ID
+	  FROM REPLY R1
+	  JOIN REPLY R2 ON R1.REPLY_ID = R2.REPLY_PARENT_ID
+	 WHERE R2.REPLY_ID = #{alarmTargetId}
+  </select>
+
+  <!-- 게시글에 좋아요 알림받을 대상 챙겨오기 -->
+  <select id="getLikeToBoardTargetMemId" parameterType="kr.or.ddit.util.alarm.service.AlarmVO" resultType="int">
+	SELECT
+	       B.MEM_ID
+	  FROM BOARD B
+	 WHERE B.BOARD_ID = #{alarmTargetId}
+  </select>
+
+  <!-- 댓글에 좋아요 알림받을 대상 챙겨오기 -->
+  <select id="getLikeToReplyTargetMemId" parameterType="kr.or.ddit.util.alarm.service.AlarmVO" resultType="int">
+	SELECT
+	       R.MEM_ID
+	  FROM REPLY R
+	 WHERE R.REPLY_ID = #{alarmTargetId}
+  </select>
+
+</mapper>

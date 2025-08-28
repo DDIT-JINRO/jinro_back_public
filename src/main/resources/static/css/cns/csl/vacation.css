@@ -1,0 +1,307 @@
+@charset "UTF-8";
+.vac-approve-panel {
+	height: 50%;
+}
+
+.vac-approve-container {
+	display: flex;
+	flex-direction: row;
+	gap: 3%;
+	flex-grow: 1;
+}
+
+.vac-list-panel {
+	flex: 1;
+	overflow: auto;
+}
+
+.vac-approve-content-left{
+	width: 25%;
+	text-align: -webkit-center;
+}
+
+.vac-approve-content-right{
+	width: 70%;
+}
+/* ──────────────────────────────────────────────────────────
+   기본정보 테이블 (오른쪽 패널)
+──────────────────────────────────────────────────────────*/
+.template-container {
+	flex-direction: column;
+}
+
+.panel-footer.button-group {
+	margin-top: auto;
+	display: flex;
+	justify-content: space-between;
+/* 	border-top: 1px solid #e0e0e0; */
+	padding-top: 16px;
+	padding-left: 20px;
+    padding-right: 20px;
+}
+
+.vac-approve-content-right-header .btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap; /* 버튼 텍스트가 줄바꿈되지 않게 합니다. */
+}
+
+.template-panel .btn-delete,
+.template-panel .btn-reset {
+	background: #C00003;
+	color: #fff;
+	margin-right: 8px;
+}
+
+.date-reset{
+	margin-top: 15px;
+}
+
+.template-panel .btn-delete:hover,
+.template-panel .btn-reset:hover {
+	background: #A00002;
+}
+
+.template-panel .btn-confirm {
+	background: #07223D;
+	color: #fff;
+	margin-left: 2%;
+}
+.template-panel .btn-save {
+	background: #07223D;
+	color: #fff;
+	margin-left: auto;
+}
+
+.template-panel .btn-confirm:hover,
+.template-panel .btn-save:hover {
+	background: #07223D;
+}
+
+/* 달력 중앙 맞추기용 */
+.flatpickr-input{
+	margin-top : 10px;
+}
+
+/* ck에디터 크기 맞추기용 */
+.ck-editor__editable[role="textbox"]{
+	height: 50%;
+}
+
+
+
+/* ──────────────────────────────────────────────────────────
+   리스트 테이블
+──────────────────────────────────────────────────────────*/
+.table-wrapper {
+	flex: 1;
+	overflow-y: auto;
+}
+
+.template-panel table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 8px;
+	font-size: 14px;
+}
+
+.template-panel th,
+.template-panel td {
+	padding: 10px;
+	text-align: left;
+}
+
+.template-panel thead th {
+	background: #fafafa;
+	font-weight: 600;
+	border-bottom: 2px solid #e0e0e0;
+}
+
+.template-panel tbody tr {
+	transition: background 0.2s;
+}
+
+.template-panel tbody tr:nth-child(odd) {
+	background: #fff;
+}
+
+.template-panel tbody tr:nth-child(even) {
+	background: #fcfcfc;
+}
+
+.template-panel tbody tr:hover {
+	background: #f0f8ff;
+}
+
+
+.form-group {
+	display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.form-group h3{
+	margin: 0;
+}
+
+/* ──────────────────────────────────────────────────────────
+   기존 첨부파일 리스트 스타일
+──────────────────────────────────────────────────────────*/
+.existing-files {
+	height: 100px;
+	list-style: none;
+	padding: 0;
+	margin: 8px 0;
+}
+
+.existing-files li {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 6px 10px;
+	margin-bottom: 4px;
+	border: 1px solid #e0e0e0;
+	border-radius: 6px;
+	background-color: #fafafa;
+	transition: background-color 0.2s ease;
+}
+
+.existing-files li:hover {
+	cursor: pointer;
+	background-color: #f5f9ff;
+	transform: none;
+}
+
+.existing-files li a {
+	color: #007bff;
+	text-decoration: none;
+	flex-grow: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-size: 14px;
+}
+
+.existing-files li a:hover {
+	color: #0056b3;
+	text-decoration: underline;
+}
+
+.existing-files li button {
+	background: #dc3545;
+	border: none;
+	color: #fff;
+	padding: 4px 12px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 12px;
+	transition: background-color 0.2s ease;
+}
+
+.existing-files li button:hover {
+	background: #c82333;
+	transform: none;
+	box-shadow: none;
+}
+
+.existing-files li div {
+	width: 100%;
+}
+
+
+/*페이지네이션 css*/
+.pagination {
+    padding: 10px 0 0 0;
+}
+
+
+/*_________________캘린더________________________
+______________________________________________*/
+
+.calGroup {
+    display: flex; 
+    align-items: center;       
+    justify-content: center;  
+    position: relative;       
+}
+
+.calGroup h3 {
+    margin: 0;            
+}
+
+.calGroup .date-reset {
+    position: absolute;    
+    left: 0;
+    margin: 8px; 
+    padding: 8px 16px;    
+    border-radius: 6px;     
+}
+
+
+/*_________________휴가 신청 양식 우측________________________
+______________________________________________*/
+
+.vac-approve-content-right-header{
+	display: flex;
+}
+
+.vac-approve-content-right-header {
+    display: flex;
+    align-items: center; /* 자식 요소들을 수직 가운데 정렬합니다. */
+    flex-wrap: wrap; /* 창 크기가 작아지면 다음 줄로 넘어가도록 합니다. */
+    gap: 10px 15px; /* 세로/가로 간격을 설정합니다. */
+}
+
+/* 모든 label 요소의 스타일 */
+.vac-approve-content-right-header label {
+    font-weight: 600;
+    white-space: nowrap; /* 글자가 줄바꿈되지 않도록 합니다. */
+}
+
+/* input 요소의 스타일 */
+.vac-approve-content-right-header input[type="text"] {
+    flex: 1; /* 남는 공간을 균등하게 차지하여 input의 너비를 맞춥니다. */
+    min-width: 100px; /* input의 최소 너비를 설정합니다. */
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box; /* 패딩과 보더가 너비에 포함되도록 합니다. */
+}
+
+/* 버튼 그룹 컨테이너 */
+.vac-approve-content-right-header .panel-footer.button-group {
+    /* 기존 스타일에서 너비와 패딩을 조정합니다. */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* 버튼을 오른쪽 끝으로 보냅니다. */
+    flex-shrink: 0; /* 버튼 그룹이 줄어들지 않도록 합니다. */
+    gap: 10px; /* 버튼 간의 간격을 설정합니다. */
+    margin-left: auto; /* 버튼 그룹을 맨 오른쪽으로 밀어냅니다. */
+    padding: 0; /* 불필요한 패딩 제거 */
+}
+
+/*_________________아래 카드 필터________________________
+______________________________________________*/
+
+.filter-group.filters {
+	display: flex;
+	align-items: center;
+    padding: 10px;
+    gap: 10px;
+}
+.sort-group{
+	display: flex;
+	align-items: center;
+    padding: 10px;
+    margin-left: 30px;
+    gap: 10px;
+}
+
+
+.filter-box {
+	height: 8%;
+}

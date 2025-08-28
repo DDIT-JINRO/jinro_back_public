@@ -1,0 +1,21 @@
+@charset "UTF-8";
+
+.form-radio-group {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+}
+
+.form-radio-group label {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	cursor: pointer;
+}
+
+.feedback-form__readonly-text {
+	font-size: 1rem;
+	color: #333;
+	padding: 8px 0;
+	display: inline-block;
+}

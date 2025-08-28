@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.pse.cat.service.impl.CareerAptitudeTestMapper">
+
+	<insert id="testSave"
+		parameterType="kr.or.ddit.pse.cat.service.TemporarySaveVO">
+		INSERT INTO TEMPORARY_SAVE (
+		TS_ID
+		, MEM_ID
+		, TS_CREATED_AT
+		, TS_CONTENT
+		, TS_TYPE
+		) VALUES (
+		(SELECT NVL(MAX(TS_ID),0)+1 FROM
+		TEMPORARY_SAVE)
+		, #{memId}
+		, SYSDATE
+		, #{tsContent}
+		, #{tsType}
+		)
+	</insert>
+
+	<select id="getSavingTest"
+		resultType="kr.or.ddit.pse.cat.service.TemporarySaveVO"
+		parameterType="kr.or.ddit.pse.cat.service.TemporarySaveVO">
+		SELECT MEM_ID, TS_CONTENT
+		FROM TEMPORARY_SAVE
+		WHERE TS_TYPE = #{tsType} AND MEM_ID = #{memId}
+	</select>
+	
+	<update id="delTempSaveTest" parameterType="kr.or.ddit.pse.cat.service.TemporarySaveVO">
+		DELETE FROM TEMPORARY_SAVE WHERE MEM_ID = #{memId} AND TS_TYPE = #{tsType}
+	</update>
+	
+	<insert id="insertAptitudeResult" parameterType="kr.or.ddit.pse.cat.service.AptitudeTestVO">
+		INSERT INTO APTITUDE_TEST (
+			AT_ID
+			, MEM_ID
+			, AT_TEST_NO
+			, AT_DATE
+			, AT_RESULT_URL
+			, AT_RESULT_TEXT
+		) VALUES (
+			(SELECT NVL(MAX(AT_ID), 0) + 1 FROM APTITUDE_TEST)
+			, #{memId}
+			, #{atTestNo}
+			, SYSDATE
+			, #{atResultUrl}
+			, #{atResultText}
+		)
+	</insert>
+	
+	<insert id="insertRecommendKeyword" parameterType="kr.or.ddit.admin.las.service.RecommendKeywordVO">
+		INSERT INTO RECOMMEND_KEYWORD (
+		    RK_ID
+		    , MEM_ID
+		    , RK_NAME
+		    , RK_CREATED_AT
+		) VALUES (
+		    (SELECT NVL(MAX(RK_ID), 0) + 1 FROM RECOMMEND_KEYWORD)
+		  , #{memId}
+		  , #{rkName}
+		  , SYSDATE
+		)
+	</insert>
+	
+</mapper>

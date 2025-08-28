@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.admin.cmg.service.impl.ContentsManagementMapper">
+
+	<select id="getEntList" resultType="kr.or.ddit.empt.enp.service.CompanyVO" parameterType="kr.or.ddit.empt.enp.service.CompanyVO" >
+		SELECT * FROM (
+			SELECT ROWNUM AS RNUM, B.*
+			FROM (
+					SELECT
+						  CP_ID
+						, CP_NAME
+						, CP_SCALE
+						, CP_LOCATION_X
+						, CP_LOCATION_Y
+						, CP_DESCRIPTION
+						, CP_WEBSITE
+						, CP_BUSINO
+						, CP_IMG_URL
+						, FILE_GROUP_ID
+						, CP_REGION
+					FROM
+						COMPANY
+					<where>
+						CP_ID IS NOT NULL
+						<if test="keyword != null and keyword != '' and status == 1">
+							AND (CP_NAME LIKE '%' || #{keyword} || '%' OR
+							CP_REGION LIKE '%' || #{keyword} || '%' )
+						</if>
+						<if test="keyword != null and keyword != '' and status == 2">
+							AND CP_NAME LIKE '%' || #{keyword} || '%'
+						</if>
+						<if test="keyword != null and keyword != '' and status == 3">
+							AND CP_REGION LIKE '%' || #{keyword} || '%'
+						</if>
+					</where>
+			ORDER BY CP_ID
+			) B
+			WHERE ROWNUM &lt;= #{endNo}
+			)
+			WHERE RNUM &gt;
+			#{startNo}
+	</select>
+
+	<select id="getAllEntList" parameterType="kr.or.ddit.empt.enp.service.CompanyVO" resultType="int">
+		SELECT COUNT(*)
+		FROM   COMPANY
+		<where>
+			CP_ID IS NOT NULL
+			<if test="keyword != null and keyword != '' and status == 1">
+				AND (CP_NAME LIKE '%' || #{keyword} || '%' OR
+				CP_REGION LIKE '%' || #{keyword} || '%' )
+			</if>
+			<if test="keyword != null and keyword != '' and status == 2">
+				AND CP_NAME LIKE '%' || #{keyword} || '%'
+			</if>
+			<if test="keyword != null and keyword != '' and status == 3">
+				AND CP_REGION LIKE '%' || #{keyword} || '%'
+			</if>
+		</where>
+	</select>
+
+	<select id="entDetail" parameterType="String" resultType="kr.or.ddit.empt.enp.service.CompanyVO">
+		SELECT
+		    A.CP_ID,
+		    A.CP_NAME,
+		    A.CP_SCALE,
+		    B.CC_NAME,
+		    A.CP_LOCATION_X,
+		    A.CP_LOCATION_Y,
+		    A.CP_DESCRIPTION,
+		    A.CP_WEBSITE,
+		    A.CP_BUSINO,
+		    A.CP_IMG_URL,
+		    A.FILE_GROUP_ID,
+		    A.CP_REGION
+		FROM
+		    COMPANY A
+		JOIN
+		    COM_CODE B ON A.CP_SCALE = B.CC_ID
+		WHERE
+		    A.CP_ID = #{cpId}
+	</select>
+
+	<select id="selectReviewList" parameterType="kr.or.ddit.empt.enp.service.InterviewReviewVO" resultType="kr.or.ddit.empt.enp.service.InterviewReviewVO">
+	SELECT X.*
+	FROM(
+		SELECT
+		    IR.IR_ID
+		    , IR.MEM_ID
+		    , IR.IR_TYPE
+		    , IR.TARGET_ID
+		    , IR.IR_CONTENT
+		    , IR.IR_CREATED_AT
+		    , IR.IR_MOD_AT
+		    , IR.IR_RATING
+		    , IR.IR_APPLICATION
+		    , IR.IR_INTERVIEW_AT
+		    , IR.IR_STATUS
+		    , CASE IR_TYPE
+		        WHEN 'G02001' THEN U.UNIV_NAME
+		        WHEN 'G02002' THEN C.CP_NAME
+		    END AS TARGET_NAME
+		    , M.MEM_NAME AS MEM_NAME
+		    , V.VERI_CREATED_AT
+		    , V.FILE_GROUP_ID
+		    , V.VERI_REASON
+		    , ROW_NUMBER() OVER(
+                ORDER BY
+                <choose>
+                    <when test="sortBy != null and sortBy != ''">
+                        ${sortBy} ${order}
+                    </when>
+                    <otherwise>
+                        IR_ID
+                    </otherwise>
+                </choose>
+            ) AS RNUM
+		FROM
+		    INTERVIEW_REVIEW IR
+		    JOIN MEMBER M ON IR.MEM_ID = M.MEM_ID
+		    LEFT JOIN COMPANY C ON IR.TARGET_ID = C.CP_ID
+		    LEFT JOIN UNIVERSITY U ON IR.TARGET_ID = U.UNIV_ID
+		    LEFT JOIN VERIFICATION V ON IR.IR_ID = V.VERI_ID
+		ORDER BY
+			<choose>
+				<when test="sortBy != null and sortBy != ''">
+					${sortBy} ${order}
+				</when>
+				<otherwise>
+					IR_ID
+				</otherwise>
+			</choose>
+			) X
+	WHERE
+		1 = 1
+	    <if test="keyword != null and keyword != ''">
+		    <choose>
+		        <when test = "status == 'target'">
+					AND X.TARGET_NAME LIKE '%' || #{keyword} || '%'
+		        </when>
+		        <when test = "status == 'writer'">
+					AND X.MEM_NAME LIKE '%' || #{keyword} || '%'
+		        </when>
+		        <when test = "status == 'content'">
+					AND X.IR_CONTENT LIKE '%' || #{keyword} || '%'
+		        </when>
+		        <otherwise>
+		        	AND (X.TARGET_NAME LIKE '%' || #{keyword} || '%' OR X.MEM_NAME LIKE '%' || #{keyword} || '%' OR X.IR_CONTENT LIKE '%' || #{keyword} || '%')
+		        </otherwise>
+		    </choose>
+	    </if>
+	OFFSET #{startRow} - 1 ROWS FETCH NEXT #{endRow} - #{startRow} + 1 ROWS ONLY
+	</select>
+
+	<select id="selectReviewListTotal" parameterType="kr.or.ddit.empt.enp.service.InterviewReviewVO" resultType="int">
+	SELECT COUNT(*)
+	FROM(
+		SELECT
+		    IR.IR_ID
+		    , IR.MEM_ID
+		    , IR.IR_TYPE
+		    , IR.TARGET_ID
+		    , IR.IR_CONTENT
+		    , IR.IR_CREATED_AT
+		    , IR.IR_MOD_AT
+		    , IR.IR_RATING
+		    , IR.IR_APPLICATION
+		    , IR.IR_INTERVIEW_AT
+		    , IR.IR_STATUS
+		    , CASE IR_TYPE
+		        WHEN 'G02001' THEN U.UNIV_NAME
+		        WHEN 'G02002' THEN C.CP_NAME
+		    END AS TARGET_NAME
+		    , M.MEM_NAME AS MEM_NAME
+		    , V.VERI_CREATED_AT
+		    , V.FILE_GROUP_ID
+		    , V.VERI_REASON
+		    , ROW_NUMBER() OVER(
+                ORDER BY
+                <choose>
+                    <when test="sortBy != null and sortBy != ''">
+                        ${sortBy} ${order}
+                    </when>
+                    <otherwise>
+                        IR_ID
+                    </otherwise>
+                </choose>
+            ) AS RNUM
+		FROM
+		    INTERVIEW_REVIEW IR
+		    JOIN MEMBER M ON IR.MEM_ID = M.MEM_ID
+		    LEFT JOIN COMPANY C ON IR.TARGET_ID = C.CP_ID
+		    LEFT JOIN UNIVERSITY U ON IR.TARGET_ID = U.UNIV_ID
+		    LEFT JOIN VERIFICATION V ON IR.IR_ID = V.VERI_ID
+		ORDER BY
+			<choose>
+				<when test="sortBy != null and sortBy != ''">
+					${sortBy} ${order}
+				</when>
+				<otherwise>
+					IR_ID
+				</otherwise>
+			</choose>
+			) X
+	WHERE
+		1 = 1
+	    <if test="keyword != null and keyword != ''">
+		    <choose>
+		        <when test = "status == 'target'">
+					AND X.TARGET_NAME LIKE '%' || #{keyword} || '%'
+		        </when>
+		        <when test = "status == 'writer'">
+					AND X.MEM_NAME LIKE '%' || #{keyword} || '%'
+		        </when>
+		        <when test = "status == 'content'">
+					AND X.IR_CONTENT LIKE '%' || #{keyword} || '%'
+		        </when>
+		        <otherwise>
+		        	AND (X.TARGET_NAME LIKE '%' || #{keyword} || '%' OR X.MEM_NAME LIKE '%' || #{keyword} || '%' OR X.IR_CONTENT LIKE '%' || #{keyword} || '%')
+		        </otherwise>
+		    </choose>
+	    </if>
+	</select>
+
+	<select id="selectIrStatusList" resultType="map">
+		SELECT
+		    CC_ID
+		    , CC_NAME
+		FROM
+		    COM_CODE
+		WHERE
+		    CL_CODE = 'S06'
+	</select>
+
+	<select id="selectReviewDetail" parameterType="String" resultType="kr.or.ddit.empt.enp.service.InterviewReviewVO">
+		SELECT
+		    IR.IR_ID
+		    , IR.MEM_ID
+		    , IR.IR_TYPE
+		    , IR.TARGET_ID
+		    , IR.IR_CONTENT
+		    , IR.IR_CREATED_AT
+		    , IR.IR_MOD_AT
+		    , IR.IR_RATING
+		    , IR.IR_APPLICATION
+		    , IR.IR_INTERVIEW_AT
+		    , IR.IR_STATUS
+		    , CASE IR_TYPE
+		        WHEN 'G02001' THEN U.UNIV_NAME
+		        WHEN 'G02002' THEN C.CP_NAME
+		    END AS TARGET_NAME
+		    , M.MEM_NAME AS MEM_NAME
+		    , V.VERI_CREATED_AT
+		    , V.FILE_GROUP_ID
+		    , V.VERI_REASON
+		FROM
+		    INTERVIEW_REVIEW IR
+		    JOIN MEMBER M ON IR.MEM_ID = M.MEM_ID
+		    LEFT JOIN COMPANY C ON IR.TARGET_ID = C.CP_ID
+		    LEFT JOIN UNIVERSITY U ON IR.TARGET_ID = U.UNIV_ID
+		    LEFT JOIN VERIFICATION V ON IR.IR_ID = V.VERI_ID
+		WHERE
+			IR_ID = #{irId}
+	</select>
+
+	<update id="updateInterviewReviewStatus" parameterType="kr.or.ddit.empt.enp.service.InterviewReviewVO">
+	    UPDATE INTERVIEW_REVIEW
+	    SET
+	        IR_STATUS = #{irStatus}
+	    WHERE
+	        IR_ID = #{irId}
+	</update>
+
+	<update id="updateVerification" parameterType="kr.or.ddit.empt.enp.service.InterviewReviewVO">
+	    UPDATE VERIFICATION
+	    <set>
+	        VERI_REASON = #{veriReason},
+	        VERI_STATUS = #{irStatus},
+	        VERI_CATEGORY =
+	        <choose>
+	            <when test="irType == 'G02002'">
+	                'G38001'
+	            </when>
+	            <when test="irType == 'G02001'">
+	                'G38002'
+	            </when>
+	        </choose>
+	    </set>
+	    WHERE
+	        VERI_ID = #{irId}
+	</update>
+</mapper>

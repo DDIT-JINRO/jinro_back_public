@@ -1,0 +1,131 @@
+@charset "UTF-8";
+
+.admin-side-sidebar {
+	width: 260px;
+	background-color: #07223D;
+	color: white;
+	height: 100vh;
+	padding: 0;
+	float: left;
+	transform: translateX(-100%);
+	transition: transform 0.5s ease;
+	position: relative;
+	z-index: 999;
+}
+
+.admin-side-sidebar.active {
+	transform: translateX(0);
+}
+
+.admin-side-logo {
+	padding: 50px 0 20px 0;
+	justify-content: center;
+
+}
+
+.admin-side-logo-text {
+	padding: 0 0 20px 60px;
+}
+
+.admin-side-logo-container {
+	display: flex;
+	justify-content: center;
+
+}
+
+.admin-side-menu {
+	list-style: none;
+	padding: 0;
+	padding-top: 30px;
+}
+
+.admin-side-menu-item {
+	padding-bottom: 30px;
+}
+
+.admin-side-menu-item.open {
+	width: 75%;
+	background-color: rgba(1, 174, 188, 0.22);
+	color: #01AEBC;
+	box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.admin-side-mainMove a{
+	width: 100%;
+	height: 50px;
+	background-color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-decoration: none;
+}
+
+.admin-side-mainMove:hover {
+	cursor: pointer;
+}
+
+.admin-side-portaltext {
+	color : black;
+	font-size: 15px;
+	font-weight: bold;
+}
+
+.admin-side-mainMove img {
+	width: 15px;
+	height: 15px;
+	padding-right: 10px;
+}
+
+.admin-side-menu-item>a {
+	display: block;
+	padding: 10px 10px 10px 30px;
+	color: white;
+	text-decoration: none;
+	font-size: 14px;
+	cursor: pointer;
+	border-top: 1px solid #848EFB;
+	border-right: 1px solid #848EFB;
+	border-bottom: 1px solid #848EFB;
+	width: 60%;
+	border-top-right-radius: 20px;
+	border-bottom-right-radius: 20px;
+	transition: all 0.3s ease;
+}
+
+.admin-side-menu-item>a:hover {
+	width: 75%;
+	background-color: rgba(1, 174, 188, 0.22);
+	color: #01AEBC;
+	box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.admin-side-submenu {
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.3s ease;
+	padding-left: 15px;
+/* 	padding-top: 15px; */
+	list-style: none;
+}
+
+.admin-side-submenu.open {
+	max-height: 500px;
+}
+
+.admin-side-submenu li a {
+	font-size: 14px;
+	color: #e0e0e0;
+	display: block;
+	padding: 6px 10px;
+	transition: all 0.3s ease;
+	border-radius: 8px;
+	text-decoration: none;
+}
+
+.admin-side-submenu li a:hover {
+	background-color: #1b3b5c;
+	color: white;
+	padding-left: 20px;
+	transform: translateX(5px);
+}
+

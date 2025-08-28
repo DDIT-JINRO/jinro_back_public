@@ -1,0 +1,215 @@
+@charset "UTF-8";
+
+/* =================================================== */
+/* 상담 예약 상세 페이지 (공통 테마 적용) */
+/* =================================================== */
+
+/* 정보 입력 섹션 헤더 */
+.reserveHeader {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 16px;
+}
+
+.reserveHeader h3 {
+	font-size: 18px; /* 테마에 맞게 폰트 크기 조정 */
+	font-weight: 600;
+	color: #1f2937; /* 테마에 맞게 폰트 색상 조정 */
+	margin: 0;
+}
+
+.dept-asterisk {
+	width: 20px;
+	height: 20px;
+	background-image: url('/images/imtintrvw/asterisk.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+/* 개인정보, 신청동기 등을 감싸는 흰색 패널 */
+.input-section, .inputDescription {
+	background-color: #fff;
+	border: 1px solid #e5e7eb; /* 테두리 스타일 통일 */
+	border-radius: 12px; /* 둥근 모서리 통일 */
+	padding: 24px;
+	margin-bottom: 24px;
+}
+
+/* 개인정보 입력 필드들을 2열로 정렬 */
+.input-section {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr); /* 2열 그리드 */
+	gap: 20px 24px; /* 세로, 가로 간격 */
+}
+
+/* 개별 입력 그룹 (레이블 + 입력 필드) */
+.input-group {
+	display: flex;
+	flex-direction: column; /* 레이블과 인풋을 세로로 배치 */
+	gap: 8px;
+}
+
+.input-group label, .inputDescription label {
+	font-weight: 600;
+	color: #374151; /* 레이블 색상 통일 */
+	font-size: 14px;
+}
+
+/* 입력 필드 (input, textarea) 공통 스타일 */
+.input-group input, .inputDescription textarea {
+	width: 100%;
+	padding: 12px 16px;
+	font-size: 16px;
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	background-color: #fff;
+	box-sizing: border-box;
+	font-family: 'Noto Sans KR', sans-serif;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* 읽기 전용 입력 필드 스타일 */
+.input-group input[readonly] {
+	background-color: #f9fafb; /* 비활성 배경색 통일 */
+	color: #4b5563;
+	pointer-events: none;
+}
+
+/* 신청 동기 입력창 */
+.inputDescription textarea {
+	resize: vertical;
+	min-height: 200px;
+}
+
+.inputDescription textarea:focus {
+	outline: none;
+	border-color: #7881f5;
+	box-shadow: 0 0 0 3px rgba(120, 129, 245, 0.1);
+}
+
+/* 예약 확정 버튼 (테마 적용) */
+#submitBtn {
+	display: block;
+	width: 100%;
+	max-width: 320px; /* 최대 너비 조정 */
+	margin: 40px auto 0;
+	padding: 14px 28px;
+	background-color: #7881f5;
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	font-size: 16px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+}
+
+#submitBtn:hover {
+	background-color: #6366f1;
+}
+
+/* 반응형 - 화면이 768px보다 작을 때 1열로 변경 */
+@media ( max-width : 768px) {
+	.input-section {
+		grid-template-columns: 1fr; /* 1열로 변경 */
+	}
+}
+
+#autoCompleteBtn {
+  right: 15px; 
+  top: 15px; /* 상단에서 15px 떨어진 곳에 배치합니다. */
+  position: absolute;
+  width: 90px;
+  height: 35px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: #007bff;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s, transform 0.2s;
+}
+#autoCompleteBtn:hover {
+  background: #0056b3;
+  transform: scale(1.05);
+}
+
+
+/* ===== Modal ===== */
+.ai-modal-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(20, 24, 28, 0.45);
+	display: none;
+	z-index: 3000; /* 캐릭터 이미지 등 어떤 요소보다 위로 (요청 이력 반영) */
+}
+
+.ai-modal {
+	position: fixed;
+	left: 50%;
+	top: 80px; /* 원하는 상단 위치 */
+	transform: translateX(-50%);
+	width: 420px;
+	max-width: 90vw;
+	background: #fff;
+	border-radius: 16px;
+	padding: 20px;
+	display: none;
+	z-index: 3010;
+	box-shadow: 0 30px 90px rgba(0, 0, 0, 0.25), 0 8px 24px
+		rgba(0, 0, 0, 0.2);
+}
+
+.ai-modal h4 {
+	margin: 2px 0 16px;
+	font-size: 18px;
+	font-weight: 800;
+	text-align: center;	
+}
+
+.ai-modal p {
+	color: #4f5965;
+	line-height: 1.5;
+}
+
+.ai-modal .row {
+	display: flex;
+	gap: 10px;
+	margin-top: 16px;
+	justify-content: flex-end;
+}
+
+.ai-kv {
+	margin: 10px 0;
+	background: #f8fafb;
+	border: 1px dashed #e4e9ee;
+	border-radius: 12px;
+	padding: 10px 12px;
+	color: #47515b;
+}
+
+.ai-kv > div + div {
+    margin-top: 12px;
+}
+
+.btn {
+    appearance: none;
+    border: none;
+    border-radius: 12px;
+    padding: 11px 18px;
+    font-weight: 800;
+    cursor: pointer;
+    background: #6a82fb;
+    color: #fff;
+    transition: all .15s ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.btn.secondary {
+    background: #f3f5f7;
+    color: #202427;
+}

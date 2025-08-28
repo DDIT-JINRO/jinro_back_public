@@ -1,0 +1,529 @@
+@charset "UTF-8";
+
+/* ==================================
+   Block: Feedback Form
+   ================================== */
+.feedback-form__header {
+	margin-bottom: 20px;
+	text-align: center;
+}
+
+.feedback-form__main-title {
+	margin-bottom: 8px;
+}
+
+.feedback-form__subtitle {
+	color: #666;
+	font-size: 0.95rem;
+}
+
+.feedback-form__body {
+	background-color: #fff;
+	border: 1px solid #e5e7eb;
+	border-radius: 12px;
+	padding: 32px;
+}
+
+.feedback-form__group-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+}
+
+.feedback-form__required-info {
+	font-size: 0.8em;
+	color: #666;
+}
+
+.feedback-form__table {
+	width: 100%;
+	border-collapse: collapse;
+	border-top: 2px solid #333;
+	margin-bottom: 30px;
+}
+
+.feedback-form__table th, .feedback-form__table td {
+	padding: 15px;
+	border-bottom: 1px solid #ddd;
+	vertical-align: middle;
+}
+
+.feedback-form__table th {
+	width: 180px;
+	background-color: #f7f7f7;
+	text-align: left;
+	font-weight: 600;
+}
+
+.feedback-form__required {
+	color: red;
+	margin-left: 4px;
+}
+
+.feedback-form__notice {
+	font-size: 14px;
+	color: #333;
+	margin: 0 0 10px 0;
+	line-height: 1.5;
+}
+
+.feedback-form__notice-ex {
+	display: block;
+	font-size: 13px;
+	color: #666;
+	margin-top: 5px;
+}
+.feedback-form__readonly-text {
+    font-size: 1rem;
+    color: #333;
+    padding: 8px 0;
+    display: inline-block;
+}
+
+/* --- 입력 필드 그룹 --- */
+.input-group {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.input-group__text-input, .input-group__textarea {
+	padding: 0 12px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	font-family: inherit;
+	font-size: 1rem;
+}
+
+.input-group__text-input {
+	height: 38px;
+	width: 220px;
+}
+
+.input-group__textarea {
+	width: 100%;
+	min-height: 120px;
+	padding: 12px;
+	line-height: 1.5;
+	resize: vertical;
+	box-sizing: border-box;
+}
+
+.input-group__button {
+	padding: 8px 12px;
+	background-color: #fff;
+	border: 1px solid #555;
+	color: #333;
+	border-radius: 4px;
+	cursor: pointer;
+	height: 38px;
+	font-weight: 500;
+}
+
+.input-group--textarea {
+	position: relative;
+}
+
+/* --- 글자 수 카운터 --- */
+.char-counter {
+	position: absolute;
+	bottom: 8px;
+	right: 12px;
+	font-size: 13px;
+	color: #666;
+}
+
+.char-counter__current {
+	color: #007bff;
+}
+
+/* --- 폼 액션 버튼 --- */
+.feedback-form__actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+	margin-top: 20px;
+}
+
+.feedback-form__button {
+	width: 80px;
+	border: none;
+	border-radius: 8px;
+	color: white;
+	font-weight: 600;
+	font-size: 14px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	height: 40px;
+}
+
+.feedback-form__button--submit {
+	background-color: #7881f5;
+}
+
+.feedback-form__button--submit:hover {
+	background-color: #5c68d9;
+}
+
+.feedback-form__button--cancel {
+	background-color: #6c757d;
+}
+
+.feedback-form__button--cancel:hover {
+	background-color: #5a6268;
+}
+
+/* ==================================
+   Block: Rating Input (별점)
+   ================================== */
+.rating-input {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.rating-input__stars {
+	display: flex;
+	gap: 2px;
+	font-size: 24px;
+	cursor: pointer;
+}
+
+.rating-input__star {
+	color: #ddd;
+	transition: color 0.2s ease;
+	user-select: none;
+}
+
+.rating-input__star:hover, .rating-input__star.is-hover,
+	.rating-input__star.is-active {
+	color: #ffc107;
+}
+
+.rating-input__text {
+	font-size: 14px;
+	color: #666;
+	min-width: 80px;
+}
+
+.rating-input__text.is-selected {
+	color: #333;
+	font-weight: 500;
+}
+
+/* ==================================
+   Block: File Uploader
+   ================================== */
+.file-uploader {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.file-uploader__input {
+	display: none;
+}
+
+.file-uploader__button {
+	display: inline-flex;
+	align-items: center;
+	padding: 6px 14px;
+	background-color: #f8f9fa;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+.file-uploader__button:hover {
+	background-color: #e9ecef;
+}
+
+.file-uploader__filename {
+	display: none;
+	font-size: 13px;
+	color: #666;
+}
+
+.file-uploader__filename.is-active {
+	display: block;
+}
+
+/* ==================================
+   Block: Search Modal
+   ================================== */
+.search-modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.6);
+	display: none;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+}
+
+.search-modal.is-active {
+	display: flex;
+}
+
+.search-modal__content {
+	background-color: white;
+	padding: 30px 40px;
+	border-radius: 12px;
+	width: 100%;
+	max-width: 600px;
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	max-height: 80vh;
+}
+
+.search-modal__title {
+	margin-top: 0;
+}
+
+.search-modal__close-button {
+	position: absolute;
+	top: 10px;
+	right: 15px;
+	background: none;
+	border: none;
+	font-size: 2rem;
+	color: #999;
+	cursor: pointer;
+}
+
+.search-modal__bar {
+	display: flex;
+	gap: 10px;
+	margin: 20px 0;
+}
+
+.search-modal__input {
+	flex: 1;
+	padding: 12px;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	font-size: 1rem;
+}
+
+.search-modal__button {
+	padding: 10px 20px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: 600;
+	background-color: #7881f5;
+	color: white;
+	border: none;
+}
+
+.search-modal__list-container {
+	flex: 1;
+	overflow-y: auto;
+	border: 1px solid #eee;
+	border-radius: 8px;
+}
+
+.search-modal__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.search-modal__list-item {
+	padding: 15px 20px;
+	border-bottom: 1px solid #eee;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.search-modal__list-item:hover {
+	background-color: #f8f9ff;
+}
+
+.search-modal__list-item.is-selected {
+	background-color: #7881f5;
+	color: white;
+}
+
+.search-modal__list-item-name {
+	font-weight: 600;
+}
+
+.search-modal__list-item-info {
+	font-size: 0.85rem;
+	color: #666;
+}
+
+.search-modal__list-item.is-selected .search-modal__list-item-info {
+	color: rgba(255, 255, 255, 0.8);
+}
+
+.search-modal__pagination {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 15px;
+	padding: 15px 0;
+	border-top: 1px solid #eee;
+}
+
+.search-modal__page-button {
+	padding: 8px 16px;
+	border: 1px solid #ddd;
+	background-color: white;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 0.9rem;
+	transition: all 0.2s ease;
+}
+
+.search-modal__page-button:hover:not(:disabled) {
+	background-color: #f5f5f5;
+	border-color: #ccc;
+}
+
+.search-modal__page-button:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.search-modal__actions {
+	display: flex;
+	gap: 12px;
+	justify-content: center;
+	margin-top: 20px;
+}
+
+.search-modal__action-button {
+	flex: 1;
+	max-width: 120px;
+	padding: 10px 20px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: 600;
+	border: 1px solid;
+}
+
+.search-modal__action-button--confirm {
+	background-color: #7881f5;
+	color: white;
+	border-color: transparent;
+}
+
+.search-modal__action-button--confirm:disabled {
+	background-color: #ccc;
+	cursor: not-allowed;
+}
+
+.search-modal__action-button--cancel {
+	background-color: white;
+	color: #666;
+	border-color: #ddd;
+}
+
+/* 로딩 및 오류 메시지 스타일 */
+.error-message,
+.empty-message {
+	padding: 30px 20px;
+	text-align: center;
+	color: #666;
+	font-style: italic;
+	background-color: #f8f9fa;
+	border-radius: 8px;
+	margin: 10px;
+}
+
+.error-message {
+	background-color: #ffebee;
+	color: #d32f2f;
+}
+
+.empty-message {
+	background-color: #fafafa;
+	color: #757575;
+}
+
+/* 검색 입력 필드 포커스 스타일 개선 */
+.search-modal__input:focus {
+	outline: none;
+	border-color: #7881f5;
+	box-shadow: 0 0 0 3px rgba(120, 129, 245, 0.1);
+	transition: all 0.2s ease;
+}
+
+/* 검색 버튼 로딩 상태 */
+.search-modal__button.loading {
+	background-color: #bbb;
+	cursor: not-allowed;
+	position: relative;
+	overflow: hidden;
+}
+
+.search-modal__button.loading::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+	animation: loading-shimmer 1.5s infinite;
+}
+
+@keyframes loading-shimmer {
+	0% { left: -100%; }
+	100% { left: 100%; }
+}
+
+/* ==================================
+   반응형 스타일
+   ================================== */
+@media ( max-width : 768px) {
+	.feedback-form__table th {
+		width: 120px;
+	}
+	.input-group {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	.input-group__text-input {
+		width: 100%;
+		box-sizing: border-box;
+	}
+	.rating-input {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 5px;
+	}
+	.search-modal__content {
+		max-width: 90vw;
+		margin: 20px;
+	}
+}
+
+#autoCompleteBtn {
+  right: 15px; 
+  top: 15px; /* 상단에서 15px 떨어진 곳에 배치합니다. */
+  position: absolute;
+  width: 90px;
+  height: 35px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: #007bff;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s, transform 0.2s;
+}
+#autoCompleteBtn:hover {
+  background: #0056b3;
+  transform: scale(1.05);
+}

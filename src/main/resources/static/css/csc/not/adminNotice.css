@@ -1,0 +1,380 @@
+@charset "UTF-8";
+
+
+
+/* ──────────────────────────────────────────────────────────
+   컨테이너 & 패널 공통
+──────────────────────────────────────────────────────────*/
+.template-container {
+	display: flex;
+	gap: 24px;
+	height: 90vh;
+	box-sizing: border-box;
+}
+
+.template-panel {
+	background: #fff;
+	border: 1px solid #e0e0e0;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	min-width: 0;
+}
+
+.template-panel[style*="flex: 1.2"] {
+	flex: 1.2;
+}
+
+.template-panel[style*="flex: 1.5"] {
+	flex: 1.5;
+}
+
+.template-panel.list-panel {
+	display: flex;
+	flex-direction: column;
+}
+
+/* ──────────────────────────────────────────────────────────
+   패널 헤더
+──────────────────────────────────────────────────────────*/
+.panel-header {
+	background: #07223D;
+	color: #fff;
+	font-size: 18px;
+	font-weight: 600;
+	padding: 12px 16px;
+	border-radius: 8px 8px 0 0;
+	margin: -20px -20px 16px;
+	box-sizing: border-box;
+}
+
+/* ──────────────────────────────────────────────────────────
+   필터박스 (오른쪽 정렬)
+──────────────────────────────────────────────────────────*/
+.filter-box {
+	margin-top: 10px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	justify-content: flex-end;
+	margin-bottom: 12px;
+}
+
+.filter-box select,
+.filter-box input[type="text"] {
+	padding: 6px 10px;
+	font-size: 14px;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	outline: none;
+	box-sizing: border-box;
+}
+
+.filter-box input[type="text"] {
+	flex: 1;
+}
+
+.filter-box .btn-save {
+	padding: 6px 14px;
+	background: #07223D;
+	color: #fff;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 14px;
+	margin-left: auto;
+}
+
+.filter-box .btn-save:hover {
+	background: #07223D;
+}
+
+/* ──────────────────────────────────────────────────────────
+   리스트 테이블
+──────────────────────────────────────────────────────────*/
+.table-wrapper {
+	flex: 1;
+	overflow-y: auto;
+}
+
+.template-panel table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 8px;
+	font-size: 14px;
+}
+
+.template-panel th,
+.template-panel td {
+	padding: 10px;
+	text-align: left;
+}
+
+.template-panel thead th {
+	background: #fafafa;
+	font-weight: 600;
+	border-bottom: 2px solid #e0e0e0;
+}
+
+.template-panel tbody tr {
+	transition: background 0.2s;
+}
+
+.template-panel tbody tr:nth-child(odd) {
+	background: #fff;
+}
+
+.template-panel tbody tr:nth-child(even) {
+	background: #fcfcfc;
+}
+
+.template-panel tbody tr:hover {
+	background: #f0f8ff;
+}
+
+/* ──────────────────────────────────────────────────────────
+   기본정보 테이블 (오른쪽 패널)
+──────────────────────────────────────────────────────────*/
+.template-panel[style*="flex: 1.5"] > form {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	box-sizing: border-box;
+}
+
+.panel-footer.button-group {
+	margin-top: auto;
+	display: flex;
+	justify-content: flex-end;
+	border-top: 1px solid #e0e0e0;
+	padding-top: 16px;
+}
+
+.template-panel thead th.th-cnt {
+	text-align: right;
+}
+
+/* ──────────────────────────────────────────────────────────
+   상세/작성 폼
+──────────────────────────────────────────────────────────*/
+.template-panel form > div {
+	margin-bottom: 16px;
+	display: flex;
+	align-items: center;
+}
+
+.template-panel form label {
+	width: 100px;
+	font-size: 14px;
+	color: #333;
+}
+
+.template-panel form input[type="text"],
+.template-panel form textarea {
+	flex: 1;
+	padding: 6px 10px;
+	font-size: 14px;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	box-sizing: border-box;
+}
+
+.template-panel form textarea {
+	height: 180px;
+}
+
+/* ──────────────────────────────────────────────────────────
+   버튼 그룹 (삭제/초기화/저장)
+──────────────────────────────────────────────────────────*/
+.template-panel .btn-delete,
+.template-panel .btn-reset,
+.template-panel .btn-save {
+	padding: 8px 16px;
+	font-size: 14px;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.template-panel .btn-delete,
+.template-panel .btn-reset {
+	background: #C00003;
+	color: #fff;
+	margin-right: 8px;
+}
+
+.template-panel .btn-delete:hover,
+.template-panel .btn-reset:hover {
+	background: #A00002;
+}
+
+.template-panel .btn-save {
+	background: #07223D;
+	color: #fff;
+	margin-left: auto;
+}
+
+.template-panel .btn-save:hover {
+	background: #07223D;
+}
+
+/* ──────────────────────────────────────────────────────────
+   하단 페이지네이션 고정
+──────────────────────────────────────────────────────────*/
+.card-footer {
+	margin-top: auto;
+}
+
+.panel-footer.pagination {
+	display: flex;
+	flex-wrap: nowrap;
+	list-style: none;
+	gap: 0.5rem;
+	justify-content: center;
+	align-items: center;
+	padding: 1rem 0;
+}
+
+.panel-footer.pagination a {
+	padding: 0.4rem 0.75rem;
+	border-radius: 5px;
+	text-decoration: none;
+	color: black;
+	font-weight: 500;
+}
+
+.panel-footer.pagination a:hover {
+	background-color: #f0f0f0;
+}
+
+.panel-footer.pagination .active {
+	background-color: #2C2C2C;
+	color: white;
+	pointer-events: none;
+}
+
+.panel-footer.pagination .disabled {
+	color: #757575;
+	pointer-events: none;
+}
+
+/* ──────────────────────────────────────────────────────────
+   CKEditor 개선: label 포함 정렬 및 너비 고정
+──────────────────────────────────────────────────────────*/
+.template-panel form .noticeFormGroup,
+.template-panel form > div.ck-row {
+	display: flex;
+	align-items: flex-start;
+	margin-bottom: 16px;
+}
+
+.template-panel form > div.ck-row label {
+	width: 100px;
+	font-size: 14px;
+	color: #333;
+	padding-top: 10px;
+}
+
+.template-panel form > div.ck-row .ck-editor {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.template-panel .ck-editor .ck-editor__editable_inline {
+	width: 100%;
+	min-height: 300px;
+	max-height: 320px;
+	overflow-y: auto;
+	box-sizing: border-box;
+	padding: 6px 10px;
+}
+
+.template-panel .ck-editor .ck-content {
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	word-break: break-word;
+	overflow-x: auto;
+}
+
+.template-panel .ck-editor .ck-content pre {
+	white-space: pre;
+	overflow-x: auto;
+}
+
+/* 리스트 스타일 제거 */
+li {
+	list-style-type: none;
+}
+
+/* ──────────────────────────────────────────────────────────
+   기존 첨부파일 리스트 스타일
+──────────────────────────────────────────────────────────*/
+.existing-files {
+	height: 100px;
+	overflow: scroll;
+	list-style: none;
+	padding: 0;
+	margin: 8px 0;
+}
+
+.existing-files li {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 6px 10px;
+	margin-bottom: 4px;
+	border: 1px solid #e0e0e0;
+	border-radius: 6px;
+	background-color: #fafafa;
+	transition: background-color 0.2s ease;
+}
+
+.existing-files li:hover {
+	background-color: #f5f9ff;
+	transform: none;
+}
+
+.existing-files li a {
+	color: #007bff;
+	text-decoration: none;
+	flex-grow: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-size: 14px;
+}
+
+.existing-files li a:hover {
+	color: #0056b3;
+	text-decoration: underline;
+}
+
+.existing-files li button {
+	background: #dc3545;
+	border: none;
+	color: #fff;
+	padding: 4px 12px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 12px;
+	transition: background-color 0.2s ease;
+}
+
+.existing-files li button:hover {
+	background: #c82333;
+	transform: none;
+	box-shadow: none;
+}
+
+.noticeFormGroup > div > label,
+.noticeFormGroup > label {
+	display: block;
+	font-weight: bold;
+	margin-bottom: 4px;
+	font-size: 14px;
+}

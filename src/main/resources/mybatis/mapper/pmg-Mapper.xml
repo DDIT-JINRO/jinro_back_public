@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.admin.pmg.service.impl.PenaltyManagementMapper">
+
+	<!-- 오늘 접수된 신고 수 -->
+    <select id="selectTodayReportCount" resultType="Long">
+        SELECT COUNT(*)
+        FROM report
+        WHERE TRUNC(REPORT_CREATED_AT) = TRUNC(SYSDATE)
+    </select>
+
+    <!-- 처리 대기중 신고 수 -->
+    <select id="selectPendingReportCount" resultType="Long">
+        SELECT COUNT(*)
+        FROM report
+        WHERE REPORT_STATUS = 'S03001'
+    </select>
+
+    <!-- 전체 회원 수 -->
+    <select id="selectTotalMemberCount" resultType="Long">
+        SELECT COUNT(*)
+        FROM member
+    </select>
+
+    <!-- 정지된 회원 수 -->
+    <select id="selectSuspendedMemberCount" resultType="Long">
+        SELECT COUNT(DISTINCT mp.MEM_ID)
+        FROM member_penalty mp
+        WHERE mp.MP_TYPE = 'G14002'
+          AND mp.MP_COMPLETE_AT > SYSDATE
+    </select>
+
+    <!-- 제재 유형 분포 (일별/월별 통합) -->
+	<select id="selectPenaltyTypeStats" parameterType="map" resultType="map">
+	    WITH penalty_types AS (
+	        SELECT '부적절한 게시물' AS penaltyType FROM dual UNION ALL
+	        SELECT '욕설 및 비방' FROM dual UNION ALL
+	        SELECT '혐오 및 차별적 표현' FROM dual UNION ALL
+	        SELECT '폭력적, 위협적 내용' FROM dual UNION ALL
+	        SELECT '허위 사실 유포' FROM dual UNION ALL
+	        SELECT '스팸 및 광고' FROM dual UNION ALL
+	        SELECT '불법적 홍보' FROM dual UNION ALL
+	        SELECT '타인에게 불쾌감을 주는 행위' FROM dual UNION ALL
+	        SELECT '커뮤니티 이용 방해' FROM dual UNION ALL
+	        SELECT '기타 운영 정책 위반' FROM dual
+	    ),
+	    filtered_penalty AS (
+	        SELECT mp.MP_WARN_REASON, mp.MEM_ID
+	        FROM member_penalty mp
+            INNER JOIN member m ON mp.MEM_ID = m.MEM_ID
+	        <where>
+	            AND EXTRACT(YEAR FROM mp.MP_WARN_DATE) = EXTRACT(YEAR FROM SYSDATE)
+
+	            <!-- 일간 필터링 -->
+	            <if test="filterType == 'daily'">
+	                AND TRUNC(mp.MP_WARN_DATE) = TRUNC(SYSDATE)
+	            </if>
+
+	            <!-- 월간 필터링 -->
+	            <if test="filterType == 'monthly'">
+	                <if test="month != null">
+	                    AND EXTRACT(MONTH FROM mp.MP_WARN_DATE) = EXTRACT(MONTH FROM SYSDATE)
+	                </if>
+	            </if>
+
+	            <!-- 기간설정 -->
+	            <if test="filterType == 'selectDays'">
+	                <if test="startDate != null and startDate != ''">
+	                    AND TRUNC(mp.MP_WARN_DATE) >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+	                </if>
+	                <if test="endDate != null and endDate != ''">
+	                    <![CDATA[
+	                    AND TRUNC(mp.MP_WARN_DATE) <= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+	                    ]]>
+	                </if>
+	            </if>
+
+	            <!-- 성별 필터링 -->
+	            <if test="gender != null and gender eq 'G11001'">
+	                AND m.MEM_GEN = 'G11001'
+	            </if>
+	            <if test="gender != null and gender eq 'G11002'">
+	                AND m.MEM_GEN = 'G11002'
+	            </if>
+
+	            <if test="ageGroup != null and ageGroup != '' and ageGroup eq 'teen'">
+			    	AND TRUNC(MONTHS_BETWEEN(mp.MP_WARN_DATE, m.MEM_BIRTH) / 12) &lt;= 19
+			    </if>
+			    <if test="ageGroup != null and ageGroup != '' and ageGroup eq 'youth'">
+			    	AND TRUNC(MONTHS_BETWEEN(mp.MP_WARN_DATE, m.MEM_BIRTH) / 12) &gt;= 20
+			    </if>
+	        </where>
+	    )
+	    SELECT
+	        pt.penaltyType,
+	        NVL(COUNT(fp.MP_WARN_REASON), 0) AS count
+	    FROM penalty_types pt
+	    LEFT JOIN filtered_penalty fp
+	        ON pt.penaltyType = fp.MP_WARN_REASON
+	    GROUP BY pt.penaltyType
+	    ORDER BY count DESC
+	</select>
+
+</mapper>

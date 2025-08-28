@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.impl.InterviewListMapper">
+
+    <!-- 사용자 정의 질문 리스트 조회 -->
+    <select id="getCustomQuestionList" parameterType="kr.or.ddit.main.service.MemberVO" resultType="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.InterviewDetailListVO">
+        SELECT 
+            IDL.IDL_ID as idlId,
+            IDL.MEM_ID as memId,
+            IDL.IDL_TITLE as idlTitle,
+            IDL.IDL_CREATED_AT as idlCreatedAt,
+            IDL.IDL_DEL_YN as idlDelYn,
+            COUNT(ID.IQ_ID) as questionCount
+        FROM INTERVIEW_DETAIL_LIST IDL
+        LEFT JOIN INTERVIEW_DETAIL ID ON IDL.IDL_ID = ID.IDL_ID
+        WHERE IDL.IDL_DEL_YN = 'N'
+          AND IDL.MEM_ID = #{memId}
+        GROUP BY IDL.IDL_ID, IDL.MEM_ID, IDL.IDL_TITLE, IDL.IDL_CREATED_AT, IDL.IDL_DEL_YN
+        ORDER BY IDL.IDL_CREATED_AT DESC
+    </select>
+
+    <!-- 업종별 질문 리스트 조회 (IQ_GUBUN과 ComCodeVO 조인) -->
+    <select id="getIndustryList" resultType="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.InterviewQuestionVO">
+        SELECT DISTINCT
+            SIQ.SIQ_JOB as iqGubun,
+            CC.CC_NAME as industryName
+        FROM SELF_INTRO_Q SIQ
+        INNER JOIN COM_CODE CC ON SIQ.SIQ_JOB = CC.CC_ID
+        WHERE CC.USE_YN = 'Y'
+        ORDER BY CC.CC_NAME
+    </select>
+    
+    <!-- 선택된 질문 리스트의 ID로 실제 질문들 조회 -->
+    <select id="getQuestionsByDetailListId" resultType="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.InterviewQuestionVO">
+        SELECT 
+            IQ.SIQ_ID as iqId,
+            IQ.SIQ_JOB as iqGubun,
+            IQ.SIQ_CONTENT as iqContent,
+            ID.ID_ORDER as idOrder
+        FROM INTERVIEW_DETAIL ID
+        INNER JOIN SELF_INTRO_Q IQ ON ID.IQ_ID = IQ.SIQ_ID
+        WHERE ID.IDL_ID = #{idlId}
+        ORDER BY ID.ID_ORDER ASC
+    </select>
+    
+    <!-- 업종별 랜덤 질문 조회 -->
+    <select id="getRandomQuestionsByIndustry" resultType="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.InterviewQuestionVO">
+        SELECT 
+            SIQ_ID as iqId,
+            SIQ_JOB as iqGubun,
+            SIQ_CONTENT as iqContent
+        FROM SELF_INTRO_Q SIQ
+        WHERE SIQ_JOB = #{industryCode}
+        FETCH FIRST #{questionCount} ROWS ONLY
+    </select>
+
+</mapper>

@@ -1,0 +1,327 @@
+@charset "UTF-8";
+
+/* =================================================== */
+/* AI 자소서 피드백 페이지 (AI 이력서 피드백 테마 적용) */
+/* =================================================== */
+
+/* 컨테이너 */
+.aifb-container {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.aifb-title {
+	font-size: 24px;
+	font-weight: 600;
+	text-align: center;
+	color: #111827;
+	margin-bottom: 16px;
+}
+
+/* 드롭다운 (자소서 선택) */
+.self-intro-select {
+	width: 100%;
+	padding: 12px 16px;
+	font-size: 16px;
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	background-color: #fff;
+	appearance: none;
+	background-image:
+		url("data:image/svg+xml;utf8,<svg fill='%239D9D9D' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+	background-repeat: no-repeat;
+	background-position: right 16px center;
+	background-size: 18px;
+	cursor: pointer;
+}
+
+/* 메인 콘텐츠 */
+.aifb-content-wrapper {
+	display: flex;
+	gap: 24px;
+	width: 100%;
+	align-items: flex-start;
+}
+
+.aifb-section, .aifb-feedback-wrapper {
+	flex: 1;
+	border: 1px solid #e5e7eb;
+	border-radius: 12px;
+	padding: 24px;
+	background-color: #fff;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	height: 80vh; /* 화면 높이의 80%를 차지하도록 설정 */
+	box-sizing: border-box;
+	overflow-y: auto;
+}
+
+/* 섹션 헤더 (자소서 / 피드백 공통) */
+.aifb-section-header, .aifb-feedback-header {
+	padding-bottom: 16px;
+	border-bottom: 1px solid #e5e7eb;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px;
+	min-height: auto;
+}
+
+.aifb-section-header h2, .aifb-feedback-header h2 {
+	font-family: 'Noto Sans KR', sans-serif;
+	font-weight: 600;
+	font-size: 18px;
+	color: #1f2937;
+	margin: 0;
+	white-space: nowrap;
+}
+
+/* 내용 영역 */
+.aifb-questions-wrapper, .aifb-feedback-area {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	font-family: 'Noto Sans KR', sans-serif;
+	font-size: 14px;
+	line-height: 1.35;
+}
+
+/* 불러온 자소서 질문/답변 블록 스타일 */
+.qa-block {
+	padding-bottom: 8px; /* 기존보다 줄임 */
+	margin-bottom: 20px; /* 추가: 블록 간 간격 */
+	border-bottom: 1px solid #f3f4f6;
+}
+
+.qa-block:last-child {
+	border-bottom: none;
+	padding-bottom: 0;
+	margin-bottom: 0;
+}
+
+.qa-block p {
+  margin: 0;
+  padding: 0;
+}
+.qa-block br + br {
+  display: none; /* 연속 br 제거 */
+}
+
+.question-block {
+	display: flex;
+	gap: 6px;
+	align-items: flex-start;
+	font-size: 15px;
+	font-weight: 600;
+	color: #374151;
+	margin-bottom: 16px;
+	line-height: 1.8;
+	
+}
+
+.answer-block p {
+	line-height: 1.8;
+	color: #4b5563;
+}
+
+.char-count {
+	margin-top: 16px;
+	margin-bottom: 16px;
+	padding-bottom: 0 !important;
+	font-size: 12px;
+	color: #9ca3af;
+	text-align: right;
+}
+
+.feedback-section {
+	line-height: 1.8;
+	margin-bottom: 12px;
+}
+
+/* 버튼 그룹 */
+.aifb-button-group {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+.aifb-button {
+	padding: 8px 16px;
+	font-family: 'Noto Sans KR', sans-serif;
+	font-weight: 600;
+	font-size: 14px;
+	border-radius: 8px;
+	border: 1px solid #d1d5db;
+	cursor: pointer;
+	background-color: #f3f4f6;
+	color: #374151;
+	transition: all 0.2s ease;
+	white-space: nowrap;
+}
+
+.aifb-button:hover {
+	background-color: #e5e7eb;
+}
+
+/* 하단 버튼 영역 */
+.aifb-footer-wrapper {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	margin-top: 32px;
+	padding-top: 24px;
+	border-top: 1px solid #e5e7eb;
+}
+
+.ai-feedback-section {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+}
+
+.powered-by-text {
+	font-family: 'Noto Sans KR', sans-serif;
+	font-size: 12px;
+	color: #9ca3af;
+	font-weight: 400;
+}
+
+.aifb-button.feedback {
+	background-color: #7881f5;
+	color: #fff;
+	border-color: #7881f5;
+	padding: 10px 20px;
+}
+
+.aifb-button.feedback:hover {
+	background-color: #6366f1;
+}
+
+.aifb-button.proofread {
+	background-color: #fff;
+	color: #7881f5;
+	border-color: #7881f5;
+	padding: 10px 20px;
+}
+
+.aifb-button.proofread:hover {
+	background-color: #7881f5;
+	color: #fff;
+}
+
+/* 스피너 구현 */
+.spinner-wrapper {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding: 40px 20px;
+	min-height: 250px;
+	text-align: center;
+	color: #666;
+	gap: 100px;
+}
+
+.spinner-border {
+	width: 2.5rem;
+	height: 2.5rem;
+	border: 0.25em solid #7881f5;
+	border-right-color: transparent;
+	border-radius: 50%;
+	animation: spinner-spin .75s linear infinite;
+	display: block;
+}
+
+@keyframes spinner-spin {to { transform:rotate(360deg);
+	
+}
+
+}
+
+/* ===== Modal ===== */
+.ai-modal-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(20, 24, 28, 0.45);
+	display: none;
+	z-index: 3000; /* 캐릭터 이미지 등 어떤 요소보다 위로 (요청 이력 반영) */
+}
+
+.ai-modal {
+	position: fixed;
+	left: 50%;
+	top: 80px; /* 원하는 상단 위치 */
+	transform: translateX(-50%);
+	width: 420px;
+	max-width: 90vw;
+	background: #fff;
+	border-radius: 16px;
+	padding: 20px;
+	display: none;
+	z-index: 3010;
+	box-shadow: 0 30px 90px rgba(0, 0, 0, 0.25), 0 8px 24px
+		rgba(0, 0, 0, 0.2);
+}
+
+.ai-modal h4 {
+	margin: 2px 0 16px;
+	font-size: 18px;
+	font-weight: 800;
+	text-align: center;
+}
+
+.ai-modal p {
+	color: #4f5965;
+	line-height: 1.5;
+}
+
+.ai-modal .row {
+	display: flex;
+	gap: 10px;
+	margin-top: 16px;
+	justify-content: flex-end;
+}
+
+.ai-kv {
+	margin: 10px 0;
+	background: #f8fafb;
+	border: 1px dashed #e4e9ee;
+	border-radius: 12px;
+	padding: 10px 12px;
+	color: #47515b;
+}
+
+.ai-kv>div+div {
+	margin-top: 12px;
+}
+
+.btn {
+	appearance: none;
+	border: none;
+	border-radius: 12px;
+	padding: 11px 18px;
+	font-weight: 800;
+	cursor: pointer;
+	background: #6a82fb;
+	color: #fff;
+	transition: all .15s ease;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.btn.secondary {
+	background: #f3f5f7;
+	color: #202427;
+}
+
+.answer-block {
+	margin-bottom: 0; /* 답변 블록 자체의 하단 여백 완전 제거 */
+	min-height: auto; /* 기존 100px 제거하여 불필요한 높이 제거 */
+	padding: 0; /* 패딩도 제거 */
+	height: auto;
+}
+

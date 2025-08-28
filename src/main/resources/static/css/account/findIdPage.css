@@ -1,0 +1,158 @@
+@charset "UTF-8";
+
+.tempPw{
+	color:  rgb(120, 129, 245);
+}
+
+button:disabled,
+button.disabled-btn {
+  background-color: rgb(192, 196, 204);;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.email-list {
+  list-style: none;           
+  padding: 0;                 
+  margin: 0 auto;             
+  text-align: center;         
+}
+
+.email-item {
+  padding-left: 40px;
+  margin: 8px 0;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: rgb(120, 129, 245);
+}
+
+.findEmailResult {
+	background-color: #F0F0F0;
+	margin-top: 20px;
+	justify-content: center;
+	display: flex;
+	font-size: 15px;
+	font-weight: 500;
+	border-radius: 6px;
+	display: none;
+	margin-bottom: 20px;
+}
+
+#emailList {
+	padding-bottom: 20px;
+}
+
+.resultMessege {
+	
+	color: rgb(120, 129, 245);
+		
+}
+
+.flex {
+	padding: 30px;
+	display: flex;
+}
+
+.resultMessege {
+	padding: 0 5px;
+}
+
+.signup-box {
+	margin-top: 24px;
+	padding: 12px;
+	text-align: center;
+	background-color: #e7f7fd;
+	border-radius: 6px;
+	font-size: 14px;
+}
+
+.signup-box a {
+	color: #7881f5;
+	text-decoration: none;
+	margin-left: 6px;
+	font-weight: bold;
+}
+
+.findEmail-btn {
+	width: 100%;
+	padding: 10px;
+	background-color: #7881f5;
+	border: none;
+	border-radius: 6px;
+	color: white;
+	font-weight: bold;
+	font-size: 16px;
+	cursor: pointer;
+	margin-top: 60px;
+	transition: all 0.3s ease;
+}
+
+.findEmail-btn:hover {
+	background-color: #5c68d9; /* 더 진한 파랑 */
+	transform: scale(1.03);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.find-links {
+	justify-content: space-between;
+	text-align: right;
+	font-size: 13px;
+	margin-top: 10px;
+}
+
+.find-links a {
+	color: #7881f5;
+	text-decoration: none;
+	margin-left: 8px;
+}
+
+
+
+/*             보류                 */
+.findEmail-req-tag {
+	display: flex;
+	justify-content: center;
+}
+
+.public-wrapper-main {
+	display: flex;
+	justify-content: center;
+	box-shadow: none;
+}
+
+.findEmail-container {
+	justify-content: center;
+	background: white;
+	padding: 40px 32px;
+	width: 400px;
+	border-radius: 16px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.findEmail-container-imgBox {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 24px;
+}
+
+.findEmail-container label {
+	display: block;
+	font-weight: 600;
+	margin: 16px 0 6px;
+}
+
+.findEmail-container input,
+.findEmail-container button {
+  box-sizing: border-box;
+}
+
+.findEmail-container input[type="email"]
+	{
+	width: 100%;
+	padding-top: 12px;
+	padding-bottom: 12px;
+	padding-left: 12px;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	font-size: 14px;
+}

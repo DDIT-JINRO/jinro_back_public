@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mpg.mat.bmk.service.impl.BookMarkMapper">
+	
+	<select id="selectBookmarkList" resultType="kr.or.ddit.mpg.mat.bmk.service.BookMarkVO" parameterType="kr.or.ddit.mpg.mat.bmk.service.BookMarkVO">
+		WITH ALL_BOOKMARKS AS (
+		    <!-- 1. 대학 정보 북마크 (G03001) -->
+		    SELECT
+		        B.BM_ID               AS BM_ID           <!-- 북마크 고유번호 -->
+		        , B.BM_CATEGORY_ID    AS BM_CATEGORY_ID  <!-- 카테고리 상세코드 (대학, 기업, ...) -->
+		        , CC.CC_NAME          AS CATEGORY_NAME   <!-- 카테고리명 (예: '대학 정보') --> 
+		        , U.UNIV_NAME         AS TITLE           <!-- 대학명 -->
+		        , U.UNIV_CAMPUS || ' (' || U.UNIV_REGION || ')' AS CONTENT_1 <!-- 내용1 (캠퍼스 및 지역) -->
+		        , U.UNIV_ADDR         AS CONTENT_2       <!-- 내용2 (상세 주소) -->
+		        , B.BM_TARGET_ID      AS BM_TARGET_ID    <!-- 원본 기본키 -->
+		        , B.BM_CREATED_AT     AS BM_CREATED_AT   <!-- 북마크 생성일 -->
+		        , NULL AS JOB_CODE
+		    FROM
+		        BOOKMARK B
+		        JOIN COM_CODE CC ON B.BM_CATEGORY_ID = CC.CC_ID
+		        JOIN UNIVERSITY U ON B.BM_TARGET_ID = U.UNIV_ID
+		    WHERE
+		        B.BM_CATEGORY_ID = 'G03001' AND B.MEM_ID = #{memId}
+		
+		    UNION ALL
+		
+		    <!-- 2. 기업 정보 북마크 (G03002) -->
+		    SELECT
+		        B.BM_ID               AS BM_ID           
+		        , B.BM_CATEGORY_ID    AS BM_CATEGORY_ID  
+		        , CC.CC_NAME          AS CATEGORY_NAME   
+		        , C.CP_NAME           AS TITLE              <!-- 기업명 -->
+		        , (SELECT CC_NAME FROM COM_CODE WHERE CC_ID = C.CP_SCALE) AS CONTENT_1 <!-- 내용1 (기업 규모) -->
+		        , TO_CHAR(SUBSTR(C.CP_DESCRIPTION, 1, 500))    AS CONTENT_2 <!-- 내용2 (기업 설명) -->
+		        , B.BM_TARGET_ID      AS BM_TARGET_ID
+		        , B.BM_CREATED_AT     AS BM_CREATED_AT
+		        , NULL AS JOB_CODE
+		    FROM
+		        BOOKMARK B
+		        JOIN COM_CODE CC ON B.BM_CATEGORY_ID = CC.CC_ID
+		        JOIN COMPANY C ON B.BM_TARGET_ID = C.CP_ID
+		    WHERE
+		        B.BM_CATEGORY_ID = 'G03002' AND B.MEM_ID = #{memId}
+		
+		    UNION ALL
+		
+		    <!-- 3. 채용 정보 북마크 (G03003) -->
+		    SELECT
+		        B.BM_ID
+		        , B.BM_CATEGORY_ID
+		        , CC.CC_NAME          AS CATEGORY_NAME
+		        , H.HIRE_TITLE        AS TITLE <!-- 채용공고명 -->
+				, (SELECT CC_NAME FROM COM_CODE WHERE CC_ID = H.HIRE_CLASS_CODE) AS CONTENT_1 <!-- 내용1 (직종명) -->
+		        , '공고 기간: ' || TO_CHAR(H.HIRE_START_DATE, 'YYYY-MM-DD') || ' ~ ' || TO_CHAR(H.HIRE_END_DATE, 'YYYY-MM-DD') AS CONTENT_2 <!-- 내용2 (공고 기간) -->
+		        , B.BM_TARGET_ID      AS BM_TARGET_ID
+		        , B.BM_CREATED_AT     AS BM_CREATED_AT
+		        , NULL AS JOB_CODE
+		    FROM
+		        BOOKMARK B
+		        JOIN COM_CODE CC ON B.BM_CATEGORY_ID = CC.CC_ID
+		        JOIN HIRE H ON B.BM_TARGET_ID = H.HIRE_ID
+		    WHERE
+		        B.BM_CATEGORY_ID = 'G03003' AND B.MEM_ID = #{memId}
+		
+		    UNION ALL
+		    
+			<!-- 4. 직업 정보 북마크 (G03004) -->
+		    SELECT
+		        B.BM_ID
+		        , B.BM_CATEGORY_ID
+		        , CC.CC_NAME          AS CATEGORY_NAME
+		        , J.JOB_NAME          AS TITLE           <!-- 직업명 -->
+		        , (SELECT CC_NAME FROM COM_CODE WHERE CC_ID = J.JOB_LCL) || ' > ' || (SELECT CC_NAME FROM COM_CODE WHERE CC_ID = J.JOB_MCL) AS CONTENT_1 <!-- 직업 대분류 -->
+		        , J.JOB_MAIN_DUTY     AS CONTENT_2           <!-- 주요 업무 -->
+		        , B.BM_TARGET_ID      AS BM_TARGET_ID
+		        , B.BM_CREATED_AT
+		        , J.JOB_CODE          AS JOB_CODE
+		    FROM
+		        BOOKMARK B
+		        JOIN COM_CODE CC ON B.BM_CATEGORY_ID = CC.CC_ID
+		        JOIN JOBS J ON B.BM_TARGET_ID = J.JOB_TARGET_ID
+		    WHERE
+		        B.BM_CATEGORY_ID = 'G03004' AND B.MEM_ID = #{memId}
+		
+		    UNION ALL
+		
+		    <!-- 5. 이력서 템플릿 북마크 (G03005) -->
+		    SELECT
+		        B.BM_ID
+		        , B.BM_CATEGORY_ID
+		        , CC.CC_NAME          AS CATEGORY_NAME
+		        , BRD.BOARD_TITLE     AS TITLE            <!-- 게시글 제목 -->
+		        , (SELECT MEM_NAME FROM MEMBER WHERE MEM_ID = BRD.MEM_ID) AS CONTENT_1 <!-- 내용1 (작성자) -->
+		        , '조회수 : ' || BRD.BOARD_CNT AS CONTENT_2 <!-- 내용2 (조회수) -->
+		        , B.BM_TARGET_ID      AS BM_TARGET_ID
+		        , B.BM_CREATED_AT
+		        , NULL AS JOB_CODE
+		    FROM
+		        BOOKMARK B
+		        JOIN COM_CODE CC ON B.BM_CATEGORY_ID = CC.CC_ID
+		        JOIN BOARD BRD ON B.BM_TARGET_ID = BRD.BOARD_ID
+		    WHERE
+		        B.BM_CATEGORY_ID = 'G03005'
+		        AND B.MEM_ID = #{memId}
+		        AND BRD.CC_ID = 'G09004' <!-- 이력서 템플릿 게시판 타입 -->
+		        AND BRD.BOARD_DEL_YN = 'N'
+		        
+		    UNION ALL
+		
+		    <!-- 6. 학과정보 북마크 (G03006) -->
+		    SELECT
+		        B.BM_ID
+		        , B.BM_CATEGORY_ID
+		        , CC.CC_NAME          AS CATEGORY_NAME
+		        , (SELECT CC_NAME FROM COM_CODE WHERE CC_ID = UDD.UDD_M_CLASS) AS TITLE 
+		        , (SELECT CC_NAME FROM COM_CODE WHERE CC_ID = UDD.UDD_L_CLASS) AS CONTENT_1
+		        , UDD.UDD_SUM         AS CONTENT_2
+		        , B.BM_TARGET_ID      AS BM_TARGET_ID
+		        , B.BM_CREATED_AT
+		        , NULL AS JOB_CODE
+		    FROM
+		        BOOKMARK B
+		        JOIN COM_CODE CC ON B.BM_CATEGORY_ID = CC.CC_ID
+		        JOIN UNIV_DEPT_DETAIL UDD ON B.BM_TARGET_ID = UDD.UDD_ID
+		    WHERE
+		        B.BM_CATEGORY_ID = 'G03006'
+		        AND B.MEM_ID = #{memId}
+		)
+
+	    SELECT
+	    	*
+	    FROM(  
+	        SELECT
+	        	ROWNUM AS RNUM
+	        	, A.*
+	        FROM (
+	       		SELECT
+					BM_ID
+					, BM_CATEGORY_ID
+					, CATEGORY_NAME
+					, TITLE
+					, CONTENT_1
+					, CONTENT_2
+					, BM_TARGET_ID
+					, BM_CREATED_AT
+					, JOB_CODE
+				FROM
+					ALL_BOOKMARKS
+				WHERE
+					1 = 1
+				    <if test = "keyword != null and keyword != ''">
+					    <choose>
+					        <when test = "status == 'title'">
+								AND TITLE LIKE '%' || #{keyword} || '%'
+					        </when>
+					        <when test = "status == 'content'">
+								AND CONTENT_1 LIKE '%' || #{keyword} || '%'
+								OR CONTENT_2 LIKE '%' || #{keyword} || '%'
+					        </when>
+					        <otherwise>
+								AND (
+									TITLE LIKE '%' || #{keyword} || '%'
+										OR CONTENT_1 LIKE '%' || #{keyword} || '%'
+										OR CONTENT_2 LIKE '%' || #{keyword} || '%'
+								)
+					        </otherwise>
+					    </choose>
+				    </if>
+				    <if test = "bmCategoryId != null and bmCategoryId != ''">
+						AND BM_CATEGORY_ID = #{bmCategoryId}
+				    </if>
+				ORDER BY
+					BM_CREATED_AT DESC
+	        ) A
+	        WHERE ROWNUM <![CDATA[<=]]> #{endRow}  
+	    )
+	    WHERE RNUM <![CDATA[>=]]> #{startRow}
+	</select>
+	
+	<select id="selectBookmarkTotal" resultType="int" parameterType="kr.or.ddit.mpg.mat.bmk.service.BookMarkVO">
+		WITH ALL_BOOKMARKS AS (
+		    <!-- 1. 대학 정보 북마크 (G03001) -->
+		    SELECT
+		        B.BM_ID               AS BM_ID           <!-- 북마크 고유번호 -->
+		        , B.BM_CATEGORY_ID    AS BM_CATEGORY_ID  <!-- 카테고리 상세코드 (대학, 기업, ...) -->
+		        , CC.CC_NAME          AS CATEGORY_NAME   <!-- 카테고리명 (예: '대학 정보') --> 
+		        , U.UNIV_NAME         AS TITLE           <!-- 대학명 -->
+		        , U.UNIV_CAMPUS || ' (' || U.UNIV_REGION || ')' AS CONTENT_1 <!-- 내용1 (캠퍼스 및 지역) -->
+		        , U.UNIV_ADDR         AS CONTENT_2       <!-- 내용2 (상세 주소) -->
+		        , B.BM_TARGET_ID      AS BM_TARGET_ID    <!-- 원본 기본키 -->
+		        , B.BM_CREATED_AT     AS BM_CREATED_AT   <!-- 북마크 생성일 -->
+		        , NULL AS JOB_CODE
+		    FROM
+		        BOOKMARK B
+		        JOIN COM_CODE CC ON B.BM_CATEGORY_ID = CC.CC_ID
+		        JOIN UNIVERSITY U ON B.BM_TARGET_ID = U.UNIV_ID
+		    WHERE
+		        B.BM_CATEGORY_ID = 'G03001' AND B.MEM_ID = #{memId}
+		
+		    UNION ALL
+		
+		    <!-- 2. 기업 정보 북마크 (G03002) -->
+		    SELECT
+		        B.BM_ID               AS BM_ID           
+		        , B.BM_CATEGORY_ID    AS BM_CATEGORY_ID  
+		        , CC.CC_NAME          AS CATEGORY_NAME   
+		        , C.CP_NAME           AS TITLE              <!-- 기업명 -->
+		        , (SELECT CC_NAME FROM COM_CODE WHERE CC_ID = C.CP_SCALE) AS CONTENT_1 <!-- 내용1 (기업 규모) -->
+		        , TO_CHAR(SUBSTR(C.CP_DESCRIPTION, 1, 500))    AS CONTENT_2 <!-- 내용2 (기업 설명) -->
+		        , B.BM_TARGET_ID      AS BM_TARGET_ID
+		        , B.BM_CREATED_AT     AS BM_CREATED_AT
+		        , NULL AS JOB_CODE
+		    FROM
+		        BOOKMARK B
+		        JOIN COM_CODE CC ON B.BM_CATEGORY_ID = CC.CC_ID
+		        JOIN COMPANY C ON B.BM_TARGET_ID = C.CP_ID
+		    WHERE
+		        B.BM_CATEGORY_ID = 'G03002' AND B.MEM_ID = #{memId}
+		
+		    UNION ALL
+		
+		    <!-- 3. 채용 정보 북마크 (G03003) -->
+		    SELECT
+		        B.BM_ID
+		        , B.BM_CATEGORY_ID
+		        , CC.CC_NAME          AS CATEGORY_NAME
+		        , H.HIRE_TITLE        AS TITLE <!-- 채용공고명 -->
+				, (SELECT CC_NAME FROM COM_CODE WHERE CC_ID = H.HIRE_CLASS_CODE) AS CONTENT_1 <!-- 내용1 (직종명) -->
+		        , '공고 기간: ' || TO_CHAR(H.HIRE_START_DATE, 'YYYY-MM-DD') || ' ~ ' || TO_CHAR(H.HIRE_END_DATE, 'YYYY-MM-DD') AS CONTENT_2 <!-- 내용2 (공고 기간) -->
+		        , B.BM_TARGET_ID      AS BM_TARGET_ID
+		        , B.BM_CREATED_AT     AS BM_CREATED_AT
+		        , NULL AS JOB_CODE
+		    FROM
+		        BOOKMARK B
+		        JOIN COM_CODE CC ON B.BM_CATEGORY_ID = CC.CC_ID
+		        JOIN HIRE H ON B.BM_TARGET_ID = H.HIRE_ID
+		    WHERE
+		        B.BM_CATEGORY_ID = 'G03003' AND B.MEM_ID = #{memId}
+		
+		    UNION ALL
+		    
+			<!-- 4. 직업 정보 북마크 (G03004) -->
+		    SELECT
+		        B.BM_ID
+		        , B.BM_CATEGORY_ID
+		        , CC.CC_NAME          AS CATEGORY_NAME
+		        , J.JOB_NAME          AS TITLE           <!-- 직업명 -->
+		        , (SELECT CC_NAME FROM COM_CODE WHERE CC_ID = J.JOB_LCL) || ' > ' || (SELECT CC_NAME FROM COM_CODE WHERE CC_ID = J.JOB_MCL) AS CONTENT_1 <!-- 직업 대분류 -->
+		        , J.JOB_MAIN_DUTY AS CONTENT_2           <!-- 주요 업무 -->
+		        , B.BM_TARGET_ID      AS BM_TARGET_ID
+		        , B.BM_CREATED_AT
+		        , J.JOB_CODE          AS JOB_CODE
+		    FROM
+		        BOOKMARK B
+		        JOIN COM_CODE CC ON B.BM_CATEGORY_ID = CC.CC_ID
+		        JOIN JOBS J ON B.BM_TARGET_ID = J.JOB_TARGET_ID
+		    WHERE
+		        B.BM_CATEGORY_ID = 'G03004' AND B.MEM_ID = #{memId}
+		
+		    UNION ALL
+		
+		    <!-- 5. 이력서 템플릿 북마크 (G03005) -->
+		    SELECT
+		        B.BM_ID
+		        , B.BM_CATEGORY_ID
+		        , CC.CC_NAME          AS CATEGORY_NAME
+		        , BRD.BOARD_TITLE     AS TITLE            <!-- 게시글 제목 -->
+		        , (SELECT MEM_NAME FROM MEMBER WHERE MEM_ID = BRD.MEM_ID) AS CONTENT_1 <!-- 내용1 (작성자) -->
+		        , '조회수 : ' || BRD.BOARD_CNT AS CONTENT_2 <!-- 내용2 (조회수) -->
+		        , B.BM_TARGET_ID      AS BM_TARGET_ID
+		        , B.BM_CREATED_AT
+		        , NULL AS JOB_CODE
+		    FROM
+		        BOOKMARK B
+		        JOIN COM_CODE CC ON B.BM_CATEGORY_ID = CC.CC_ID
+		        JOIN BOARD BRD ON B.BM_TARGET_ID = BRD.BOARD_ID
+		    WHERE
+		        B.BM_CATEGORY_ID = 'G03005'
+		        AND B.MEM_ID = #{memId}
+		        AND BRD.CC_ID = 'G09004' <!-- 이력서 템플릿 게시판 타입 -->
+		        AND BRD.BOARD_DEL_YN = 'N'
+		        
+   		    UNION ALL
+		
+		    <!-- 6. 학과정보 북마크 (G03006) -->
+		    SELECT
+		        B.BM_ID
+		        , B.BM_CATEGORY_ID
+		        , CC.CC_NAME          AS CATEGORY_NAME
+		        , (SELECT CC_NAME FROM COM_CODE WHERE CC_ID = UDD.UDD_M_CLASS) AS TITLE 
+		        , (SELECT CC_NAME FROM COM_CODE WHERE CC_ID = UDD.UDD_L_CLASS) AS CONTENT_1
+		        , UDD.UDD_SUM         AS CONTENT_2
+		        , B.BM_TARGET_ID      AS BM_TARGET_ID
+		        , B.BM_CREATED_AT
+		        , NULL AS JOB_CODE
+		    FROM
+		        BOOKMARK B
+		        JOIN COM_CODE CC ON B.BM_CATEGORY_ID = CC.CC_ID
+		        JOIN UNIV_DEPT_DETAIL UDD ON B.BM_TARGET_ID = UDD.UDD_ID
+		    WHERE
+		        B.BM_CATEGORY_ID = 'G03006'
+		        AND B.MEM_ID = #{memId}
+		)
+		
+	    SELECT
+	        COUNT(*)
+	    FROM
+	        ALL_BOOKMARKS
+	    WHERE
+	        1 = 1
+	        <if test = "keyword != null and keyword != ''">
+	            <choose>
+	                <when test = "status == 'title'">
+	                    AND TITLE LIKE '%' || #{keyword} || '%'
+	                </when>
+	                <when test = "status == 'content'">
+	                    AND CONTENT_1 LIKE '%' || #{keyword} || '%'
+	                    OR CONTENT_2 LIKE '%' || #{keyword} || '%'
+	                </when>
+	                <otherwise>
+	                    AND (
+	                        TITLE LIKE '%' || #{keyword} || '%'
+	                            OR CONTENT_1 LIKE '%' || #{keyword} || '%'
+	                            OR CONTENT_2 LIKE '%' || #{keyword} || '%'
+	                    )
+	                </otherwise>
+	            </choose>
+	        </if>
+	        <if test = "bmCategoryId != null and bmCategoryId != ''">
+	            AND BM_CATEGORY_ID = #{bmCategoryId}
+	        </if>
+	</select>
+	
+	<select id="selectBmCategoryIdList" resultType="map">
+		SELECT
+		    CC_ID
+		    , CC_NAME
+		FROM
+		    COM_CODE
+		WHERE
+		    CL_CODE = 'G03'
+		ORDER BY
+		    CC_ID
+	</select>
+	
+	<delete id="deleteBookmark" parameterType="kr.or.ddit.mpg.mat.bmk.service.BookMarkVO">
+		DELETE FROM BOOKMARK
+		WHERE
+			MEM_ID = #{memId}
+		AND
+			BM_CATEGORY_ID = #{bmCategoryId}
+		AND
+			BM_TARGET_ID = #{bmTargetId}
+	</delete>
+		
+	<insert id="insertBookmark" parameterType="kr.or.ddit.mpg.mat.bmk.service.BookMarkVO">
+		INSERT INTO BOOKMARK (
+			BM_ID
+			, MEM_ID
+			, BM_CATEGORY_ID
+			, BM_TARGET_ID
+			, BM_CREATED_AT
+		) VALUES (
+			  (SELECT NVL(MAX(BM_ID), 0) + 1 FROM BOOKMARK)
+			, #{memId}
+			, #{bmCategoryId}
+			, #{bmTargetId}
+			, SYSDATE
+		)
+	</insert>
+		
+</mapper>

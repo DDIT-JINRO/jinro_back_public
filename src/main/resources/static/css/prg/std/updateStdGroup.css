@@ -1,0 +1,330 @@
+@charset "UTF-8";
+
+:root {
+  --card-bg: #fff;
+  --card-border: #E8ECEF;
+  --card-radius: 10px;
+  --card-shadow: rgba(0, 0, 0, 0.05);
+  --primary: #848EFB;
+  --text-dark: #212529;
+  --text-mid: #555;
+  --text-light: #858E96;
+  --gap: 20px;
+}
+
+/* ─── 0) 카드 래퍼 적용 ─── */
+.create-wrapper {
+  max-width: 1160px;
+  margin: 40px auto;
+  margin-top: 20px;
+  padding: 24px;
+  background: var(--card-bg);
+  border: 2px solid var(--card-border);
+  border-radius: var(--card-radius);
+  box-shadow: 0 3px 10px var(--card-shadow);
+}
+
+.public-wrapper-main h3{
+	font-family: 'MyFont';
+	text-align: center;
+}
+
+/* ─── 1) 그리드 레이아웃 ─── */
+.create-wrapper form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--gap);
+}
+
+/* ─── 2) 폼 그룹 ─── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.form-group > label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+/* ─── 3) 입력 필드 통일 ─── */
+.title-input,
+.chat-title-input,
+.desc-textarea,
+.custom-select__label {
+  width: 100%;
+  font-size: 1rem;
+  color: var(--text-dark);
+  background: #fff;
+  border: 1px solid var(--card-border);
+  border-radius: 5px;
+  padding: 0 16px;
+  box-sizing: border-box;
+  transition: border-color .2s, box-shadow .2s;
+}
+.title-input,
+.chat-title-input { height: 50px; }
+.desc-textarea { min-height: 200px; padding: 16px; resize: vertical; }
+
+/* 포커스 */
+.title-input:focus,
+.chat-title-input:focus,
+.desc-textarea:focus,
+.custom-select__label:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(132, 142, 251, 0.2);
+}
+
+/* ─── 4) 커스텀 셀렉트 ─── */
+.custom-select {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.custom-select__options {
+  top: calc(100% + 4px);
+  box-shadow: 0 4px 8px var(--card-shadow);
+}
+/* optgroup label */
+.custom-select__options .optgroup-label {
+  background: #F9F9F9;
+  font-weight: 600;
+}
+
+/* ─── 5) 버튼 스타일 ─── */
+.btn-area {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+.btn-submit,
+.btn-cancel {
+  width: 90px;
+  height: 35px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .2s;
+}
+.btn-submit {
+  background: var(--primary);
+  color: #fff;
+}
+.btn-submit:hover {
+  background: #6e74d7;
+}
+.btn-cancel {
+  background: #E9E9E9;
+  color: var(--text-mid);
+}
+
+/* ─── 6) 에러 상태 ─── */
+.form-group.error > label {
+  color: #E53E3E;
+}
+.form-group.error .title-input,
+.form-group.error .chat-title-input,
+.form-group.error .desc-textarea,
+.form-group.error .custom-select__label {
+  border-color: #E53E3E;
+  box-shadow: 0 0 0 1px rgba(229, 62, 62, 0.3);
+}
+.error-message {
+  font-size: 0.85rem;
+  color: #E53E3E;
+  margin-top: 4px;
+}
+
+/* 스터디그룹 게시글 작성용 CSS */
+
+.study-post-wrapper {
+  width: 1160px;
+  margin: 0 auto;
+  padding: 20px;              /* 내부 여백 축소 */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: #FFFFFF;
+  border: 2px solid #E8ECEF;
+  border-radius: 10px;
+}
+
+/* 제목, 채팅방제목 input */
+.title-input,
+.chat-title-input {
+  width: 100%;                /* 100%로 맞춰서 정렬 */
+  height: 50px;
+  padding: 0 16px;
+  font-size: 18px;
+  border: 1px solid #D8D8D8;
+  border-radius: 5px;
+  background-color: #fff;
+  color: #212529;
+  box-sizing: border-box;
+}
+
+/* 상단 세부 정보 (성별/지역/인원/관심분야) */
+.study-info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);  /* 4개 컬럼 고정 */
+  gap: 20px;
+}
+
+/* 소개글 textarea */
+.desc-textarea {
+  width: 100%;               /* 100%로 고정 */
+  min-height: 200px;
+  padding: 16px;
+  font-size: 16px;
+  line-height: 1.5;
+  border: 1px solid #D8D8D8;
+  border-radius: 5px;
+  resize: vertical;
+  background-color: #fff;
+  color: #212529;
+  box-sizing: border-box;
+}
+
+/* 버튼 영역 */
+.btn-area {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 10px;
+}
+
+.btn-submit,
+.btn-cancel {
+  width: 90px;
+  height: 35px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-submit {
+  background: #D3F8FF;
+  color: #848EFB;
+}
+
+.btn-cancel {
+  background: #E9E9E9;
+  color: #9C9B9D;
+}
+
+/* 포커스 스타일 */
+.title-input:focus,
+.chat-title-input:focus,
+.select-box:focus,
+.desc-textarea:focus {
+  outline: none;
+  border-color: #848EFB;
+  box-shadow: 0 0 0 2px rgba(132, 142, 251, 0.2);
+}
+
+/* 커스텀 셀렉트 박스. 옵션 갯수가 많아서 위로 펼쳐지는것 방지 */
+.custom-select { position: relative; width: 100%; }
+.custom-select__label {
+  height: 50px; line-height: 50px; padding: 0 14px;
+  border: 1px solid #D8D8D8; border-radius: 5px;
+  background: #fff; cursor: pointer;
+}
+.custom-select__options {
+  position: absolute; top: 100%; left: 0; width: 100%;
+  margin-top: 4px; padding: 0; list-style: none;
+  border: 1px solid #D8D8D8; border-radius: 5px;
+  background: #fff; max-height: 250px; overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: none;
+  z-index: 10;
+}
+/* 그룹 레이블 스타일 */
+.custom-select__options .optgroup-label {
+  padding: 8px 14px;
+  font-size: 14px; font-weight: bold;
+  color: #626262;
+  background: #F9F9F9;
+  cursor: default;
+}
+/* 실제 옵션 */
+.custom-select__options li:not(.optgroup-label) {
+  padding: 0 14px; line-height: 40px;
+  cursor: pointer;
+}
+.custom-select__options li:not(.optgroup-label):hover {
+  background: #F0F0F0;
+}
+
+/* 폼 전송용 select 숨김 */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); border: 0;
+}
+
+/* 실제 select 숨기기 */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  border: 0; clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;                /* label과 컨트롤 사이 여백 */
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #212529;
+}
+
+/* 에러 상태 스타일 */
+.form-group.error > label {
+  color: #E53E3E;            /* 레이블을 빨간색으로 */
+}
+.form-group.error .title-input,
+.form-group.error .chat-title-input,
+.form-group.error .desc-textarea,
+.form-group.error .custom-select__label {
+  border-color: #E53E3E;     /* 입력창/커스텀셀렉트 테두리도 빨갛게 */
+  box-shadow: 0 0 0 1px rgba(229, 62, 62, 0.3);
+}
+
+/* 에러 메시지 */
+.error-message {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #E53E3E;
+}
+
+/* — 커스텀 셀렉트 비활성화 스타일 — */
+.custom-select--disabled .custom-select__label {
+  background-color: #f3f4f6;
+  color: #858e96;
+  cursor: not-allowed;
+}
+.custom-select--disabled .custom-select__options {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* — 옵션비활성화(li[data-disabled]) 스타일 — */
+.custom-select__options li[data-disabled] {
+  color: #ccc;
+  cursor: not-allowed;
+}
+.custom-select__options li[data-disabled]:hover {
+  background: none;
+}

@@ -1,0 +1,624 @@
+/* ===== 대학 기본 정보 섹션 ===== */
+.univ-detail-info {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px;
+    overflow: hidden;
+}
+
+.univ-basic-info {
+    padding: 30px;
+}
+
+.univ-title-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f1f3f4;
+}
+
+.univ-name {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.univ-bookmark {
+    flex-shrink: 0;
+    margin-left: 20px;
+}
+
+/* ===== 대학 정보 그리드 ===== */
+.univ-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.info-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #6c757d;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-value {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #212529;
+    line-height: 1.4;
+}
+
+/* ===== 학과 목록 섹션 ===== */
+.dept-list-section {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin-bottom: 40px;
+}
+
+.dept-list-section h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 10px 0;
+}
+
+.section-description {
+    color: #6c757d;
+    margin-bottom: 25px;
+    font-style: italic;
+    font-size: 0.95rem;
+}
+
+/* ===== 검색창 스타일 ===== */
+.dept-search {
+    display: flex;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 25px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dept-search input {
+    width: 100%;
+    border: none;
+    padding: 12px 16px;
+    font-size: 1rem;
+    background-color: transparent;
+}
+
+.dept-search input:focus {
+    outline: none;
+}
+
+.dept-search input::placeholder {
+    color: #9ca3af;
+}
+
+.dept-search .search-btn {
+    background: none;
+    border: none;
+    padding: 0 16px;
+    cursor: pointer;
+    color: #6b7280;
+    transition: color 0.2s ease;
+}
+
+.dept-search .search-btn:hover {
+    color: #374151;
+}
+
+/* ===== 학과 목록 스타일 ===== */
+.dept-list {
+    margin-top: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* 학과 목록 헤더 */
+.dept-list-header {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #f3f4f6;
+    font-weight: 600;
+    color: #4b5563;
+    border-bottom: 1px solid #e5e7eb;
+    gap: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.header-item {
+    padding: 0 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+/* 헤더 컬럼 너비 */
+.header-name {
+    flex: 2;
+    justify-content: flex-start;
+}
+
+.header-tuition,
+.header-scholar {
+    flex: 1.5;
+}
+
+.header-competition,
+.header-employment {
+    flex: 1;
+}
+
+/* 개별 학과 항목 */
+.dept-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background-color: #fff;
+    margin-bottom: 10px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.dept-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.dept-item-content {
+    display: flex;
+    align-items: center;
+    padding: 18px 20px;
+    gap: 10px;
+}
+
+.dept-info-item {
+    padding: 0 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.95rem;
+    color: #374151;
+    text-align: center;
+}
+
+.dept-info-item:first-child {
+    justify-content: flex-start;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* 학과명 링크 스타일 */
+.dept-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid transparent;
+}
+
+.dept-link:hover {
+    color: #1d4ed8;
+    text-decoration: none;
+    border-bottom-color: #2563eb;
+    transform: translateY(-1px);
+}
+
+.dept-link:active {
+    color: #1e40af;
+    transform: translateY(0);
+}
+
+/* 데이터 없음 표시 */
+.no-data {
+    color: #9ca3af;
+    font-style: italic;
+    font-size: 0.9rem;
+    font-weight: normal;
+}
+
+/* 학과 정보 아이템 컬럼 너비 */
+.dept-name {
+    flex: 2;
+    justify-content: flex-start;
+}
+
+.dept-tuition,
+.dept-scholar {
+    flex: 1.5;
+}
+
+.dept-competition,
+.dept-employment {
+    flex: 1;
+}
+
+/* ===== 비교 표시 스타일 ===== */
+.comparison-item .value-comparison {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.comparison-item .current-value {
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+
+.comparison-item .current-value.higher {
+    color: #dc2626;
+}
+
+.comparison-item .current-value.lower {
+    color: #16a34a;
+}
+
+.comparison-item .current-value.equal {
+    color: #374151;
+}
+
+/* 장학금과 취업률의 경우 색상 반대 */
+.dept-scholar .current-value.higher,
+.dept-employment .current-value.higher {
+    color: #16a34a; /* 좋음 - 초록색 */
+}
+
+.dept-scholar .current-value.lower,
+.dept-employment .current-value.lower {
+    color: #dc2626; /* 나쁨 - 빨간색 */
+}
+
+.comparison-item .avg-value {
+    font-size: 0.85em;
+    color: #6b7280;
+    font-style: italic;
+}
+
+.comparison-item .comparison-indicator {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-top: 2px;
+}
+
+.comparison-item .comparison-indicator.higher {
+    color: #dc2626;
+}
+
+.comparison-item .comparison-indicator.lower {
+    color: #16a34a;
+}
+
+/* 장학금과 취업률의 화살표 색상 반대 */
+.dept-scholar .comparison-indicator.higher,
+.dept-employment .comparison-indicator.higher {
+    color: #16a34a; /* 좋음 - 초록색 */
+}
+
+.dept-scholar .comparison-indicator.lower,
+.dept-employment .comparison-indicator.lower {
+    color: #dc2626; /* 나쁨 - 빨간색 */
+}
+
+/* ===== 북마크 버튼 스타일 ===== */
+.bookmark-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.bookmark-btn:hover {
+    background-color: #f3f4f6;
+}
+
+.bookmark-btn .icon-inactive {
+    display: none;
+}
+
+.bookmark-btn .icon-active {
+    display: inline-block;
+}
+
+.bookmark-btn span img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+.bookmark-btn:not(.active) .icon-active {
+    display: none;
+}
+
+.bookmark-btn:not(.active) .icon-inactive {
+    display: inline-block;
+}
+
+/* ===== 홈페이지 링크 스타일 ===== */
+.homepage-link {
+    display: inline-block;
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 15px;
+    background-color: #7881f5;
+    font-size: 0.85rem;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.homepage-link:hover {
+    background-color: #eef2ff;
+    border-color: #818cf8;
+    color: #4338ca;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.no-homepage {
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    color: #9ca3af;
+    background-color: #f9fafb;
+    border: 1px dashed #e5e7eb;
+    border-radius: 15px;
+    cursor: default;
+    white-space: nowrap;
+    font-style: italic;
+}
+
+/* ===== 범례 스타일 ===== */
+.comparison-legend {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.comparison-legend h3 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.legend-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9em;
+    color: #555;
+}
+
+.legend-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.legend-color.higher {
+    background-color: #dc2626;
+}
+
+.legend-color.lower {
+    background-color: #16a34a;
+}
+
+.legend-text {
+    font-style: italic;
+    color: #6b7280;
+}
+
+/* ===== 데이터 없음 메시지 ===== */
+.no-data-message {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    border: 1px dashed #e5e7eb;
+}
+
+.no-data-message p {
+    margin: 0;
+    font-size: 1.1rem;
+    font-style: italic;
+}
+
+/* 검색 결과 없음 메시지 */
+.search-no-result {
+    background-color: #fff5f5;
+    border-color: #fca5a5;
+    color: #dc2626;
+}
+
+.search-no-result p {
+    font-weight: 500;
+}
+
+/* 검색 중 숨겨진 항목 효과 */
+.dept-item {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.dept-item[style*="display: none"] {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+/* 대학 면접 후기 */
+.interview-list-section {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+}
+
+/* 각 면접 후기 항목에 대한 스타일 (하나의 후기 카드) */
+.review-item {
+	border: 1px solid #c1c4cb;
+	border-radius: 18px;
+	padding: 16px;
+	margin-bottom: 12px; /* 후기 항목 간 간격 */
+	background-color: #f9fafb;
+}
+
+.review-item strong {
+	font-size: 1.1rem;
+	color: #374151;
+	padding: 7px;
+}
+
+/* 작성자와 별점 부분을 한 줄에 표시하기 위한 flexbox */
+.review-meta {
+	display: flex;
+	align-items: center;
+	margin-bottom: 8px;
+	font-size: 0.9rem;
+	color: #6b7280;
+}
+
+/* 별점 아이콘 스타일 */
+.review-item strong.review-rating-icon {
+	color: #f59e0b; /* 노란색 */
+	font-size: 1.2rem; /* 크기 조절 */
+	padding: 2px;
+}
+
+/* 후기 내용 스타일 */
+.review-content {
+	font-size: 0.95rem;
+	color: #4b5563;
+	line-height: 1.5;
+	white-space: pre-wrap; /* 줄바꿈 유지 */
+	margin-bottom: 8px;
+}
+
+/* 후기 날짜 스타일 */
+.review-date {
+	font-size: 0.85rem;
+	color: #9ca3af;
+	text-align: right;
+	margin-top: 8px;
+}
+
+/* 면접 후기가 없는 경우의 메시지 스타일 */
+.no-review-message {
+	font-size: 0.9rem;
+	color: #9ca3af;
+	padding: 10px;
+	text-align: center;
+	border: 1px dashed #e0e0e0;
+	border-radius: 8px;
+}
+
+/* ===== 반응형 디자인 ===== */
+@media (max-width: 768px) {
+    .public-wrapper {
+        padding: 0 15px;
+    }
+    
+    .univ-title-section {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .univ-bookmark {
+        margin-left: 0;
+    }
+    
+    .univ-name {
+        font-size: 1.5rem;
+    }
+    
+    .univ-info-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .dept-list-header,
+    .dept-item-content {
+        padding: 12px 15px;
+        gap: 8px;
+    }
+    
+    .header-item,
+    .dept-info-item {
+        font-size: 0.85rem;
+        padding: 0 2px;
+    }
+    
+    .comparison-item .value-comparison {
+        gap: 2px;
+    }
+    
+    .comparison-item .current-value {
+        font-size: 0.85rem;
+    }
+    
+    .comparison-item .avg-value {
+        font-size: 0.75em;
+    }
+}
+
+@media (max-width: 480px) {
+    .dept-list-header {
+        font-size: 0.8rem;
+    }
+    
+    .header-item,
+    .dept-info-item {
+        font-size: 0.75rem;
+    }
+    
+    .comparison-item .current-value {
+        font-size: 0.8rem;
+    }
+    
+    .comparison-item .avg-value {
+        font-size: 0.7em;
+    }
+}

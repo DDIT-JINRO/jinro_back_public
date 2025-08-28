@@ -1,0 +1,1139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.admin.umg.service.impl.UserManagementMapper">
+
+	<select id="getAlluserList"
+		parameterType="kr.or.ddit.main.service.MemberVO" resultType="int">
+		SELECT COUNT(*)
+		FROM MEMBER
+		<where>
+			MEM_ID IS NOT NULL
+			AND MEM_ROLE = #{memRole}
+			AND DEL_YN = 'N'
+			<if test="keyword != null and keyword != '' and status == 1">
+				AND (MEM_NAME LIKE '%' || #{keyword} || '%' OR
+				MEM_NICKNAME LIKE '%' || #{keyword} || '%' OR MEM_EMAIL LIKE '%' ||
+				#{keyword} || '%')
+			</if>
+			<if test="keyword != null and keyword != '' and status == 2">
+				AND MEM_NAME LIKE '%' || #{keyword} || '%'
+			</if>
+			<if test="keyword != null and keyword != '' and status == 3">
+				AND MEM_NICKNAME LIKE '%' || #{keyword} || '%'
+			</if>
+			<if test="keyword != null and keyword != '' and status == 4">
+				AND MEM_EMAIL LIKE '%' || #{keyword} || '%'
+			</if>
+		</where>
+	</select>
+
+	<select id="getUserList"
+		resultType="kr.or.ddit.main.service.MemberVO"
+		parameterType="kr.or.ddit.main.service.MemberVO">
+		SELECT * FROM (
+		SELECT ROWNUM AS RNUM, B.*
+		FROM (
+		SELECT
+		MEM_ID
+		, MEM_EMAIL
+		, MEM_PASSWORD
+		, MEM_NICKNAME
+		, MEM_PHONE_NUMBER
+		, MEM_NAME
+		, MEM_GEN
+		,
+		MEM_BIRTH
+		, MEM_ALARM
+		, MEM_STUDENT
+		, MEM_ROLE
+		, MEM_POINT
+		, CREATED_AT
+		,
+		PW_UPDATED_AT
+		, DEL_YN
+		, FILE_BADGE
+		, FILE_PROFILE
+		, FILE_ETC
+		, LOGIN_TYPE
+		, MEM_TOKEN
+		, FILE_SUB
+		FROM
+		MEMBER
+		<where>
+			MEM_ID IS NOT NULL
+			AND MEM_ROLE = #{memRole}
+			AND DEL_YN = 'N'
+			<if test="keyword != null and keyword != '' and status == 1">
+				AND (MEM_NAME LIKE '%' || #{keyword} || '%' OR
+				MEM_NICKNAME LIKE '%' || #{keyword} || '%' OR MEM_EMAIL LIKE '%' ||
+				#{keyword} || '%')
+			</if>
+			<if test="keyword != null and keyword != '' and status == 2">
+				AND MEM_NAME LIKE '%' || #{keyword} || '%'
+			</if>
+			<if test="keyword != null and keyword != '' and status == 3">
+				AND MEM_NICKNAME LIKE '%' || #{keyword} || '%'
+			</if>
+			<if test="keyword != null and keyword != '' and status == 4">
+				AND MEM_EMAIL LIKE '%' || #{keyword} || '%'
+			</if>
+		</where>
+		ORDER BY MEM_ID
+		) B
+		WHERE ROWNUM &lt;= #{endNo}
+		)
+		WHERE RNUM &gt;=
+		#{startNo}
+	</select>
+
+	<select id="getMemberVO" parameterType="String"
+		resultType="kr.or.ddit.main.service.MemberVO">
+		SELECT
+		MEM_ID
+		, MEM_EMAIL
+		, MEM_PASSWORD
+		, MEM_NICKNAME
+		,
+		MEM_PHONE_NUMBER
+		, MEM_NAME
+		, MEM_GEN
+		, MEM_BIRTH
+		, MEM_ALARM
+		, MEM_STUDENT
+		, MEM_ROLE
+		, MEM_POINT
+		, CREATED_AT
+		, PW_UPDATED_AT
+		, DEL_YN
+		, FILE_BADGE
+		,
+		FILE_PROFILE
+		, FILE_ETC
+		, LOGIN_TYPE
+		, MEM_TOKEN
+		, FILE_SUB
+		FROM
+		MEMBER
+		WHERE MEM_ID = #{id}
+	</select>
+
+	<select id="getMemberInterest" parameterType="String"
+		resultType="String">
+		SELECT CC.CC_NAME
+		FROM INTEREST_CN IC
+		JOIN COM_CODE CC ON
+		IC.IC_CODE = CC.CC_ID
+		WHERE IC.MEM_ID = #{id}
+	</select>
+
+	<select id="selectPenaltyCountByMemberId" parameterType="String"
+		resultType="kr.or.ddit.admin.umg.service.MemberPenaltyCountVO">
+		SELECT
+		M.MEM_ID,
+		NVL(SUM(CASE WHEN MP.MP_TYPE = 'G14001' THEN
+		1 ELSE 0 END), 0) AS warn_count,
+		NVL(SUM(CASE WHEN MP.MP_TYPE =
+		'G14002' THEN 1 ELSE 0 END), 0) AS
+		ban_count
+		FROM
+		MEMBER M
+		LEFT JOIN
+		MEMBER_PENALTY MP ON M.MEM_ID = MP.MEM_ID
+		WHERE
+		M.MEM_ID = #{id}
+		GROUP BY
+		M.MEM_ID
+	</select>
+
+	<insert id="insertUserByAdmin"
+		parameterType="kr.or.ddit.main.service.MemberVO">
+		INSERT INTO MEMBER (
+		MEM_ID
+		, MEM_EMAIL
+		, MEM_PASSWORD
+		,
+		MEM_NICKNAME
+		, MEM_PHONE_NUMBER
+		, MEM_NAME
+		, MEM_GEN
+		, MEM_BIRTH
+		,
+		MEM_ALARM
+		, MEM_STUDENT
+		, MEM_ROLE
+		, MEM_POINT
+		, CREATED_AT
+		, PW_UPDATED_AT
+		, DEL_YN
+		, FILE_PROFILE
+		, LOGIN_TYPE
+		, MEM_TOKEN
+		) VALUES (
+		(SELECT
+		NVL(MAX(MEM_ID),0)+1 FROM MEMBER)
+		, #{memEmail}
+		, #{memPassword}
+		,
+		#{memNickname}
+		, #{memPhoneNumber}
+		, #{memName}
+		, #{memGen}
+		, #{memBirth}
+		, 'G12001'
+		, 'N'
+		, #{memRole}
+		, 0
+		, SYSDATE
+		, SYSDATE
+		, 'N'
+		, #{fileProfile}
+		, 'G33001'
+		, NULL
+		)
+	</insert>
+
+	<update id="updateMemberInfo"
+		parameterType="kr.or.ddit.main.service.MemberVO">
+		UPDATE MEMBER
+		SET
+		MEM_NICKNAME = #{memNickname},
+		MEM_ROLE =
+		#{memRole},
+		MEM_NAME = #{memName}
+		WHERE
+		MEM_ID = #{memId}
+	</update>
+
+	<select id="selectVacByCns" parameterType="String"
+		resultType="int">
+		SELECT
+		COUNT(*)
+		FROM
+		VACATION
+		WHERE VA_REQUESTOR = #{memId} AND
+		VA_CONFIRM = 'S03003'
+	</select>
+
+	<select id="selectCounseling" parameterType="String"
+		resultType="int">
+		SELECT
+		COUNT(*)
+		FROM
+		COUNSELING
+		WHERE COUNSEL = #{memId}
+		AND
+		COUNSEL_STATUS = 'S04004'
+	</select>
+
+	<select id="selectAvgRate" parameterType="String"
+		resultType="double">
+		SELECT NVL(AVG(R.CR_RATE),0) AS avg_rate
+		FROM
+		COUNSELING_REVIEW R
+		WHERE R.CR_ID IN (
+		SELECT C.COUNSEL_ID
+		FROM
+		COUNSELING C
+		WHERE C.COUNSEL = #{memId}
+		AND C.COUNSEL_REVIEWD = 'Y'
+		)
+	</select>
+
+	<select id="getReportList" parameterType="map" resultType="kr.or.ddit.com.report.service.ReportVO">
+		WITH base AS (
+		    SELECT
+		        r.report_id
+		        , r.target_type
+		        , r.target_id
+		        , r.report_reason
+		        , r.report_status
+		        , r.report_created_at
+		        , r.report_complete_at
+		        , r.report_complete_id
+		        , r.mem_id -- 신고자 ID
+		        , m1.mem_name AS reporter_name -- 신고자명
+		        , r.file_group_no
+		        , CASE
+		            WHEN r.target_type = 'G10001' THEN
+		                b.mem_id
+		            WHEN r.target_type = 'G10002' THEN
+		                rp.mem_id
+		        END         AS reported_mem_id -- 신고대상자 ID
+		        , m2.mem_name AS reported_name -- 신고대상자명
+		    FROM
+		        report r
+			/* 신고 대상(게시글/댓글)에 따라 조건부 조인 */
+		        LEFT JOIN board  b ON r.target_type = 'G10001'
+		                             AND r.target_id = b.board_id
+		        LEFT JOIN reply  rp ON r.target_type = 'G10002'
+		                              AND r.target_id = rp.reply_id
+		        LEFT JOIN member m1 ON r.mem_id = m1.mem_id
+		        LEFT JOIN member m2 ON (
+		            CASE
+		                WHEN r.target_type = 'G10001' THEN
+		                    b.mem_id
+		                WHEN r.target_type = 'G10002' THEN
+		                    rp.mem_id
+		            END
+		        ) = m2.mem_id
+		    WHERE
+		        r.report_id IS NOT NULL
+		)
+		, filtered AS (
+		SELECT
+		t.*
+		, ROW_NUMBER() OVER (
+		ORDER BY
+		CASE WHEN t.REPORT_STATUS = 'S03001' THEN 0 ELSE 1 END ASC,
+		/* --- 각 그룹 내에서 정렬 컬럼 화이트리스트 --- */
+		<choose>
+			<when test="sortBy == 'status'"> t.REPORT_STATUS ${sortOrder} , t.REPORT_CREATED_AT desc </when>
+			<when test="sortBy == 'memId'"> t.MEM_ID ${sortOrder} </when> <!-- 신고자 ID -->
+			<when test="sortBy == 'plTitle'"> t.REPORTED_NAME ${sortOrder} </when> <!-- 신고대상자명 -->
+			<when test="sortBy == 'plCreatedAt'"> t.REPORT_CREATED_AT ${sortOrder} </when> <!-- 신고 접수일 -->
+			<otherwise> t.REPORT_STATUS ${sortOrder}, t.REPORT_CREATED_AT desc</otherwise> <!-- 기본 -->
+		</choose>
+		) AS RNUM
+		FROM base t
+		WHERE 1=1
+			<!-- 상태 필터 (예: S03001 접수 / S03002 반려 / S03003 승인) -->
+			<if test="filter != null and filter != ''">
+				AND t.REPORT_STATUS = #{filter}
+			</if>
+			
+			<!-- 키워드 검색 -->
+			<if test="keyword != null and keyword != ''">
+				<choose>
+					<!-- 2: 신고자명 -->
+					<when test="status == 2">
+						AND t.REPORTER_NAME LIKE '%' || #{keyword} || '%'
+					</when>
+					<!-- 3: 신고대상자명 -->
+					<when test="status == 3">
+						AND t.REPORTED_NAME LIKE '%' || #{keyword} || '%'
+					</when>
+					<!-- 1 또는 그 외: 전체(신고자/신고대상자/사유) -->
+					<otherwise>
+						AND ( t.REPORTER_NAME LIKE '%' || #{keyword} || '%'
+						OR t.REPORTED_NAME LIKE '%' || #{keyword} || '%'
+						OR t.REPORT_REASON LIKE '%' || #{keyword} || '%' )
+					</otherwise>
+				</choose>
+			</if>
+		)
+		SELECT
+			REPORT_ID
+			, TARGET_TYPE
+			, TARGET_ID
+			, REPORT_REASON
+			, REPORT_STATUS
+			, REPORT_CREATED_AT
+			, REPORT_COMPLETE_AT
+			, REPORT_COMPLETE_ID
+			, MEM_ID
+			, REPORTER_NAME
+			, FILE_GROUP_NO
+			, REPORTED_MEM_ID
+			, REPORTED_NAME
+			, RNUM
+		FROM filtered
+		WHERE RNUM BETWEEN #{startNo} AND #{endNo}
+	</select>
+	
+	<select id="getAllReportList"
+    parameterType="kr.or.ddit.com.report.service.ReportVO"
+    resultType="int">
+    SELECT COUNT(*)
+    FROM REPORT R
+    LEFT JOIN BOARD B
+        ON R.TARGET_TYPE = 'G10001' AND R.TARGET_ID = B.BOARD_ID
+    LEFT JOIN REPLY RP
+        ON R.TARGET_TYPE = 'G10002' AND R.TARGET_ID = RP.REPLY_ID
+    LEFT JOIN MEMBER M1
+        ON R.MEM_ID = M1.MEM_ID
+    LEFT JOIN MEMBER M2
+        ON (CASE WHEN R.TARGET_TYPE = 'G10001' THEN B.MEM_ID
+                 WHEN R.TARGET_TYPE = 'G10002' THEN RP.MEM_ID
+            END) = M2.MEM_ID
+    <where>
+        R.REPORT_ID IS NOT NULL
+        <if test="filter != null and filter != ''">
+            AND R.REPORT_STATUS = #{filter}
+        </if>
+
+        <if test="keyword != null and keyword != '' and status == 1">
+            AND (M1.MEM_NAME LIKE '%' || #{keyword} || '%'
+            OR M2.MEM_NAME LIKE '%' || #{keyword} || '%'
+            OR R.REPORT_REASON LIKE '%' || #{keyword} || '%')
+        </if>
+        <if test="keyword != null and keyword != '' and status == 2">
+            AND M1.MEM_NAME LIKE '%' || #{keyword} || '%'
+        </if>
+        <if test="keyword != null and keyword != '' and status == 3">
+            AND M2.MEM_NAME LIKE '%' || #{keyword} || '%'
+        </if>
+        <if test="keyword != null and keyword != '' and status == 4">
+            AND R.REPORT_REASON LIKE '%' || #{keyword} || '%'
+        </if>
+    </where>
+</select>
+
+	<select id="getPenaltyList" resultType="kr.or.ddit.account.lgn.service.MemberPenaltyVO" parameterType="kr.or.ddit.account.lgn.service.MemberPenaltyVO">
+	    SELECT * FROM (
+	        SELECT ROWNUM AS RNUM, B.*
+	        FROM (
+	            SELECT
+	                MP.MP_ID,
+	                MP.REPORT_ID,
+	                MP.MP_WARN_REASON,
+	                MP.MP_WARN_DATE,
+	                MP.MEM_ID,
+	                M.MEM_NAME,
+	                MP.MP_TYPE,
+	                MP.MP_STARTED_AT,
+	                MP.MP_COMPLETE_AT,
+	                MP.FILE_GROUP_NO
+	            FROM MEMBER_PENALTY MP
+	            JOIN MEMBER M ON MP.MEM_ID = M.MEM_ID
+	            <where>
+	                MP.MP_ID IS NOT NULL
+
+	                <!-- 키워드 검색 조건 -->
+	                <if test="keyword != null and keyword != '' and status == 1">
+	                    AND (M.MEM_NAME LIKE '%' || #{keyword} || '%' OR
+	                         MP.MP_WARN_REASON LIKE '%' || #{keyword} || '%')
+	                </if>
+	                <if test="keyword != null and keyword != '' and status == 2">
+	                    AND M.MEM_NAME LIKE '%' || #{keyword} || '%'
+	                </if>
+	                <if test="keyword != null and keyword != '' and status == 3">
+	                    AND MP.MP_WARN_REASON LIKE '%' || #{keyword} || '%'
+	                </if>
+
+	                <!-- 제재 유형별 필터링 -->
+	                <if test="mpType != null and mpType != ''">
+	                    AND MP.MP_TYPE = #{mpType}
+	                </if>
+	            </where>
+
+	            <!-- 정렬 조건 -->
+	            <choose>
+	            	<when test="sortBy == null or sortBy == ''">
+	            		ORDER BY MP.MP_ID
+	            	</when>
+	                <when test="sortBy != null and sortBy != ''">
+	                    ORDER BY
+	                    <choose>
+	                        <when test="sortBy == 'memberName'">M.MEM_NAME</when>
+	                        <when test="sortBy == 'warnDate'">MP.MP_WARN_DATE</when>
+	                        <when test="sortBy == 'mpType'">MP.MP_TYPE</when>
+	                        <when test="sortBy == 'startedAt'">MP.MP_STARTED_AT</when>
+	                        <when test="sortBy == 'completeAt'">MP.MP_COMPLETE_AT</when>
+	                        <otherwise>MP.MP_WARN_DATE</otherwise>
+	                    </choose>
+	                    <if test="sortOrder == 'desc'">DESC</if>
+	                    <if test="sortOrder == 'asc' or sortOrder == null">ASC</if>
+	                </when>
+	                <otherwise>
+	                    ORDER BY MP.MP_WARN_DATE DESC
+	                </otherwise>
+	            </choose>
+	        ) B
+	        WHERE ROWNUM <![CDATA[<=]]> #{endNo}
+	    )
+	    WHERE RNUM <![CDATA[>=]]> #{startNo}
+	</select>
+	
+	<select id="getReportVO" parameterType="String"
+		resultType="kr.or.ddit.com.report.service.ReportVO">
+		SELECT
+		R.REPORT_ID
+		, R.TARGET_TYPE
+		, R.TARGET_ID
+		,
+		R.REPORT_REASON
+		, R.REPORT_STATUS
+		, R.REPORT_CREATED_AT
+		,
+		R.REPORT_COMPLETE_AT
+		, R.REPORT_COMPLETE_ID
+		, R.MEM_ID
+		, M1.MEM_NAME AS
+		REPORTER_NAME
+		, R.FILE_GROUP_NO
+		, CASE
+		WHEN R.TARGET_TYPE = 'G10001' THEN
+		B.MEM_ID
+		WHEN R.TARGET_TYPE = 'G10002' THEN RP.MEM_ID
+		END AS
+		REPORTED_MEM_ID
+		, M2.MEM_NAME AS REPORTED_NAME
+		FROM REPORT R
+		LEFT JOIN
+		BOARD B
+		ON R.TARGET_TYPE = 'G10001'
+		AND R.TARGET_ID = B.BOARD_ID
+		LEFT
+		JOIN REPLY RP
+		ON R.TARGET_TYPE = 'G10002'
+		AND R.TARGET_ID = RP.REPLY_ID
+		LEFT JOIN MEMBER M1
+		ON R.MEM_ID = M1.MEM_ID
+		LEFT JOIN MEMBER M2
+		ON (CASE
+		WHEN R.TARGET_TYPE = 'G10001' THEN B.MEM_ID
+		WHEN R.TARGET_TYPE =
+		'G10002' THEN RP.MEM_ID
+		END) = M2.MEM_ID
+		WHERE REPORT_ID = #{reportId}
+	</select>
+	
+	<select id="getAllMemberPenaltyList" resultType="int">
+	    SELECT COUNT(*)
+	    FROM MEMBER_PENALTY MP
+	    JOIN MEMBER M ON MP.MEM_ID = M.MEM_ID
+	    <where>
+	        MP.MP_ID IS NOT NULL
+
+	        <!-- 키워드 검색 조건 -->
+	        <if test="keyword != null and keyword != '' and status == 1">
+	            AND (M.MEM_NAME LIKE '%' || #{keyword} || '%' OR
+	                 MP.MP_WARN_REASON LIKE '%' || #{keyword} || '%')
+	        </if>
+	        <if test="keyword != null and keyword != '' and status == 2">
+	            AND M.MEM_NAME LIKE '%' || #{keyword} || '%'
+	        </if>
+	        <if test="keyword != null and keyword != '' and status == 3">
+	            AND MP.MP_WARN_REASON LIKE '%' || #{keyword} || '%'
+	        </if>
+
+	        <!-- 제재 유형별 필터링 (새로 추가) -->
+	        <if test="mpType != null and mpType != ''">
+	            AND MP.MP_TYPE = #{mpType}
+	        </if>
+	    </where>
+	</select>
+
+	<select id="getMemIdByReport" parameterType="int"
+		resultType="int">
+		SELECT CASE WHEN RP.TARGET_TYPE = 'G10001' THEN B.MEM_ID
+		            WHEN RP.TARGET_TYPE = 'G10002' THEN RE.MEM_ID
+		        END AS MEM_ID
+		FROM REPORT RP
+		LEFT JOIN BOARD B ON RP.TARGET_TYPE = 'G10001' AND RP.TARGET_ID = B.BOARD_ID
+		LEFT JOIN REPLY RE ON RP.TARGET_TYPE = 'G10002' AND RP.TARGET_ID = RE.REPLY_ID
+		LEFT JOIN MEMBER MB ON B.MEM_ID = MB.MEM_ID
+		LEFT JOIN MEMBER MR ON RE.MEM_ID = MR.MEM_ID
+		WHERE RP.REPORT_ID = #{reportId}
+	</select>
+
+	<insert id="submitPenalty"
+		parameterType="kr.or.ddit.account.lgn.service.MemberPenaltyVO">
+		INSERT INTO MEMBER_PENALTY (
+		MP_ID,
+		REPORT_ID,
+		MP_WARN_REASON,
+		MP_WARN_DATE,
+		MEM_ID,
+		MP_TYPE,
+		MP_STARTED_AT,
+		MP_COMPLETE_AT,
+		FILE_GROUP_NO
+		) VALUES (
+		(SELECT NVL(MAX(MP_ID),0) + 1
+		FROM MEMBER_PENALTY),
+		#{reportId},
+		#{mpWarnReason},
+		SYSDATE,
+		#{memId},
+		#{mpType},
+		<choose>
+			<when test="mpType == 'G14002'">
+			#{penaltyStart},
+			#{penaltyEnd},
+			</when>
+			<otherwise>
+			NULL,
+			NULL,
+			</otherwise>
+		</choose>
+		#{fileGroupNo}
+		)
+	</insert>
+
+	<select id="getPenaltyDetail" parameterType="String"
+		resultType="kr.or.ddit.account.lgn.service.MemberPenaltyVO">
+		SELECT
+		MP.MP_ID,
+		MP.REPORT_ID,
+		MP.MP_WARN_REASON,
+		MP.MP_WARN_DATE,
+		MP.MEM_ID,
+		M.MEM_NAME, -- 멤버 이름
+		MP.MP_TYPE,
+		MP.MP_STARTED_AT,
+		MP.MP_COMPLETE_AT,
+		MP.FILE_GROUP_NO
+		FROM
+		MEMBER_PENALTY
+		MP
+		JOIN
+		MEMBER M
+		ON MP.MEM_ID = M.MEM_ID
+		WHERE MP_ID = #{mpId}
+		ORDER BY
+		MP.MP_WARN_DATE DESC
+	</select>
+
+	<update id="updateReport" parameterType="int">
+		UPDATE REPORT
+		SET
+		REPORT_STATUS = 'S03003'
+		WHERE
+		REPORT_ID = #{reportId}
+	</update>
+
+	<update id="reportModify"
+		parameterType="kr.or.ddit.com.report.service.ReportVO">
+		UPDATE REPORT
+		SET
+		REPORT_STATUS = #{reportStatus}
+		WHERE
+		REPORT_ID = #{reportId}
+	</update>
+
+	<update id="updateMemDelYn" parameterType="int">
+		UPDATE MEMBER
+		SET
+		DEL_YN = 'Y'
+		WHERE
+		MEM_ID = #{memId}
+	</update>
+
+	<!-- 1. 일일 사용자 현황 (오늘 로그인한 고유 사용자 수) -->
+	<select id="getDailyActiveUsers" resultType="int">
+	    SELECT COUNT(DISTINCT MEM_ID)
+	    FROM LOGIN_LOG
+	    WHERE TRUNC(LL_CREATED_AT) = TRUNC(SYSDATE)
+	    AND LL_STATUS = 'I'
+	</select>
+
+	<!-- 2. 일일 평균 홈페이지 이용 현황 (분 단위) -->
+	<select id="getDailyAverageUsageTime" resultType="double">
+	    WITH SESSION_TIMES AS (
+	        SELECT
+	            MEM_ID,
+	            LL_CREATED_AT AS LOGIN_TIME,
+	            LEAD(LL_CREATED_AT) OVER (PARTITION BY MEM_ID ORDER BY LL_CREATED_AT) AS LOGOUT_TIME,
+	            LL_STATUS,
+	            LEAD(LL_STATUS) OVER (PARTITION BY MEM_ID ORDER BY LL_CREATED_AT) AS NEXT_STATUS
+	        FROM LOGIN_LOG
+	        WHERE TRUNC(LL_CREATED_AT) = TRUNC(SYSDATE)
+	    )
+	    SELECT NVL(AVG((LOGOUT_TIME - LOGIN_TIME) * 24 * 60), 0) AS avg_minutes
+	    FROM SESSION_TIMES
+	    WHERE LL_STATUS = 'I'
+	    AND NEXT_STATUS = 'O'
+	    AND LOGOUT_TIME IS NOT NULL
+	</select>
+
+	<!-- 3. 현재 온라인 사용자 수 -->
+	<select id="getCurrentOnlineUsers" resultType="int">
+	    WITH LAST_LOG AS (
+	        SELECT
+	            MEM_ID,
+	            LL_STATUS,
+	            ROW_NUMBER() OVER (PARTITION BY MEM_ID ORDER BY LL_CREATED_AT DESC) AS rn
+	        FROM LOGIN_LOG
+	    )
+	    SELECT COUNT(*)
+	    FROM LAST_LOG
+	    WHERE rn = 1
+	    AND LL_STATUS = 'I'
+	</select>
+
+	<!-- 4. 활동 상태가 포함된 전체 회원 리스트 -->
+	<select id="getMemberActivityList" resultType="kr.or.ddit.main.service.MemberVO">
+	    SELECT * FROM (
+		    SELECT ROWNUM AS RNUM, B.*
+		    FROM (
+		        SELECT
+		            M.MEM_ID,
+		            M.MEM_EMAIL,
+		            M.MEM_NICKNAME,
+		            M.MEM_NAME,
+		            M.MEM_ROLE,
+		            M.CREATED_AT,
+		            M.DEL_YN,
+		            CASE
+		                WHEN P.MEM_ID IS NOT NULL THEN 'SUSPENDED'
+		                WHEN L.LL_STATUS = 'I' THEN 'ONLINE'
+		                WHEN L.LL_STATUS = 'O' THEN 'OFFLINE'
+		                ELSE 'NEVER_LOGIN'
+		            END AS ACTIVITY_STATUS,
+		            L.LL_CREATED_AT AS LAST_ACTIVITY_TIME
+		        FROM MEMBER M
+		        LEFT JOIN (
+		            SELECT
+		                MEM_ID,
+		                LL_STATUS,
+		                LL_CREATED_AT,
+		                ROW_NUMBER() OVER (PARTITION BY MEM_ID ORDER BY LL_CREATED_AT DESC) AS rn
+		            FROM LOGIN_LOG
+		        ) L ON M.MEM_ID = L.MEM_ID AND L.rn = 1
+		        LEFT JOIN (
+		            SELECT DISTINCT MEM_ID
+		            FROM MEMBER_PENALTY
+		            WHERE MP_TYPE = 'G14002'
+		            AND MP_COMPLETE_AT > SYSDATE
+		        ) P ON M.MEM_ID = P.MEM_ID
+		        <where>
+		            M.DEL_YN = 'N'
+		            AND M.MEM_ROLE = 'R01001'
+		            <if test="keyword != null and keyword != ''">
+		                AND (UPPER(M.MEM_NAME) LIKE '%' || UPPER(#{keyword}) || '%'
+		                OR UPPER(M.MEM_NICKNAME) LIKE '%' || UPPER(#{keyword}) || '%'
+		                OR UPPER(M.MEM_EMAIL) LIKE '%' || UPPER(#{keyword}) || '%')
+		            </if>
+		            <if test="activityStatus != null and activityStatus != '' or inFilter != null and inFilter != ''">
+		                <if test="activityStatus == 'SUSPENDED' or inFilter == 'suspended'">
+		                    AND P.MEM_ID IS NOT NULL
+		                </if>
+		                <if test="activityStatus == 'ONLINE' or inFilter == 'online'">
+		                    AND L.LL_STATUS = 'I'
+		                    AND P.MEM_ID IS NULL
+		                </if>
+		                <if test="activityStatus == 'OFFLINE' or inFilter == 'offline'">
+		                     AND (
+		                        (L.LL_STATUS = 'O' AND P.MEM_ID IS NULL)
+		                        OR (L.LL_STATUS IS NULL AND P.MEM_ID IS NULL)
+		                     )
+		                </if>
+		                <if test="activityStatus == 'NEVER_LOGIN' or inFilter == 'neverLogin'">
+		                     AND L.LL_STATUS IS NULL
+		                     AND P.MEM_ID IS NULL
+		                </if>
+		            </if>
+		        </where>
+		        <choose>
+		            <when test="sortBy != null and sortBy != ''">
+		                ORDER BY
+		                <choose>
+		                    <when test="sortBy == 'id'">M.MEM_ID</when>
+		                    <when test="sortBy == 'name'">M.MEM_NAME</when>
+		                    <when test="sortBy == 'email'">M.MEM_EMAIL</when>
+		                    <otherwise>M.MEM_ID</otherwise>
+		                </choose>
+		                <if test="sortOrder == 'desc'">DESC</if>
+		                <if test="sortOrder == 'asc' or sortOrder == null">ASC</if>
+		            </when>
+		            <otherwise>
+		                ORDER BY
+		                CASE
+		                    WHEN P.MEM_ID IS NOT NULL THEN 0
+		                    WHEN L.LL_STATUS = 'I' THEN 1
+		                    WHEN L.LL_STATUS = 'O' THEN 2
+		                    ELSE 3
+		                END,
+		                NVL(L.LL_CREATED_AT, TO_DATE('1900-01-01', 'YYYY-MM-DD')) DESC
+		            </otherwise>
+		        </choose>
+		    ) B
+		    WHERE ROWNUM <![CDATA[<=]]> #{endNo}
+		)
+		WHERE RNUM <![CDATA[>=]]> #{startNo}
+	</select>
+
+	<!-- 5. 활동 상태 회원 리스트 총 건수 -->
+	<select id="getAllMemberActivityList" resultType="int">
+	    SELECT COUNT(*)
+			FROM MEMBER M
+			LEFT JOIN (
+			    SELECT
+			        MEM_ID,
+			        LL_STATUS,
+			        LL_CREATED_AT,
+			        ROW_NUMBER() OVER (PARTITION BY MEM_ID ORDER BY LL_CREATED_AT DESC) AS rn
+			    FROM LOGIN_LOG
+			) L ON M.MEM_ID = L.MEM_ID AND L.rn = 1
+			LEFT JOIN (
+			    SELECT DISTINCT MEM_ID
+			    FROM MEMBER_PENALTY
+			    WHERE MP_TYPE = 'G14002'
+			    AND MP_COMPLETE_AT > SYSDATE
+			) P ON M.MEM_ID = P.MEM_ID
+			<where>
+			    M.DEL_YN = 'N'
+			    AND M.MEM_ROLE = 'R01001'
+			    <if test="keyword != null and keyword != ''">
+			        AND (UPPER(M.MEM_NAME) LIKE '%' || UPPER(#{keyword}) || '%'
+			        OR UPPER(M.MEM_NICKNAME) LIKE '%' || UPPER(#{keyword}) || '%'
+			        OR UPPER(M.MEM_EMAIL) LIKE '%' || UPPER(#{keyword}) || '%')
+			    </if>
+			    <if test="activityStatus != null and activityStatus != '' or inFilter != null and inFilter != ''">
+			        <if test="activityStatus == 'SUSPENDED' or inFilter == 'suspended'">
+			            AND P.MEM_ID IS NOT NULL
+			        </if>
+			        <if test="activityStatus == 'ONLINE' or inFilter == 'online'">
+			            AND L.LL_STATUS = 'I'
+			            AND P.MEM_ID IS NULL
+			        </if>
+			        <if test="activityStatus == 'OFFLINE' or inFilter == 'offline'">
+			            AND (
+				            (L.LL_STATUS = 'O'
+				            AND P.MEM_ID IS NULL)
+				            OR (
+				            	 L.LL_STATUS IS NULL
+				            	AND P.MEM_ID IS NULL
+				            )
+			            )
+			        </if>
+			        <if test="activityStatus == 'NEVER_LOGIN' or inFilter == 'neverLogin'">
+			            AND L.LL_STATUS IS NULL
+			            AND P.MEM_ID IS NULL
+			        </if>
+			    </if>
+			</where>
+	</select>
+
+	<!-- 6. 어제 로그인한 고유 사용자 수 -->
+	<select id="getYesterdayActiveUsers" resultType="int">
+	    SELECT COUNT(DISTINCT MEM_ID)
+	    FROM LOGIN_LOG
+	    WHERE TRUNC(LL_CREATED_AT) = TRUNC(SYSDATE) - 1
+	    AND LL_STATUS = 'I'
+	</select>
+
+	<!-- 7. 어제 평균 홈페이지 이용 시간 (분 단위) -->
+	<select id="getYesterdayAverageUsageTime" resultType="double">
+	    WITH SESSION_TIMES AS (
+	        SELECT
+	            MEM_ID,
+	            LL_CREATED_AT AS LOGIN_TIME,
+	            LEAD(LL_CREATED_AT) OVER (PARTITION BY MEM_ID ORDER BY LL_CREATED_AT) AS LOGOUT_TIME,
+	            LL_STATUS,
+	            LEAD(LL_STATUS) OVER (PARTITION BY MEM_ID ORDER BY LL_CREATED_AT) AS NEXT_STATUS
+	        FROM LOGIN_LOG
+	        WHERE TRUNC(LL_CREATED_AT) = TRUNC(SYSDATE) - 1
+	    )
+	    SELECT NVL(AVG((LOGOUT_TIME - LOGIN_TIME) * 24 * 60), 0) AS avg_minutes
+	    FROM SESSION_TIMES
+	    WHERE LL_STATUS = 'I'
+	    AND NEXT_STATUS = 'O'
+	    AND LOGOUT_TIME IS NOT NULL
+	</select>
+
+	<select id="getMemberDetailBoardList" resultType="kr.or.ddit.comm.vo.CommBoardVO">
+		SELECT * FROM (
+		        SELECT ROWNUM AS RNUM, B.*
+		        FROM (
+		            SELECT
+		                BOARD_ID,
+		                MEM_ID,
+		                CC_ID,
+		                BOARD_TITLE,
+		                BOARD_CONTENT,
+		                BOARD_CREATED_AT,
+		                BOARD_UPDATED_AT,
+		                BOARD_CNT,
+		                BOARD_DEL_YN,
+		                FILEGROUP_ID
+		            FROM
+		                BOARD
+		            WHERE
+		                MEM_ID = #{memId}
+		            <if test="ccId != null and ccId != ''">
+		                AND CC_ID = #{ccId}
+		            </if>
+		            <choose>
+		                <when test="sortBy != null and sortBy != ''">
+		                    ORDER BY
+		                    <choose>
+		                        <when test="sortBy == 'boardId'">BOARD_ID</when>
+		                        <when test="sortBy == 'boardDelYn'">BOARD_DEL_YN</when>
+		                        <when test="sortBy == 'boardCreatedAt'">BOARD_CREATED_AT</when>
+		                        <otherwise>BOARD_ID</otherwise>
+		                    </choose>
+		                    <if test="sortOrder == 'desc'">DESC</if>
+		                    <if test="sortOrder == 'asc' or sortOrder == null">ASC</if>
+		                </when>
+		                <otherwise>
+		                    ORDER BY
+		                        BOARD_ID ASC
+		                </otherwise>
+		            </choose>
+		        ) B
+		        WHERE ROWNUM &lt;= #{endNo}
+		    )
+		    WHERE RNUM &gt;= #{startNo}
+	</select>
+
+	<select id="selectBoardCountByMemId" resultType="int">
+	    SELECT
+	        COUNT(*)
+	    FROM
+	        BOARD
+	    WHERE
+	        MEM_ID = #{memId}
+	    <if test="ccId != null and ccId != ''">
+	        AND CC_ID = #{ccId}
+	    </if>
+	</select>
+
+	<!-- 8. 일일 가입자 수 (오늘 가입한 사용자 수) -->
+	<select id="getDailySignUpUsers" resultType="int">
+	    SELECT COUNT(*)
+	    FROM MEMBER
+	    WHERE TRUNC(CREATED_AT) = TRUNC(SYSDATE)
+	    AND DEL_YN = 'N'
+	</select>
+
+	<!-- 9. 어제 가입한 사용자 수 -->
+	<select id="getYesterdaySignUpUsers" resultType="int">
+	    SELECT COUNT(*)
+	    FROM MEMBER
+	    WHERE TRUNC(CREATED_AT) = TRUNC(SYSDATE) - 1
+	    AND DEL_YN = 'N'
+	</select>
+
+	<!-- 10. 월간 탈퇴자 수 (이번 달 탈퇴한 사용자 수) -->
+	<select id="getMonthlyWithdrawalUsers" resultType="int">
+	    SELECT COUNT(*)
+	    FROM MEM_DEL
+	    WHERE TRUNC(MD_DELETED_AT, 'MM') = TRUNC(SYSDATE, 'MM')
+	    AND MD_DELETED_AT IS NOT NULL
+	</select>
+
+	<!-- 11. 지난 달 탈퇴한 사용자 수 -->
+	<select id="getLastMonthWithdrawalUsers" resultType="int">
+	    SELECT COUNT(*)
+	    FROM MEM_DEL
+	    WHERE TRUNC(MD_DELETED_AT, 'MM') = TRUNC(ADD_MONTHS(SYSDATE, -1), 'MM')
+	    AND MD_DELETED_AT IS NOT NULL
+	</select>
+
+	<!-- 멤버 Detail 보내줄 때 같이 보내줄 데이터들 -->
+	<!-- 1. 모의면접 횟수 조회 -->
+	<select id="getMockInterviewCount" parameterType="String" resultType="int">
+	    SELECT COUNT(*)
+	    FROM PAGE_LOG
+	    WHERE MEM_ID = #{memId}
+	    AND PL_TITLE = '모의면접'
+	</select>
+
+	<!-- 2. AI 피드백 횟수 조회 -->
+	<select id="getAiFeedbackCount" parameterType="String" resultType="int">
+	    SELECT COUNT(*)
+	    FROM PAGE_LOG
+	    WHERE MEM_ID = #{memId}
+	    AND PL_TITLE LIKE 'AI 피드백%'
+	</select>
+
+	<!-- 3. 완료된 상담횟수 조회 -->
+	<select id="getCounselingCompletedCount" parameterType="String" resultType="int">
+	    SELECT COUNT(*)
+	    FROM COUNSELING
+	    WHERE COUNSEL = #{memId}
+	    AND COUNSEL_STATUS = 'S04004'
+	</select>
+
+	<!-- 4. 월드컵 횟수 조회 -->
+	<select id="getWorldcupCount" parameterType="String" resultType="int">
+	    SELECT COUNT(*)
+	    FROM PAGE_LOG
+	    WHERE MEM_ID = #{memId}
+	    AND PL_TITLE = '월드컵'
+	</select>
+
+	<!-- 5. 로드맵 횟수 조회 -->
+	<select id="getRoadmapCount" parameterType="String" resultType="int">
+	    SELECT COUNT(*)
+	    FROM PAGE_LOG
+	    WHERE MEM_ID = #{memId}
+	    AND PL_TITLE = '로드맵'
+	</select>
+
+	<!-- 6. 심리검사 횟수 조회 -->
+	<select id="getPsychTestCount" parameterType="String" resultType="int">
+	    SELECT COUNT(*)
+	    FROM APTITUDE_TEST
+	    WHERE MEM_ID = #{memId}
+	</select>
+
+	<!-- 7. 최근 로그인 기록 조회 -->
+	<select id="getRecentLoginDate" parameterType="String" resultType="String">
+	    SELECT TO_CHAR(LL_CREATED_AT, 'YYYY-MM-DD HH24:MI:SS') AS recent_login
+	    FROM (
+	        SELECT LL_CREATED_AT
+	        FROM LOGIN_LOG
+	        WHERE MEM_ID = #{memId}
+	        AND LL_STATUS = 'I'
+	        ORDER BY LL_CREATED_AT DESC
+	    )
+	    WHERE ROWNUM = 1
+	</select>
+
+	<!-- 8. 최근 제재 기록 조회 -->
+	<select id="getRecentPenaltyDate" parameterType="String" resultType="String">
+	    SELECT TO_CHAR(MP_WARN_DATE, 'YYYY-MM-DD HH24:MI:SS') AS recent_penalty
+	    FROM (
+	        SELECT MP_WARN_DATE
+	        FROM MEMBER_PENALTY
+	        WHERE MEM_ID = #{memId}
+	        ORDER BY MP_WARN_DATE DESC
+	    )
+	    WHERE ROWNUM = 1
+	</select>
+
+	<select id="getMemberDetailReplyList" resultType="kr.or.ddit.comm.vo.CommReplyVO">
+	    SELECT * FROM (
+	        SELECT ROWNUM AS RNUM, B.*
+	        FROM (
+	            SELECT
+	                A.REPLY_ID,
+	                A.BOARD_ID,
+	                A.MEM_ID,
+	                A.REPLY_CONTENT,
+	                A.REPLY_CREATED_AT,
+	                A.REPLY_UPDATED_AT,
+	                A.REPLY_DEL_YN,
+	                A.REPLY_PARENT_ID,
+	                B.CC_ID
+	            FROM
+	                REPLY A
+	            INNER JOIN
+	                BOARD B ON A.BOARD_ID = B.BOARD_ID
+	            WHERE
+	                A.MEM_ID = #{memId}
+	            <choose>
+	                <when test="sortBy != null and sortBy != ''">
+	                    ORDER BY
+	                    <choose>
+	                        <when test="sortBy == 'replyId'">A.REPLY_ID</when>
+	                        <when test="sortBy == 'replyDelYn'">A.REPLY_DEL_YN</when>
+	                        <when test="sortBy == 'replyCreatedAt'">A.REPLY_CREATED_AT</when>
+	                        <otherwise>A.REPLY_ID</otherwise>
+	                    </choose>
+	                    <if test="sortOrder == 'desc'">DESC</if>
+	                    <if test="sortOrder == 'asc' or sortOrder == null">ASC</if>
+	                </when>
+	                <otherwise>
+	                    ORDER BY
+	                        A.REPLY_ID ASC
+	                </otherwise>
+	            </choose>
+	        ) B
+	        WHERE ROWNUM &lt;= #{endNo}
+	    )
+	    WHERE RNUM &gt;= #{startNo}
+	</select>
+
+	<select id="selectReplyCountByMemId" resultType="int">
+		SELECT
+	        COUNT(*)
+	    FROM
+	        REPLY
+	    WHERE
+	        MEM_ID = #{memId}
+	</select>
+	<select id="getMemberPageLogList" resultType="kr.or.ddit.admin.las.service.PageLogVO">
+		SELECT * FROM (
+		    SELECT ROWNUM AS RNUM, A.*
+		    FROM (
+		        SELECT
+		            PL.PL_ID,
+		            PL.MEM_ID,
+		            PL.PL_URL,
+		            PL.PL_TITLE,
+		            PL.PL_REFERER_URL,
+		            PL.PL_CREATED_AT,
+		            M.MEM_NAME
+		        FROM
+		            PAGE_LOG PL
+		        LEFT JOIN
+		        	MEMBER M ON PL.MEM_ID = M.MEM_ID
+		        <where>
+		        	PL.MEM_ID = #{memId}
+		            <if test="keyword != null and keyword != ''">
+		                AND (
+		                    PL.PL_TITLE LIKE '%' || #{keyword} || '%'
+		                    OR PL.PL_URL LIKE '%' || #{keyword} || '%'
+		                    OR M.MEM_NAME LIKE '%' || #{keyword} || '%'
+		                )
+		            </if>
+		        </where>
+		        <choose>
+		            <when test="sortBy != null and sortBy != ''">
+		                ORDER BY
+		                <choose>
+		                    <when test="sortBy == 'plId'">PL.PL_ID</when>
+		                    <when test="sortBy == 'memId'">PL.MEM_ID</when>
+		                    <when test="sortBy == 'memName'">M.MEM_NAME</when>
+		                    <when test="sortBy == 'plTitle'">PL.PL_TITLE</when>
+		                    <when test="sortBy == 'plCreatedAt'">PL.PL_CREATED_AT</when>
+		                    <otherwise>PL.PL_ID</otherwise>
+		                </choose>
+		                <if test="sortOrder == 'desc'">DESC</if>
+		                <if test="sortOrder == 'asc' or sortOrder == null">ASC</if>
+		            </when>
+		            <otherwise>
+		                ORDER BY PL.PL_CREATED_AT DESC
+		            </otherwise>
+		        </choose>
+		    ) A
+		    WHERE ROWNUM <![CDATA[<=]]> #{endNo}
+		)
+		WHERE RNUM <![CDATA[>=]]> #{startNo}
+	</select>
+
+	<select id="getAllMemberPageLogList" resultType="int">
+	    SELECT COUNT(*)
+	    FROM PAGE_LOG PL
+	    LEFT JOIN
+		MEMBER M ON PL.MEM_ID = M.MEM_ID
+	    <where>
+	    	PL.MEM_ID = #{memId}
+	        <if test="keyword != null and keyword != ''">
+	            AND (
+	                PL.PL_TITLE LIKE '%' || #{keyword} || '%'
+	                OR PL.PL_URL LIKE '%' || #{keyword} || '%'
+	                OR M.MEM_NAME LIKE '%' || #{keyword} || '%'
+	            )
+	        </if>
+	    </where>
+	</select>
+
+	<update id="penaltyModify" parameterType="kr.or.ddit.account.lgn.service.MemberPenaltyVO">
+		UPDATE	MEMBER_PENALTY
+		SET		MP_TYPE = #{mpType}
+				,MP_WARN_DATE = SYSDATE
+				<if test="mpType == 'G14002'">
+				, MP_STARTED_AT = #{penaltyStart}
+				, MP_COMPLETE_AT = #{penaltyEnd}
+				</if>
+				<if test="mpType == 'G14001'">
+				, MP_STARTED_AT = null
+				, MP_COMPLETE_AT = null
+				</if>
+		WHERE  MP_ID = #{mpId}
+	</update>
+
+	<update id="resetMemDelYn" parameterType="int">
+		UPDATE	MEMBER
+		SET		DEL_YN = 'N'
+		WHERE	MEM_ID = #{memId}
+	</update>
+
+	<update id="penaltyCancel" parameterType="kr.or.ddit.account.lgn.service.MemberPenaltyVO">
+		DELETE FROM MEMBER_PENALTY
+		WHERE  MP_ID = #{mpId}
+	</update>
+
+	<update id="resetReportStatus" parameterType="int">
+		UPDATE REPORT
+		SET REPORT_STATUS = 'S03001'
+		WHERE REPORT_ID = #{reportId}
+	</update>
+
+</mapper>

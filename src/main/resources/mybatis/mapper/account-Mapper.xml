@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.account.lgn.service.impl.LoginMapper">
+
+	<select id="selectMemberByEmailForNaver"
+		resultType="kr.or.ddit.main.service.MemberVO" parameterType="String">
+		SELECT
+		MEM_ID, MEM_EMAIL, MEM_PASSWORD, MEM_NICKNAME, MEM_PHONE_NUMBER,
+		MEM_NAME, MEM_GEN, MEM_BIRTH, MEM_ALARM, MEM_STUDENT, MEM_ROLE,
+		MEM_POINT, CREATED_AT, PW_UPDATED_AT, DEL_YN, FILE_PROFILE, FILE_ETC,
+		LOGIN_TYPE, MEM_TOKEN
+		FROM MEMBER
+		WHERE MEM_EMAIL = #{inputEmail} AND
+		LOGIN_TYPE = 'G33003'
+	</select>
+
+	<select id="selectMemberByEmailForKakao"
+		resultType="kr.or.ddit.main.service.MemberVO" parameterType="String">
+		SELECT
+		MEM_ID, MEM_EMAIL, MEM_PASSWORD, MEM_NICKNAME, MEM_PHONE_NUMBER,
+		MEM_NAME, MEM_GEN, MEM_BIRTH, MEM_ALARM, MEM_STUDENT, MEM_ROLE,
+		MEM_POINT, CREATED_AT, PW_UPDATED_AT, DEL_YN, FILE_PROFILE, FILE_ETC,
+		LOGIN_TYPE, MEM_TOKEN
+		FROM MEMBER
+		WHERE MEM_EMAIL = #{inputEmail} AND
+		LOGIN_TYPE = 'G33002'
+	</select>
+
+	<select id="selectMemberByEmail"
+		resultType="kr.or.ddit.main.service.MemberVO" parameterType="String">
+		SELECT
+		MEM_ID, MEM_EMAIL, MEM_PASSWORD, MEM_NICKNAME, MEM_PHONE_NUMBER,
+		MEM_NAME, MEM_GEN, MEM_BIRTH, MEM_ALARM, MEM_STUDENT, MEM_ROLE,
+		MEM_POINT, CREATED_AT, PW_UPDATED_AT, DEL_YN, FILE_PROFILE, FILE_ETC,
+		LOGIN_TYPE, MEM_TOKEN
+		FROM MEMBER
+		WHERE MEM_EMAIL = #{inputEmail} AND
+		LOGIN_TYPE = 'G33001'
+	</select>
+
+	<select id="selectMemDelStat" parameterType="int"
+		resultType="kr.or.ddit.account.lgn.service.MemDelVO">
+		SELECT MD_STATUS
+		FROM MEM_DEL
+		WHERE MEM_ID = #{memId}
+		ORDER BY MD_ID DESC
+		FETCH FIRST 1 ROWS ONLY
+	</select>
+
+	<select id="selectMemPnt" parameterType="int"
+		resultType="kr.or.ddit.account.lgn.service.MemberPenaltyVO">
+		SELECT
+		MP_ID, REPORT_ID, MP_WARN_REASON, MP_WARN_DATE,
+		MEM_ID, MP_TYPE,
+		MP_STARTED_AT, MP_COMPLETE_AT, FILE_GROUP_NO
+		FROM
+		MEMBER_PENALTY
+		WHERE MEM_ID = #{memId}
+		AND MP_TYPE = 'G14002'
+        AND MP_COMPLETE_AT > SYSDATE
+	</select>
+
+	<update id="memTokenInsert" parameterType="map">
+		UPDATE MEMBER
+		SET
+		MEM_TOKEN = #{refreshToken}
+		WHERE MEM_ID = #{memId}
+	</update>
+
+	<select id="selectAuthByMemId" parameterType="int"
+		resultType="kr.or.ddit.main.service.MemberVO">
+		SELECT MEM_ROLE
+		FROM MEMBER
+		WHERE MEM_ID = #{memId}
+	</select>
+
+	<select id="selectById" parameterType="int"
+		resultType="kr.or.ddit.main.service.MemberVO">
+		SELECT MEM_ID, MEM_EMAIL, MEM_PASSWORD, MEM_NICKNAME,
+		MEM_PHONE_NUMBER, MEM_NAME, MEM_GEN, MEM_BIRTH, MEM_ALARM,
+		MEM_STUDENT, MEM_ROLE, MEM_POINT, CREATED_AT, PW_UPDATED_AT, DEL_YN,
+		FILE_PROFILE, FILE_ETC, LOGIN_TYPE, MEM_TOKEN
+		FROM MEMBER
+		WHERE MEM_ID
+		=#{memId}
+	</select>
+
+	<select id="selectByEmailForKakao"
+		resultType="kr.or.ddit.main.service.MemberVO"
+		parameterType="kr.or.ddit.main.service.MemberVO">
+		SELECT MEM_ID, MEM_EMAIL, MEM_ROLE, DEL_YN
+		FROM MEMBER
+		WHERE
+		MEM_EMAIL = #{memEmail} AND LOGIN_TYPE = 'G33002'
+	</select>
+
+	<select id="selectByEmailForNaver"
+		resultType="kr.or.ddit.main.service.MemberVO"
+		parameterType="kr.or.ddit.main.service.MemberVO">
+		SELECT MEM_ID, MEM_EMAIL, MEM_ROLE, DEL_YN
+		FROM MEMBER
+		WHERE
+		MEM_EMAIL = #{memEmail} AND LOGIN_TYPE = 'G33003'
+	</select>
+
+	<insert id="kakaoInsert"
+		parameterType="kr.or.ddit.main.service.MemberVO">
+		INSERT INTO MEMBER(MEM_ID, MEM_EMAIL, MEM_PASSWORD,
+		MEM_NICKNAME, MEM_PHONE_NUMBER, MEM_NAME, MEM_GEN, MEM_BIRTH,
+		MEM_ALARM, MEM_STUDENT, MEM_ROLE, MEM_POINT, CREATED_AT,
+		PW_UPDATED_AT, DEL_YN, FILE_BADGE, FILE_PROFILE, FILE_ETC, LOGIN_TYPE,
+		MEM_TOKEN)
+		VALUES (((SELECT NVL(MAX(MEM_ID),0)+1 FROM
+		MEMBER)),#{memEmail}, '********',
+		(SELECT '카카오회원' || (
+		NVL(MAX(
+		CASE
+		WHEN
+		mem_nickname LIKE '카카오회원%' AND REGEXP_LIKE(mem_nickname,
+		'^카카오회원[0-9]+$')
+		THEN TO_NUMBER(SUBSTR(mem_nickname, LENGTH('카카오회원') +
+		1))
+		ELSE NULL
+		END
+		), 0) + 1
+		) AS new_nickname
+		FROM member
+		WHERE mem_nickname
+		LIKE '카카오회원%'), #{memPhoneNumber}, #{memName},
+		#{memGen}, #{memBirth},
+		'G12004', 'N', 'R01001', '0', SYSDATE,
+		SYSDATE, 'N', null, null, null,
+		'G33002', null )
+	</insert>
+
+	<insert id="naverInsert"
+		parameterType="kr.or.ddit.main.service.MemberVO">
+		INSERT INTO MEMBER(MEM_ID, MEM_EMAIL, MEM_PASSWORD,
+		MEM_NICKNAME, MEM_PHONE_NUMBER, MEM_NAME, MEM_GEN, MEM_BIRTH,
+		MEM_ALARM, MEM_STUDENT, MEM_ROLE, MEM_POINT, CREATED_AT,
+		PW_UPDATED_AT, DEL_YN, FILE_BADGE, FILE_PROFILE, FILE_ETC, LOGIN_TYPE,
+		MEM_TOKEN)
+		VALUES (((SELECT NVL(MAX(MEM_ID),0)+1 FROM
+		MEMBER)),#{memEmail}, '********',
+		(SELECT '네이버회원' || (
+		NVL(MAX(
+		CASE
+		WHEN
+		mem_nickname LIKE '네이버회원%' AND REGEXP_LIKE(mem_nickname,
+		'^네이버회원[0-9]+$')
+		THEN TO_NUMBER(SUBSTR(mem_nickname, LENGTH('네이버회원') +
+		1))
+		ELSE NULL
+		END
+		), 0) + 1
+		) AS new_nickname
+		FROM member
+		WHERE mem_nickname
+		LIKE '네이버회원%'), #{memPhoneNumber}, #{memName},
+		#{memGen}, #{memBirth},
+		'G12004', 'N', 'R01001', '0', SYSDATE,
+		SYSDATE, 'N', null, null, null,
+		'G33003', null )
+	</insert>
+
+	<select id="findEmailStringByNameAndPhone"
+		resultType="kr.or.ddit.main.service.MemberVO"
+		parameterType="kr.or.ddit.main.service.MemberVO">
+		SELECT MEM_EMAIL FROM MEMBER WHERE MEM_NAME = #{memName}
+		AND MEM_PHONE_NUMBER = #{memPhoneNumber} AND LOGIN_TYPE = 'G33001'
+	</select>
+
+	<select id="validateUser"
+		parameterType="kr.or.ddit.main.service.MemberVO"
+		resultType="kr.or.ddit.main.service.MemberVO">
+		SELECT MEM_ID, MEM_EMAIL, MEM_NAME FROM MEMBER WHERE
+		MEM_EMAIL = #{memEmail} AND MEM_NAME = #{memName} AND LOGIN_TYPE =
+		'G33001'
+	</select>
+
+	<update id="insertEncodePass"
+		parameterType="kr.or.ddit.main.service.MemberVO">
+		UPDATE MEMBER
+		SET MEM_PASSWORD = #{memPassword}
+		WHERE
+		MEM_EMAIL = #{memEmail} AND LOGIN_TYPE = 'G33001'
+	</update>
+
+	<insert id="insertLoginLog" parameterType="int">
+		INSERT INTO LOGIN_LOG
+		(
+		LL_ID
+		, LL_CREATED_AT
+		, LL_STATUS
+		, MEM_ID
+		) VALUES (
+		(SELECT NVL(MAX(LL_ID),0)+1 FROM LOGIN_LOG)
+		, SYSDATE
+		, 'I'
+		, #{memId}
+		)
+	</insert>
+	<insert id="insertLogoutLog" parameterType="int">
+		INSERT INTO LOGIN_LOG
+		(
+		LL_ID
+		, LL_CREATED_AT
+		, LL_STATUS
+		, MEM_ID
+		) VALUES (
+		(SELECT NVL(MAX(LL_ID),0)+1 FROM LOGIN_LOG)
+		, SYSDATE
+		, 'O'
+		, #{memId}
+		)
+	</insert>
+	
+	<update id="updateMemDelStatus" parameterType="int">
+		UPDATE MEM_DEL
+		SET
+		    MD_STATUS = 'S01002'
+		WHERE
+		    MEM_ID = #{memId}
+	</update>
+	
+	<update id="updateMemDel" parameterType="int">
+		UPDATE MEMBER
+	    SET
+	        DEL_YN = 'N'
+	    WHERE
+	        MEM_ID = #{memId}
+	</update>
+</mapper>

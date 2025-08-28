@@ -1,0 +1,372 @@
+/* ==========================================================================
+   자기소개서 작성 페이지 전용 스타일
+   ========================================================================== */
+
+/* 자기소개서 작성 컨테이너 */
+.selfintro-write-container {
+	max-width: 100%;
+}
+
+.selfintro-write-form {
+	display: flex;
+	flex-direction: column;
+	gap: 32px;
+}
+
+/* 폼 섹션 */
+.form-section {
+	margin-bottom: 32px;
+}
+
+.form-label {
+	display: block;
+	font-size: 16px;
+	font-weight: 600;
+	color: #374151;
+	margin-bottom: 8px;
+}
+
+.form-input {
+	width: 100%;
+	padding: 12px 16px;
+	font-size: 16px;
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	background-color: #fff;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+	box-sizing: border-box;
+}
+
+.form-input:focus {
+	outline: none;
+	border-color: #7881f5;
+	box-shadow: 0 0 0 3px rgba(120, 129, 245, 0.1);
+}
+
+.form-input--large {
+	padding: 16px 20px;
+	font-size: 18px;
+}
+
+/* QA 컨테이너 */
+.qa-container {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+/* QA 카드 */
+.qa-card {
+	background-color: #fff;
+	border: 1px solid #e5e7eb;
+	border-radius: 12px;
+	overflow: hidden;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+	transition: box-shadow 0.2s ease;
+}
+
+.qa-card:hover {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.qa-card__header {
+	background: #f8f9fa;
+	border-bottom: 1px solid #e5e7eb;
+	padding: 16px 20px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.qa-card__number {
+	background-color: #7881f5;
+	color: #fff;
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 600;
+	font-size: 14px;
+	flex-shrink: 0;
+}
+
+.qa-card__question {
+	color: #374151;
+	font-size: 15px;
+	font-weight: 500;
+	margin: 0;
+	line-height: 1.5;
+	flex: 1;
+}
+
+.qa-card__body {
+	padding: 20px;
+}
+
+/* 폼 그룹 */
+.form-group {
+	position: relative;
+}
+
+.form-textarea {
+	width: 100%;
+	min-height: 160px;
+	padding: 16px;
+	font-size: 15px;
+	line-height: 1.6;
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	background-color: #fff;
+	resize: vertical;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+	box-sizing: border-box;
+	font-family: inherit;
+}
+
+.form-textarea:focus {
+	outline: none;
+	border-color: #7881f5;
+	box-shadow: 0 0 0 3px rgba(120, 129, 245, 0.1);
+}
+
+.form-textarea::placeholder {
+	color: #9ca3af;
+}
+
+/* 글자 수 카운터 */
+.char-counter {
+	text-align: right;
+	margin-top: 8px;
+	font-size: 14px;
+	color: #6b7280;
+}
+
+.char-counter span {
+	font-weight: 600;
+	color: #7881f5;
+}
+
+/* 폼 액션 */
+.form-actions {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 40px;
+	padding-top: 24px;
+	border-top: 1px solid #e5e7eb;
+}
+
+.form-actions__left, .form-actions__right {
+	display: flex;
+	gap: 12px;
+}
+
+/* 버튼 스타일 */
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 12px 24px;
+	font-size: 14px;
+	font-weight: 600;
+	border-radius: 8px;
+	border: 1px solid transparent;
+	cursor: pointer;
+	text-decoration: none;
+	transition: all 0.2s ease;
+	white-space: nowrap;
+}
+
+.btn svg {
+	width: 16px;
+	height: 16px;
+}
+
+/* 기본 버튼 */
+.btn--primary {
+	background-color: #7881f5;
+	color: #fff;
+	border-color: #7881f5;
+}
+
+.btn--primary:hover {
+	background-color: #6366f1;
+	border-color: #6366f1;
+}
+
+/* 보조 버튼 */
+.btn--secondary {
+	background-color: #f3f4f6;
+	color: #374151;
+	border-color: #d1d5db;
+}
+
+.btn--secondary:hover {
+	background-color: #e5e7eb;
+	border-color: #9ca3af;
+}
+
+/* 외곽선 버튼 */
+.btn--outline {
+	background-color: #fff;
+	color: #7881f5;
+	border-color: #7881f5;
+}
+
+.btn--outline:hover {
+	background-color: #7881f5;
+	color: #fff;
+}
+
+/* 위험 버튼 */
+.btn--danger {
+	background-color: #ef4444;
+	color: #fff;
+	border-color: #ef4444;
+}
+
+.btn--danger:hover {
+	background-color: #dc2626;
+	border-color: #dc2626;
+}
+
+.btn--danger.btn--outline {
+	background-color: #fff;
+	color: #ef4444;
+	border-color: #ef4444;
+}
+
+.btn--danger.btn--outline:hover {
+	background-color: #ef4444;
+	color: #fff;
+}
+
+/* PDF 미리보기용 스타일 최적화 */
+@media print {
+	.qa-card {
+		page-break-inside: avoid;
+		break-inside: avoid;
+		margin-bottom: 16px;
+		box-shadow: none;
+		border: 1px solid #e5e7eb;
+	}
+	.qa-card__header {
+		background: #f8f9fa !important;
+		border-bottom: 1px solid #e5e7eb !important;
+		padding: 12px 16px !important;
+		-webkit-print-color-adjust: exact;
+		color-adjust: exact;
+	}
+	.qa-card__number {
+		background: #7881f5 !important;
+		color: #fff !important;
+		width: 24px !important;
+		height: 24px !important;
+		font-size: 12px !important;
+		font-weight: 500 !important;
+		-webkit-print-color-adjust: exact;
+		color-adjust: exact;
+	}
+	.qa-card__question {
+		color: #374151 !important;
+		font-size: 13px !important;
+		font-weight: 500 !important;
+		line-height: 1.4 !important;
+		word-break: keep-all !important;
+		word-wrap: break-word !important;
+	}
+	.qa-card__body {
+		padding: 12px 16px !important;
+	}
+	.form-actions, .char-counter {
+		display: none !important;
+	}
+	.form-textarea {
+		border: none !important;
+		padding: 0 !important;
+		min-height: auto !important;
+		resize: none !important;
+		background: transparent !important;
+		font-size: 12px !important;
+		line-height: 1.5 !important;
+		color: #374151 !important;
+		white-space: pre-wrap !important;
+	}
+
+	/* 미리보기 제목 스타일 */
+	.preview-title {
+		font-size: 18px !important;
+		font-weight: 600 !important;
+		color: #111827 !important;
+		margin-bottom: 20px !important;
+		text-align: center !important;
+		padding: 10px 0 !important;
+		border-bottom: 2px solid #7881f5 !important;
+	}
+	.form-section {
+		margin-bottom: 24px !important;
+	}
+
+	/* 질문 번호 숨김 */
+	.qa-card__number {
+		display: none !important;
+	}
+
+	/* 질문 헤더 간격 조정 */
+	.qa-card__header {
+		padding: 12px 16px !important;
+		gap: 0 !important;
+	}
+}
+
+/* 반응형 디자인 */
+@media ( max-width : 768px) {
+	.qa-card__header {
+		padding: 14px 16px;
+		flex-direction: row;
+		align-items: center;
+		gap: 10px;
+	}
+	.qa-card__number {
+		width: 26px;
+		height: 26px;
+		font-size: 13px;
+	}
+	.qa-card__question {
+		font-size: 14px;
+	}
+	.qa-card__body {
+		padding: 16px;
+	}
+	.form-actions {
+		flex-direction: column;
+		gap: 16px;
+		align-items: stretch;
+	}
+	.form-actions__left, .form-actions__right {
+		justify-content: center;
+	}
+	.btn {
+		width: 100%;
+		justify-content: center;
+	}
+	.form-input--large {
+		padding: 14px 16px;
+		font-size: 16px;
+	}
+}
+
+/* 자기소개서 작성 페이지 전용 버튼 스타일 */
+.form-actions__right .btn-autocomplete {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    white-space: nowrap;
+}

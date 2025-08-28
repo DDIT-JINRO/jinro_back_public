@@ -1,0 +1,260 @@
+@charset "UTF-8";
+.pageCnt {
+	display:none;
+	padding-left: 10px;
+	margin: 0;
+	font-size: 14px;
+	font-weight: 600;
+}
+/*******************************상담사 관리-1 시작 *************************************/
+.cnsMng-1 {
+	display: flex;
+	gap: 20px;
+	margin-bottom: 20px;
+}
+
+.cnsMng-1-1 {
+	width: 100%;
+	padding: 24px;
+	height: 210px;
+}
+
+.sparkline-container {
+	position: absolute;
+	right: 10px;
+	width: 250px;
+	height: 150px;
+	padding: 10px;
+}
+
+.topcnsListChartSpace {
+	height: 270px;
+	margin-top: auto;
+}
+/*******************************상담사 관리-1 끝 *************************************/
+
+/*******************************상담사 관리-2 시작 *************************************/
+.cnsCateChart {
+	width: 386.25px;
+	height: 360px;
+	background-color: #DCDEFC;
+}
+
+.cnsTop3Chart {
+	width: 386.25px;
+	height: 360px;
+}
+
+.cnsTypeChart {
+	height: 430px;
+}
+
+.cnsMg-2-2 {
+	width: 800px;
+}
+
+.counselingStatsByTimeChartCanvasSpace {
+	height: 620px;
+	margin-top: auto;
+}
+
+.counselingStatsByCategoryChartCanvasSpace {
+	height: 300px;
+	margin-top: auto;
+}
+/*******************************상담사 관리-2 끝 *************************************/
+
+/*******************************상담사 관리-3 시작 *************************************/
+.info-field label {
+	font-size: 12px;
+	color: #666;
+	margin-bottom: 5px;
+	font-weight: bold;
+}
+
+.cnsCompleteAndReviewList {
+	width: 800px;
+	height: 940px;
+}
+
+.btn-primary i {
+	margin-right: 5px;
+}
+
+.info-history2 {
+	color: gray;
+	font-size: 13px;
+	font-weight: bold;
+	min-width: 100px;
+}
+
+.cns-info-detail {
+	width: 800px;
+	height: 400px;
+	margin-bottom: 20px;
+}
+
+.cns-profile img {
+	width: 80px;
+	height: 80px;
+}
+
+.cns-header-section {
+	align-items: center; /* 항목 세로 중앙 정렬 */
+}
+
+.profileFlex {
+	display: flex;
+	justify-content: center;
+}
+
+.info-second-space2 {
+	justify-content: flex-end;
+	margin-right: 50px;
+	margin-top: 20px;
+	min-height: 52px;
+	gap: 60px;
+}
+
+.cnsList tr td {
+	height: 30px;
+}
+
+.fa-regular {
+	margin-right: 5px;
+}
+
+.cnsDetailList tr td {
+	height: 20px;
+}
+
+/* 프로필 이미지 컨테이너 */
+.cns-profile {
+	margin-left: 50px;
+	justify-self: center; /* 이미지를 가로 중앙 정렬 */
+}
+
+/* 정보 그리드 컨테이너 */
+.cns-info-grid {
+	margin-top: 20px;
+	margin-left: 50px;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr); /* 2개의 열로 나눔 */
+	gap: 10px 80px;
+	display: grid;
+	margin-left: 50px; /* 행과 열의 간격 */
+}
+
+/* 권한, 로그인 타입 그리드 컨테이너 (두 번째 cns-info-grid) */
+.cns-info-grid:nth-child(3) {
+	grid-template-columns: repeat(2, 1fr); /* 2개 항목이므로 다시 그리드 적용 */
+	grid-column: span 2; /* 부모 그리드(cns-header-section)의 2개 열 모두 차지 */
+}
+
+/* 상세 정보 개수 컨테이너 */
+.cns-detail-info-count {
+	margin-left: 20px;
+	display: flex;
+	gap: 100px; /* 항목 사이 간격 */
+	margin-top: 10px; /* 위쪽 여백 */
+}
+
+.profile-nickname {
+	width: 90px;
+	border: none;
+	border-radius: 4px;
+	font-weight: bold;
+	font-size: 16px;
+	color: #333;
+	height: 24px;
+	margin-bottom: 5px;
+	text-align: center;
+}
+
+#cns-detail-box {
+	display: flex;
+	justify-content: center;
+}
+
+.btn-modify {
+	margin-top: 40px;
+	width: 60px;
+	height: 35px;
+	background-color: #727CF5;
+	color: white;
+	font-weight: bold;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	margin-left: auto;
+	margin-top: auto;
+	display: block;
+	width: 60px;
+}
+
+/* 기타 스타일링 (기존 코드 유지) */
+.info-field label {
+	display: block;
+	margin-bottom: 5px;
+	font-weight: bold;
+}
+
+.ptag-list {
+	display: flex;
+	margin-top: 20px;
+	align-content: center;
+	padding: 0;
+	margin: 0;
+	font-size: 14px;
+	font-weight: 600;
+	margin-bottom: 10px;
+	align-content: center;
+}
+
+.search-filter-bar {
+	margin-top: 20px;
+}
+
+.info-field input {
+	width: 110px;
+	height: 20px;
+	border: 1px solid #E5E8EB;
+	border-radius: 4px;
+	padding-left: 10px;
+	font-weight: 400;
+}
+
+.star-rating {
+	color: #FFD700; /* 별 색상: 황금색 */
+	font-size: 18px;
+}
+
+.info-field select {
+	width: 125px;
+	height: 25px;
+	border: 1px solid #E5E8EB;
+	border-radius: 4px;
+	padding-left: 10px;
+	font-weight: 400;
+}
+
+#cns-profile-img {
+	width: 80px;
+	height: 80px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.cnsDetailListSpace {
+	height: 520px;
+}
+
+.filter-group {
+	display: flex;
+	flex-direction: row;
+	gap: 5px;
+}
+
+.recentLoginDateSpace {
+	margin-right: 44px;
+}

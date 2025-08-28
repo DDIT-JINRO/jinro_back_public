@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.account.join.service.impl.MemberJoinMapper">
+
+	<select id="selectUserEmail"
+		resultType="kr.or.ddit.main.service.MemberVO" parameterType="String">
+		SELECT
+		MEM_EMAIL FROM
+		MEMBER WHERE MEM_EMAIL = #{email} AND LOGIN_TYPE =
+		'G33001'
+	</select>
+
+	<select id="isNicknameExists" resultType="String"
+		parameterType="String">
+		SELECT CASE WHEN COUNT(*) > 0 THEN 'true' ELSE 'false'
+		END AS isExists
+		FROM MEMBER
+		WHERE MEM_NICKNAME = #{nickName}
+	</select>
+
+	<insert id="memberJoin"	parameterType="kr.or.ddit.main.service.MemberVO">
+		<selectKey keyProperty="memId" resultType="int"
+			order="BEFORE">
+			SELECT NVL(MAX(MEM_ID),0)+1 FROM MEMBER
+		</selectKey>
+		INSERT INTO MEMBER (
+		    MEM_ID
+		    , MEM_EMAIL
+		    , MEM_PASSWORD
+		    , MEM_NICKNAME
+		    , MEM_PHONE_NUMBER
+		    , MEM_NAME
+		    , MEM_GEN
+		    , MEM_BIRTH
+		    , MEM_ALARM
+		    , MEM_STUDENT
+		    , MEM_ROLE
+		    , MEM_POINT
+		    , CREATED_AT
+		    , PW_UPDATED_AT
+		    , DEL_YN
+		    , LOGIN_TYPE
+		) VALUES (
+		    #{memId}
+		  , #{memEmail}
+		  , #{memPassword}
+		  , #{memNickname}
+		  , #{memPhoneNumber}
+		  , #{memName}
+		  , #{memGen}
+		  , #{memBirth}
+		  , #{memAlarm}
+		  , 'N'
+		  , 'R01001'
+		  , 0
+		  , SYSDATE
+		  , SYSDATE
+		  , 'N'
+		  , 'G33001'
+		)
+	</insert>
+</mapper>

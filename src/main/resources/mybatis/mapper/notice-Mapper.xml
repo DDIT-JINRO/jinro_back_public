@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.csc.not.service.impl.NoticeMapper">
+
+	<select id="getList" resultType="kr.or.ddit.csc.not.service.NoticeVO">
+		SELECT * FROM (
+		SELECT ROWNUM AS RNUM, B.*
+		FROM (
+		SELECT NOTICE_ID,
+		NOTICE_TITLE, NOTICE_CONTENT, NOTICE_DEL_YN, NOTICE_CNT,
+		NOTICE_CREATED_AT, NOTICE_UPDATED_AT, FILE_GROUP_NO
+		FROM NOTICE
+		<where>
+			NOTICE_ID IS NOT NULL
+			AND NOTICE_DEL_YN = 'N'
+			<if test="keyword != null and keyword != ''">
+				AND NOTICE_TITLE LIKE '%' || #{keyword} || '%'
+			</if>
+			<if test="status != null and status!= '선택하세요.'">
+				AND TO_CHAR(NOTICE_UPDATED_AT, 'YYYY') = #{status}
+			</if>
+		</where>
+		ORDER BY 
+		<choose>
+            <when test="sortOrder == 'oldest'">NOTICE_ID ASC</when>
+            <when test="sortOrder == 'cnt'">NOTICE_CNT DESC, NOTICE_ID DESC</when>
+            <otherwise>NOTICE_ID DESC</otherwise>
+        </choose>
+		) B
+		WHERE ROWNUM &lt;= #{endNo}
+		)
+		WHERE RNUM &gt;=
+		#{startNo}
+	</select>
+
+	<select id="getNoticeDetail" parameterType="int" resultType="kr.or.ddit.csc.not.service.NoticeVO">
+		SELECT *
+		FROM NOTICE
+		WHERE NOTICE_ID =#{no}
+	</select>
+
+	<select id="getAllNotice" parameterType="kr.or.ddit.csc.not.service.NoticeVO" resultType="int">
+		SELECT COUNT(*)
+		FROM NOTICE
+		<where>
+			NOTICE_ID IS NOT NULL
+			AND NOTICE_DEL_YN = 'N'
+			<if test="keyword != null and keyword != ''">
+				AND NOTICE_TITLE LIKE '%' || #{keyword} || '%'
+			</if>
+		</where>
+	</select>
+
+	<update id="upNoticeCnt" parameterType="int">
+		UPDATE NOTICE
+		SET
+		NOTICE_CNT = notice_cnt+1
+		WHERE NOTICE_ID=#{no}
+	</update>
+	
+	<insert id="insertNotice" parameterType="kr.or.ddit.csc.not.service.NoticeVO">
+		INSERT INTO NOTICE(
+		NOTICE_ID, NOTICE_TITLE, NOTICE_CONTENT,
+		NOTICE_DEL_YN, NOTICE_CNT, NOTICE_CREATED_AT, FILE_GROUP_NO
+		)
+		VALUES (
+		(SELECT NVL(MAX(NOTICE_ID), 0) + 1 FROM NOTICE),
+		#{noticeTitle},	
+		#{noticeContent},
+		'N',
+		0,
+		SYSDATE,
+		#{fileGroupNo}
+		)
+	</insert>
+
+	<update id="updateNotice" parameterType="kr.or.ddit.csc.not.service.NoticeVO">
+		UPDATE NOTICE
+		SET
+		NOTICE_TITLE = #{noticeTitle},
+		NOTICE_CONTENT= #{noticeContent},
+		NOTICE_UPDATED_AT= SYSDATE
+		WHERE NOTICE_ID = #{noticeId}
+	</update>
+	
+	<update id="deleteNotice" parameterType="int">
+		UPDATE NOTICE
+		SET NOTICE_DEL_YN = 'Y'
+		WHERE NOTICE_ID = #{noticeId}
+	</update>
+	
+	<update id="updateNoticeFileGroup">
+		UPDATE NOTICE
+		SET FILE_GROUP_NO =#{newGroupId}
+		WHERE NOTICE_ID = #{noticeId}
+	</update>
+</mapper>

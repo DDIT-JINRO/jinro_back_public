@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mpg.pay.service.impl.SubscriptionMapper">
+	
+	<!-- 
+	//구독상품조회
+	public List<SubscriptionVO> selectAllProducts()
+	 -->
+	<select id="selectAllProducts" resultType="kr.or.ddit.mpg.pay.service.SubscriptionVO" > 
+		SELECT
+			sub_id
+		  , sub_name
+		  , sub_price
+		  , sub_benefit
+		  , sub_active_yn
+		  , sub_role
+		FROM
+    		SUBSCRIBE
+        WHERE
+            SUB_ACTIVE_YN = 'Y'
+        ORDER BY
+            SUB_PRICE ASC
+	</select>
+
+	<!-- 
+	// 특정 구독 상품 정보 조회
+	public SubscriptionVO selectProductById(int subId);
+	 -->
+	 <select id="selectProductById" resultType="kr.or.ddit.mpg.pay.service.SubscriptionVO">
+	 	SELECT
+			sub_id
+		  , sub_name
+		  , sub_price
+		  , sub_benefit
+		  , sub_active_yn
+		  , sub_role
+		FROM
+    		SUBSCRIBE
+        WHERE
+            SUB_ID = #{sub_id}
+	 </select>
+</mapper>

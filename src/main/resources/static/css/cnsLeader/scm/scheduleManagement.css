@@ -1,0 +1,225 @@
+
+.topheader {
+	width: 100%;
+	height: auto;
+}
+
+.bottomBox {
+	width: 100%;
+	height: 415px;
+}
+
+h3 {
+	margin-bottom: 10px;
+}
+.top-row {
+    display: flex;
+    flex-direction: row; /* 가로 방향으로 정렬 */
+    gap: 15px; /* 패널 사이의 간격 */
+    width: 100%;
+    height: inherit;
+}
+
+.top-row .template-panel:first-child {
+  flex: 1.5; /* 상담 리스트 패널의 너비 비율을 1로 설정 */
+}
+
+.top-row .template-panel:last-child {
+  flex: 2; /* 달력 패널의 너비 비율을 2로 설정 */
+}
+
+.template-container {
+    flex-direction: column;
+}
+
+.template-panel.topheader {
+    display: flex;
+    flex-direction: column;
+    /* 나머지 스타일은 기존대로 유지 */
+}
+
+.template-panel.topheader .panel-footer.pagination {
+    margin-top: auto; /* 이 속성이 페이징 영역을 아래로 밀어냅니다. */
+}
+.card-footer {
+    margin-top: auto;
+}
+/* ──────────────────────────────────────────────────────────
+   필터 영역
+──────────────────────────────────────────────────────────*/
+.filter-box {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	justify-content: flex-end;
+}
+
+.filter-box select, .filter-box input[type="text"] {
+	padding: 8px 12px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+.filter-box input[type="text"] {
+	flex: 1;
+}
+
+.filter-box .btn-save {
+	background-color: #07223D;
+	color: #fff;
+	border: none;
+	padding: 8px 16px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.filter-box .btn-save:hover {
+	background-color: #051a2d;
+}
+
+p {
+	font-size: 14px;
+	color: #555;
+	margin-bottom: 10px;
+}
+
+/* ──────────────────────────────────────────────────────────
+   테이블 영역
+──────────────────────────────────────────────────────────*/
+/* 테이블 전체 스타일 */
+
+/* ──────────────────────────────────────────────────────────
+   하단 박스 (스케줄 관리)
+──────────────────────────────────────────────────────────*/
+.template-panel.bottomBox {
+	display: flex;
+	flex-direction: column; /* 헤더와 콘텐츠가 세로로 쌓이도록 */
+	gap: 20px;
+}
+
+.bottom-content-wrapper {
+	display: flex;
+	gap: 20px;
+	height: 100%;
+}
+
+.bottom-panel {
+	background-color: #f9f9f9; /* 배경색을 약간 다르게 하여 구분을 명확히 함 */
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	padding: 16px;
+	flex: 1; /* 부모 요소의 남은 공간을 균등하게 나눠 가짐 */
+	display: flex;
+	flex-direction: column;
+}
+
+.panel-section-title {
+	font-size: 16px;
+	font-weight: 600;
+	margin: 10px 0 10px 0;
+	padding-bottom: 8px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.panel-section-content {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.info-item {
+	display: flex;
+	gap: 20px;
+}
+
+.info-label {
+	font-weight: bold;
+	color: #555;
+	min-width: 80px; /* 라벨 너비를 고정하여 값들이 정렬되게 함 */
+}
+
+.info-value {
+	font-weight: 400;
+}
+
+/* ------------------ FullCalendar 영역 스타일 수정 ------------------ */
+/* FullCalendar 기본 스타일: 오늘 날짜의 노란색 하이라이트를 제거하거나 조정 */
+.fc-day-today {
+	background-color: blue; /* 기본 노란색 배경 제거 */
+	border: none; /* 기본 테두리 제거 */
+}
+
+/* 사용자 정의 스타일: 선택된 날짜에 대한 파란색 하이라이트 */
+.fc-day.selected {
+	background-color: #e0f7fa; 
+	border: 2px solid rgb(128, 255, 128) ; 
+}
+
+/* 오늘 날짜가 선택되었을 경우의 스타일 */
+.fc-day-today.selected {
+	background-color: #e0f7fa  !important; 
+	border: 2px solid rgb(128, 255, 128);
+}
+/* FullCalendar 컨테이너 스타일 */
+#calendar {
+	height: 100%;
+	width: 100%; /* 화면 너비의 100%를 차지하도록 설정 */
+	max-width: none; /* 최대 너비 제한 해제 */
+	margin: 0px auto;
+	padding: 0; /* 내부 패딩을 0으로 설정 */
+}
+
+.fc .fc-toolbar.fc-header-toolbar {
+	margin: 0;
+}
+
+.fc .fc-toolbar-title {
+	font-size: 1em;
+	margin: 0;
+}
+
+/* 캘린더 버튼 크기 줄이기 */
+.fc .fc-button {
+	padding: 0; /* 버튼 내부 패딩을 줄입니다. */
+}
+.fc-day-other {
+    /* 날짜와 요일 모두 숨기기 */
+    visibility: hidden;
+}
+.fc .fc-bg-event {
+    opacity: 0.4;
+}
+
+.template-panel #calendar .fc-event-title {
+    font-size: 0.8rem; 
+    color: #555;
+    display: block ;
+}
+
+/* 상담 건수가 많을 때 셀에 스크롤바를 생성합니다. */
+.fc-daygrid-day-events {
+    overflow-y: auto !important;
+}
+
+/* 스크롤바를 마우스를 올렸을 때만 보이게 하려면 */
+.fc-daygrid-day-events::-webkit-scrollbar {
+    width: 5px; /* 스크롤바 너비 */
+}
+.fc-daygrid-day-events::-webkit-scrollbar-thumb {
+    background: transparent; /* 평소에는 투명 */
+    border-radius: 5px;
+}
+.fc-daygrid-day-events:hover::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2); /* 마우스를 올리면 보이게 */
+}
+
+.fc-scrollgrid-sync-table{
+	width: 100%;
+	height: 100%;
+}
+
+/*___________________ 페이지 네이션_______________ 
+_______________________ _________________________*/
+.pagination {
+    padding: 10px 0 0 0;
+}

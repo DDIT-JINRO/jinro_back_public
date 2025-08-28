@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.prg.act.sup.service.impl.ActivitySupportersMapper">
+
+	
+	 <!-- 
+	//서포터즈 총 개수 조회
+	int selectSupCount(ActivityVO activityVO)
+	 -->
+	<select id="selectSupCount" parameterType="kr.or.ddit.prg.act.service.ActivityVO">
+        SELECT COUNT(*)
+        FROM CONTEST T1
+         <where>
+         	T1.CONTEST_DEL_YN = 'N'
+            <if test="keyword != null and keyword != ''">
+                AND (CONTEST_TITLE LIKE '%' || #{keyword} || '%' OR CONTEST_DESCRIPTION LIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="contestGubunFilter != null and contestGubunFilter.size() > 0">
+                AND T1.CONTEST_GUBUN IN
+                <foreach item="item" collection="contestGubunFilter" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="contestTargetFilter != null and contestTargetFilter.size() > 0">
+                AND T1.CONTEST_TARGET IN
+                <foreach item="item" collection="contestTargetFilter" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="contestStatusFilter != null and contestStatusFilter.size() > 0">
+            	AND
+                <foreach item="status" collection="contestStatusFilter" separator=" OR " open="(" close=")">
+                    <if test="status == 'proceeding'">
+                        CONTEST_END_DATE >= TRUNC(SYSDATE)
+                    </if>
+                    <if test="status == 'finished'">
+                        CONTEST_END_DATE &lt; TRUNC(SYSDATE)
+                    </if>
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+	<!-- 
+	서포터즈 목록 조회
+	List<ActivityVO> selectSupList(ActivityVO activityVO)
+	 -->
+    <select id="selectSupList" parameterType="kr.or.ddit.prg.act.service.ActivityVO" resultType="kr.or.ddit.prg.act.service.ActivityVO">
+        SELECT *
+        FROM (
+            SELECT
+                 ROW_NUMBER() OVER(
+	                 ORDER BY 
+	                	<choose>
+						 	<when test="sortOrder == 'id'">
+		                    	T1.CONTEST_ID,
+						 	</when>
+					 	</choose>
+	                     CASE WHEN T1.CONTEST_END_DATE >= TRUNC(SYSDATE) THEN 1 ELSE 2 END, -- 1. 진행중인 공모전 먼저
+	                     <choose>
+						 	<when test="sortOrder == 'latest'">
+		                    	T1.CONTEST_END_DATE DESC -- '최신순' 선택 시: 등록일 내림차순
+						 	</when>
+						 	<when test="sortOrder == 'viewCount'">
+                            	T1.CONTEST_RECRUIT_COUNT DESC -- '조회수순'은 조회수(RECRUIT_COUNT) 기준
+                         	</when>
+						 	<otherwise>
+	                     		T1.CONTEST_END_DATE ASC,  -- '마감일순' 선택 시: 마감일 오름차순
+              					T1.CONTEST_CREATED_AT DESC  -- (2차 정렬) 마감일이 같으면 최신 등록순
+						 	</otherwise>
+						 </choose>
+	             ) AS RNUM
+                ,T1.CONTEST_ID           AS contestId
+                ,T1.CONTEST_TITLE        AS contestTitle
+                ,T1.CONTEST_GUBUN        AS contestGubunCode
+                ,GUBUN.CC_NAME           AS contestGubunName
+                ,T1.CONTEST_DESCRIPTION  AS contestDescription
+                ,T1.CONTEST_TYPE         AS contestType
+                ,TYPE.CC_NAME            AS contestTypeName
+                ,T1.CONTEST_TARGET       AS contestTarget
+                ,TARGET.CC_NAME          AS contestTargetName
+                ,T1.CONTEST_START_DATE   AS contestStartDate
+                ,T1.CONTEST_END_DATE     AS contestEndDate
+                ,T1.CONTEST_CREATED_AT   AS contestCreatedAt
+                ,T1.CONTEST_RECRUIT_COUNT AS contestRecruitCount
+                ,T1.CONTEST_URL          AS contestUrl
+                ,T1.FILE_GROUP_ID        AS fileGroupId
+                ,T1.CONTEST_HOST         AS contestHost
+             	,T1.CONTEST_ORGANIZER    AS contestOrganizer
+             	,T1.CONTEST_SPONSOR      AS contestSponsor
+             	,T1.APPLICATION_METHOD   AS applicationMethod
+             	,T1.AWARD_TYPE           AS awardType
+            FROM CONTEST T1
+            LEFT JOIN COM_CODE GUBUN
+                ON T1.CONTEST_GUBUN = GUBUN.CC_ID 
+                AND GUBUN.CL_CODE = 'G32'
+            LEFT JOIN COM_CODE TYPE
+                ON T1.CONTEST_TYPE = TYPE.CC_ID 
+                AND TYPE.CL_CODE = 'G35'
+            LEFT JOIN COM_CODE TARGET
+                ON T1.CONTEST_TARGET = TARGET.CC_ID 
+                AND TARGET.CL_CODE = 'G34'
+            <where>
+            	T1.CONTEST_DEL_YN = 'N'
+                <if test="keyword != null and keyword != ''">
+                    AND (T1.CONTEST_TITLE LIKE '%' || #{keyword} || '%' OR T1.CONTEST_DESCRIPTION LIKE '%' || #{keyword} || '%')
+                </if>
+                <if test="contestGubunFilter != null and contestGubunFilter.size() > 0">
+                    AND T1.CONTEST_GUBUN IN
+                    <foreach item="item" collection="contestGubunFilter" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="contestTargetFilter != null and contestTargetFilter.size() > 0">
+                    AND T1.CONTEST_TARGET IN
+                    <foreach item="item" collection="contestTargetFilter" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="contestStatusFilter != null and contestStatusFilter.size() > 0">
+                	AND
+	                <foreach item="status" collection="contestStatusFilter" separator=" OR " open="(" close=")">
+	                    <if test="status == 'proceeding'">
+	                        CONTEST_END_DATE >= TRUNC(SYSDATE)
+	                    </if>
+	                    <if test="status == 'finished'">
+	                        CONTEST_END_DATE &lt; TRUNC(SYSDATE)
+	                    </if>
+	                </foreach>
+	            </if>
+            </where>
+        )
+        WHERE RNUM BETWEEN #{startRow} AND #{endRow}
+    </select>
+
+	<!-- 
+	// 서포터즈 상세
+	ActivityVO selectSupDetail(String supId);
+	 -->
+    <select id="selectSupDetail" resultType="kr.or.ddit.prg.act.service.ActivityVO">
+        SELECT 
+             T1.CONTEST_ID           AS contestId
+            ,T1.CONTEST_TITLE        AS contestTitle
+            ,T1.CONTEST_GUBUN        AS contestGubunCode
+            ,GUBUN.CC_NAME           AS contestGubunName
+            ,T1.CONTEST_DESCRIPTION  AS contestDescription
+            ,T1.CONTEST_TYPE         AS contestType
+            ,TYPE.CC_NAME            AS contestTypeName
+            ,T1.CONTEST_TARGET       AS contestTarget
+            ,TARGET.CC_NAME          AS contestTargetName
+            ,T1.CONTEST_START_DATE   AS contestStartDate
+            ,T1.CONTEST_END_DATE     AS contestEndDate
+            ,T1.CONTEST_CREATED_AT   AS contestCreatedAt
+            ,T1.CONTEST_RECRUIT_COUNT AS contestRecruitCount
+            ,T1.CONTEST_URL          AS contestUrl
+            ,T1.FILE_GROUP_ID        AS fileGroupId
+            ,T1.CONTEST_HOST         AS contestHost
+         	,T1.CONTEST_ORGANIZER    AS contestOrganizer
+         	,T1.CONTEST_SPONSOR      AS contestSponsor
+         	,T1.APPLICATION_METHOD   AS applicationMethod
+         	,T1.AWARD_TYPE           AS awardType
+        FROM CONTEST T1
+        LEFT JOIN COM_CODE GUBUN
+            ON T1.CONTEST_GUBUN = GUBUN.CC_ID AND GUBUN.CL_CODE = 'G32'
+        LEFT JOIN COM_CODE TYPE 
+        	ON T1.CONTEST_TYPE = TYPE.CC_ID AND TYPE.CL_CODE = 'G35'
+        LEFT JOIN COM_CODE TARGET
+            ON T1.CONTEST_TARGET = TARGET.CC_ID AND TARGET.CL_CODE = 'G34'
+        WHERE CONTEST_ID = #{supId} AND T1.CONTEST_DEL_YN = 'N'
+    </select>
+    
+    <!-- 
+    //조회수 증가
+	public int updateSupViewCount(String supId);
+     -->
+     <update id="updateSupViewCount">
+        UPDATE CONTEST
+        SET CONTEST_RECRUIT_COUNT = CONTEST_RECRUIT_COUNT + 1
+        WHERE CONTEST_ID = #{supId}
+    </update>
+    
+</mapper>

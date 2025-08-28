@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.prg.std.service.impl.StudyGroupMapper">
+	<resultMap id="stdBoardMap"
+		type="kr.or.ddit.prg.std.service.StdBoardVO">
+		<id property="boardId" column="BOARD_ID" />
+		<result property="boardTitle" column="BOARD_TITLE" />
+		<result property="boardContent" column="BOARD_CONTENT" />
+		<result property="boardCnt" column="BOARD_CNT" />
+		<result property="boardCreatedAt" column="BOARD_CREATED_AT" />
+		<result property="boardUpdatedAt" column="BOARD_UPDATED_AT" />
+		<result property="replyCnt" column="REPLY_COUNT" />
+		<result property="curJoinCnt" column="CUR_CNT" />
+		<result property="boardId" column="BOARD_ID" />
+		<result property="memId" column="MEM_ID" />
+		<result property="boardDelYn" column="BOARD_DEL_YN" />
+
+		<association property="chatRoomVO"
+			javaType="kr.or.ddit.chat.service.ChatRoomVO">
+			<id property="crId" column="CR_ID" />
+			<result property="ccId" column="CR_CC_ID" />
+			<result property="targetId" column="CR_TARGET_ID" />
+			<result property="crTitle" column="CR_TITLE" />
+			<result property="crMaxCnt" column="CR_MAX_CNT" />
+			<result property="createdAt" column="CR_CREATED_AT" />
+		</association>
+
+	</resultMap>
+
+	<resultMap type="kr.or.ddit.prg.std.service.StdBoardVO"
+		id="oneStdBoardMap">
+		<id property="boardId" column="BOARD_ID" />
+		<result property="memId" column="MEM_ID" />
+		<result property="ccId" column="CC_ID" />
+		<result property="boardTitle" column="BOARD_TITLE" />
+		<result property="boardContent" column="BOARD_CONTENT" />
+		<result property="boardCreatedAt" column="BOARD_CREATED_AT" />
+		<result property="boardUpdatedAt" column="BOARD_UPDATED_AT" />
+		<result property="boardCnt" column="BOARD_CNT" />
+		<result property="boardDelYn" column="BOARD_DEL_YN" />
+		<result property="filegroupId" column="FILEGROUP_ID" />
+
+		<result property="curJoinCnt" column="CUR_JOIN_CNT" />
+
+		<result property="memGen" column="MEM_GEN" />
+		<result property="memName" column="MEM_NAME" />
+		<result property="memNickname" column="MEM_NICKNAME" />
+		<result property="memEmail" column="MEM_EMAIL" />
+		<result property="fileBadge" column="FILE_BADGE_ID" />
+		<result property="fileProfile" column="FILE_PROFILE_ID" />
+		<result property="fileSub" column="FILE_SUB_ID" />
+		<result property="fileBadgeStr" column="FILE_BADGE" />
+		<result property="fileProfileStr" column="FILE_PROFILE" />
+		<result property="fileSubStr" column="FILE_SUB" />
+
+		<association property="chatRoomVO"
+			javaType="kr.or.ddit.chat.service.ChatRoomVO">
+			<id property="crId" column="CR_ID" />
+			<result property="ccId" column="CR_CC_ID" />
+			<result property="targetId" column="CR_TARGET_ID" />
+			<result property="crTitle" column="CR_TITLE" />
+			<result property="crMaxCnt" column="CR_MAX_CNT" />
+			<result property="createdAt" column="CR_CREATED_AT" />
+		</association>
+
+		<collection property="stdReplyVOList"
+			resultMap="stdReplyMap" />
+	</resultMap>
+
+	<resultMap type="kr.or.ddit.prg.std.service.StdReplyVO"
+		id="stdReplyMap">
+		<id property="replyId" column="REPLY_ID" />
+		<result property="boardId" column="BOARD_ID" />
+		<result property="replyParentId" column="REPLY_PARENT_ID" />
+		<result property="replyContent" column="REPLY_CONTENT" />
+		<result property="replyDelYn" column="REPLY_DEL_YN" />
+		<result property="replyCreatedAt" column="REPLY_CREATED_AT" />
+		<result property="replyUpdatedAt" column="REPLY_UPDATED_AT" />
+		<result property="childCount" column="CHILD_COUNT" />
+
+		<result property="memId" column="R_MEM_ID" />
+		<result property="memGen" column="R_MEM_GEN" />
+		<result property="memName" column="R_MEM_NAME" />
+		<result property="memNickname" column="R_MEM_NICKNAME" />
+		<result property="memEmail" column="R_MEM_EMAIL" />
+
+		<result property="fileBadge" column="R_FILE_BADGE_ID" />
+		<result property="fileProfile" column="R_FILE_PROFILE_ID" />
+		<result property="fileSub" column="R_FILE_SUB_ID" />
+		<result property="fileBadgeStr" column="R_FILE_BADGE" />
+		<result property="fileProfileStr" column="R_FILE_PROFILE" />
+		<result property="fileSubStr" column="R_FILE_SUB" />
+	</resultMap>
+
+	<!-- 목록조회. board테이블에서 스터디그룹게시글과 연계된 chat_room테이블&chat_member테이블 -->
+	<select id="selectStudyGroupList" resultMap="stdBoardMap" parameterType="kr.or.ddit.prg.std.service.StdBoardVO">
+		SELECT X.*
+		FROM
+		(SELECT ROWNUM RN, A.*
+		FROM
+		  (
+		  SELECT
+		    B.BOARD_ID,
+		    B.BOARD_TITLE,
+		    B.BOARD_CONTENT,
+		    B.BOARD_CNT,
+		    B.BOARD_CREATED_AT,
+		    C.CR_ID,
+		    C.CC_ID AS CR_CC_ID,
+		    C.TARGET_ID AS CR_TARGET_ID,
+		    C.CR_TITLE,
+		    C.CR_MAX_CNT,
+		    C.CREATED_AT AS CR_CREATED_AT,
+		    NVL(CM.CUR_CNT, 0) AS CUR_CNT,
+		    NVL(R.REPLY_COUNT, 0) AS REPLY_COUNT
+		  FROM BOARD B
+		  LEFT JOIN CHAT_ROOM C
+		    ON C.TARGET_ID = B.BOARD_ID AND C.CC_ID = 'G04001'
+		  LEFT JOIN (
+		    SELECT CR_ID, COUNT(*) AS CUR_CNT
+		    FROM CHAT_MEMBER
+		    WHERE IS_EXITED = 'N'
+		    GROUP BY CR_ID
+		  ) CM ON CM.CR_ID = C.CR_ID
+		  LEFT JOIN (
+		    SELECT BOARD_ID, COUNT(*) AS REPLY_COUNT
+		    FROM REPLY
+		    WHERE REPLY_DEL_YN = 'N'
+		    GROUP BY BOARD_ID
+		  ) R ON R.BOARD_ID = B.BOARD_ID
+		  <where>
+		    B.CC_ID = 'G09005'
+		    AND B.BOARD_DEL_YN = 'N'
+
+		    <if test="region != null and region != ''">
+		      AND JSON_VALUE(B.BOARD_CONTENT, '$.region') = #{region}
+		    </if>
+		    <if test="gender != null and gender != ''">
+		      AND JSON_VALUE(B.BOARD_CONTENT, '$.gender') = #{gender}
+		    </if>
+		    <if test="interestItems != null and interestItems.size() > 0">
+		      AND JSON_VALUE(B.BOARD_CONTENT, '$.interest') IN
+		      <foreach collection="interestItems" item="item" open="(" separator=", " close=")">
+		      	#{item}
+		      </foreach>
+		    </if>
+		    <if test="maxPeople != null and maxPeople != 0">
+		      AND JSON_VALUE(B.BOARD_CONTENT, '$.maxPeople') = #{maxPeople}
+		    </if>
+
+		    <if test="searchType == 'title' and searchKeyword != null and searchKeyword != ''">
+		      AND LOWER(B.BOARD_TITLE) LIKE '%' || LOWER(#{searchKeyword}) || '%'
+		    </if>
+		    <if test="searchType == 'content' and searchKeyword != null and searchKeyword != ''">
+		      AND LOWER(JSON_VALUE(B.BOARD_CONTENT, '$.content')) LIKE '%' || LOWER(#{searchKeyword}) || '%'
+		    </if>
+		  </where>
+		  <if test="sortOrder  == null or sortOrder  == '' or sortOrder  == 'createDesc'">
+			  ORDER BY B.BOARD_CREATED_AT DESC
+		  </if>
+		  <if test="sortOrder  == 'createAsc'">
+			  ORDER BY B.BOARD_CREATED_AT ASC
+		  </if>
+		  <if test="sortOrder  == 'viewCntDesc'">
+			  ORDER BY B.BOARD_CNT DESC, B.BOARD_CREATED_AT DESC
+		  </if>
+		  <if test="sortOrder  == 'enteredMemDesc'">
+			  ORDER BY CUR_CNT DESC, B.BOARD_CREATED_AT DESC
+		  </if>
+	      <if test="sortOrder == 'replyCntDesc'">
+		      ORDER BY REPLY_COUNT DESC, B.BOARD_CREATED_AT DESC
+		  </if>
+		  	) A
+		   ) X
+		  WHERE X.RN > #{startNo}
+		    AND X.RN <![CDATA[<=]]> #{endNo}
+	</select>
+
+	<select id="selectStudyGroupTotalCount" resultType="int" parameterType="kr.or.ddit.prg.std.service.StdBoardVO">
+	  SELECT COUNT(*)
+	  FROM BOARD B
+	  <where>
+	    B.CC_ID = 'G09005'
+	    AND B.BOARD_DEL_YN = 'N'
+
+	    <if test="region != null and region != ''">
+	      AND JSON_VALUE(B.BOARD_CONTENT, '$.region') = #{region}
+	    </if>
+	    <if test="gender != null and gender != ''">
+	      AND JSON_VALUE(B.BOARD_CONTENT, '$.gender') = #{gender}
+	    </if>
+	    <if test="interestItems != null and interestItems.size() > 0">
+	      AND JSON_VALUE(B.BOARD_CONTENT, '$.interest') IN
+	      <foreach collection="interestItems" item="item" open="(" separator=", " close=")">
+	      	#{item}
+	      </foreach>
+	    </if>
+	    <if test="maxPeople != null and maxPeople != ''">
+	      AND JSON_VALUE(B.BOARD_CONTENT, '$.maxPeople') = #{maxPeople}
+	    </if>
+
+	    <if test="searchType == 'title' and searchKeyword != null and searchKeyword != ''">
+	      AND LOWER(B.BOARD_TITLE) LIKE '%' || LOWER(#{searchKeyword}) || '%'
+	    </if>
+	    <if test="searchType == 'content' and searchKeyword != null and searchKeyword != ''">
+	      AND LOWER(JSON_VALUE(B.BOARD_CONTENT, '$.content')) LIKE '%' || LOWER(#{searchKeyword}) || '%'
+	    </if>
+	  </where>
+	</select>
+
+	<!-- Board 테이블에 스터디그룹게시판 데이터 삽입 -->
+	<insert id="insertStdBoard" parameterType="kr.or.ddit.prg.std.service.StdBoardVO">
+		<selectKey keyProperty="boardId" resultType="int" order="BEFORE">
+			SELECT NVL(MAX(BOARD_ID),0)+1
+			FROM BOARD
+		</selectKey>
+		INSERT INTO BOARD (
+			BOARD_ID, MEM_ID, CC_ID, BOARD_TITLE
+			, BOARD_CONTENT, BOARD_CREATED_AT, BOARD_UPDATED_AT, BOARD_DEL_YN
+		)VALUES(
+			#{boardId}
+			, #{memId}
+			, #{ccId}
+			, #{boardTitle}
+			, #{boardContent}
+			, SYSDATE
+			, SYSDATE
+			, 'N'
+		)
+	</insert>
+
+	<select id="selectRegionNamesFromComCode" resultType="hashMap">
+		SELECT
+		       CC_ID
+		     , CC_NAME
+		     , CC_ETC
+		  FROM COM_CODE
+		 WHERE CL_CODE = 'G23'
+		   AND USE_YN = 'Y'
+	</select>
+
+	<select id="selectStudyGroupDetail" resultMap="oneStdBoardMap" parameterType="int">
+	    SELECT
+	        B.BOARD_ID, B.MEM_ID, B.CC_ID, B.BOARD_TITLE, B.BOARD_CONTENT,
+	        B.BOARD_CREATED_AT, B.BOARD_UPDATED_AT, B.BOARD_CNT, B.BOARD_DEL_YN,
+	        B.FILEGROUP_ID,
+
+	        -- 게시글 작성자 정보
+	        MB.MEM_GEN AS MEM_GEN,
+	        MB.MEM_NAME AS MEM_NAME,
+	        MB.MEM_NICKNAME AS MEM_NICKNAME,
+	        MB.MEM_EMAIL AS MEM_EMAIL,
+
+	        MB.FILE_BADGE AS FILE_BADGE_ID,
+	        MB.FILE_PROFILE AS FILE_PROFILE_ID,
+	        MB.FILE_SUB AS FILE_SUB_ID,
+	        FDB.FILE_SAVE_NAME AS FILE_BADGE,
+	        FDP.FILE_SAVE_NAME AS FILE_PROFILE,
+	        FDS.FILE_SAVE_NAME AS FILE_SUB,
+
+	        -- 채팅방 정보
+	        CR.CR_ID, CR.TARGET_ID, CR.CR_TITLE, CR.CR_MAX_CNT, CR.CREATED_AT,
+	        (   SELECT COUNT(*)
+	        	FROM CHAT_MEMBER CM
+	        	WHERE CM.CR_ID = CR.CR_ID AND CM.IS_EXITED = 'N'
+	        ) AS CUR_JOIN_CNT,
+
+	        -- 댓글 정보
+	        R.REPLY_ID, R.BOARD_ID AS R_BOARD_ID, R.REPLY_PARENT_ID, R.MEM_ID AS R_MEM_ID,
+	        R.REPLY_CONTENT, R.REPLY_DEL_YN, R.REPLY_CREATED_AT, R.REPLY_UPDATED_AT,
+	        ( SELECT COUNT(*)
+	          FROM REPLY R2
+	          WHERE R2.REPLY_PARENT_ID = R.REPLY_ID AND R2.REPLY_DEL_YN = 'N'
+	        ) AS CHILD_COUNT,
+
+	        -- 댓글 작성자 정보
+	        RM.MEM_GEN AS R_MEM_GEN,
+	        RM.MEM_NAME AS R_MEM_NAME,
+	        RM.MEM_NICKNAME AS R_MEM_NICKNAME,
+	        RM.MEM_EMAIL AS R_MEM_EMAIL,
+	        RM.FILE_BADGE AS R_FILE_BADGE_ID,
+	        RM.FILE_PROFILE AS R_FILE_PROFILE_ID,
+	        RM.FILE_SUB AS R_FILE_SUB_ID,
+	        RDB.FILE_SAVE_NAME AS R_FILE_BADGE,
+	        RDP.FILE_SAVE_NAME AS R_FILE_PROFILE,
+	        RDS.FILE_SAVE_NAME AS R_FILE_SUB
+
+	    FROM BOARD B
+	    LEFT JOIN MEMBER MB ON MB.MEM_ID = B.MEM_ID
+	    LEFT JOIN FILE_GROUP FGB ON FGB.FILE_GROUP_ID = MB.FILE_BADGE
+	    LEFT JOIN FILE_DETAIL FDB ON FDB.FILE_GROUP_ID = FGB.FILE_GROUP_ID
+	    LEFT JOIN FILE_GROUP FGP ON FGP.FILE_GROUP_ID = MB.FILE_PROFILE
+	    LEFT JOIN FILE_DETAIL FDP ON FDP.FILE_GROUP_ID = FGP.FILE_GROUP_ID
+	    LEFT JOIN FILE_GROUP FGS ON FGS.FILE_GROUP_ID = MB.FILE_SUB
+	    LEFT JOIN FILE_DETAIL FDS ON FDS.FILE_GROUP_ID = FGS.FILE_GROUP_ID
+
+	    LEFT JOIN CHAT_ROOM CR
+	        ON CR.TARGET_ID = B.BOARD_ID
+	       AND B.CC_ID = 'G09005'
+	       AND CR.CC_ID = 'G04001'
+
+	    LEFT OUTER JOIN REPLY R ON R.BOARD_ID = B.BOARD_ID AND R.REPLY_PARENT_ID IS NULL AND R.REPLY_DEL_YN = 'N'
+	    LEFT JOIN MEMBER RM ON RM.MEM_ID = R.MEM_ID
+	    LEFT JOIN FILE_GROUP RFG_B ON RFG_B.FILE_GROUP_ID = RM.FILE_BADGE
+	    LEFT JOIN FILE_DETAIL RDB ON RDB.FILE_GROUP_ID = RFG_B.FILE_GROUP_ID
+	    LEFT JOIN FILE_GROUP RFG_P ON RFG_P.FILE_GROUP_ID = RM.FILE_PROFILE
+	    LEFT JOIN FILE_DETAIL RDP ON RDP.FILE_GROUP_ID = RFG_P.FILE_GROUP_ID
+	    LEFT JOIN FILE_GROUP RFG_S ON RFG_S.FILE_GROUP_ID = RM.FILE_SUB
+	    LEFT JOIN FILE_DETAIL RDS ON RDS.FILE_GROUP_ID = RFG_S.FILE_GROUP_ID
+
+	    WHERE B.BOARD_ID = #{boardId}
+	      AND B.BOARD_DEL_YN = 'N'
+	    ORDER BY R.REPLY_CREATED_AT DESC
+	</select>
+
+	<select id="selectChildReplyList" parameterType="int" resultMap="stdReplyMap">
+	    SELECT
+	           R1.REPLY_ID
+	         , R1.BOARD_ID
+	         , R1.REPLY_PARENT_ID
+	         , R1.MEM_ID
+	         , R1.REPLY_CONTENT
+	         , R1.REPLY_DEL_YN
+	         , R1.REPLY_CREATED_AT
+	         , R1.REPLY_UPDATED_AT
+	         , (
+	             SELECT COUNT(*)
+	             FROM REPLY R2
+	             WHERE R2.REPLY_PARENT_ID = R1.REPLY_ID
+	               AND R2.REPLY_DEL_YN = 'N'
+	           ) AS CHILD_COUNT
+
+	         -- 대댓글 작성자 정보
+	         , M.MEM_ID			 AS R_MEM_ID
+	         , M.MEM_GEN         AS R_MEM_GEN
+	         , M.MEM_NAME        AS R_MEM_NAME
+	         , M.MEM_NICKNAME    AS R_MEM_NICKNAME
+	         , M.MEM_EMAIL       AS R_MEM_EMAIL
+	         , M.FILE_BADGE      AS R_FILE_BADGE_ID
+	         , M.FILE_PROFILE    AS R_FILE_PROFILE_ID
+	         , M.FILE_SUB        AS R_FILE_SUB_ID
+	         , D1.FILE_SAVE_NAME        AS R_FILE_BADGE
+	         , D2.FILE_SAVE_NAME        AS R_FILE_PROFILE
+	         , D3.FILE_SAVE_NAME        AS R_FILE_SUB
+
+	    FROM REPLY R1
+	    LEFT JOIN MEMBER M ON M.MEM_ID = R1.MEM_ID
+	    LEFT JOIN FILE_GROUP FG1 ON FG1.FILE_GROUP_ID = M.FILE_BADGE
+	    LEFT JOIN FILE_DETAIL D1 ON D1.FILE_GROUP_ID = FG1.FILE_GROUP_ID
+	    LEFT JOIN FILE_GROUP FG2 ON FG2.FILE_GROUP_ID = M.FILE_PROFILE
+	    LEFT JOIN FILE_DETAIL D2 ON D2.FILE_GROUP_ID = FG2.FILE_GROUP_ID
+	    LEFT JOIN FILE_GROUP FG3 ON FG3.FILE_GROUP_ID = M.FILE_SUB
+	    LEFT JOIN FILE_DETAIL D3 ON D2.FILE_GROUP_ID = FG3.FILE_GROUP_ID
+
+	    WHERE R1.REPLY_PARENT_ID = #{replyId}
+	      AND R1.REPLY_DEL_YN = 'N'
+
+	    ORDER BY R1.REPLY_CREATED_AT ASC
+	</select >
+
+	<select id="selectReplyDetail" parameterType="int" resultMap="stdReplyMap">
+		SELECT
+	           R1.REPLY_ID
+	         , R1.BOARD_ID
+	         , R1.REPLY_PARENT_ID
+	         , R1.MEM_ID
+	         , R1.REPLY_CONTENT
+	         , R1.REPLY_DEL_YN
+	         , R1.REPLY_CREATED_AT
+	         , R1.REPLY_UPDATED_AT
+	         , (
+	             SELECT COUNT(*)
+	             FROM REPLY R2
+	             WHERE R2.REPLY_PARENT_ID = R1.REPLY_ID
+	               AND R2.REPLY_DEL_YN = 'N'
+	           ) AS CHILD_COUNT
+
+	         -- 대댓글 작성자 정보
+	         , M.MEM_ID			 AS R_MEM_ID
+	         , M.MEM_GEN         AS R_MEM_GEN
+	         , M.MEM_NAME        AS R_MEM_NAME
+	         , M.MEM_NICKNAME    AS R_MEM_NICKNAME
+	         , M.MEM_EMAIL       AS R_MEM_EMAIL
+	         , M.FILE_BADGE      AS R_FILE_BADGE_ID
+	         , M.FILE_PROFILE    AS R_FILE_PROFILE_ID
+	         , M.FILE_SUB        AS R_FILE_SUB_ID
+	         , D1.FILE_SAVE_NAME        AS R_FILE_BADGE
+	         , D2.FILE_SAVE_NAME        AS R_FILE_PROFILE
+
+	    FROM REPLY R1
+	    LEFT JOIN MEMBER M ON M.MEM_ID = R1.MEM_ID
+	    LEFT JOIN FILE_GROUP FG1 ON FG1.FILE_GROUP_ID = M.FILE_BADGE
+	    LEFT JOIN FILE_DETAIL D1 ON D1.FILE_GROUP_ID = FG1.FILE_GROUP_ID
+	    LEFT JOIN FILE_GROUP FG2 ON FG2.FILE_GROUP_ID = M.FILE_PROFILE
+	    LEFT JOIN FILE_DETAIL D2 ON D2.FILE_GROUP_ID = FG2.FILE_GROUP_ID
+
+	    WHERE R1.REPLY_ID = #{replyId}
+	</select>
+
+	<update id="increaseViewCnt" parameterType="int">
+		UPDATE BOARD
+		   SET BOARD_CNT = BOARD_CNT+1
+		 WHERE BOARD_ID = #{boardId}
+		   AND BOARD_DEL_YN = 'N'
+		   AND CC_ID = 'G09005'
+	</update>
+
+	<insert id="insertReply" parameterType="kr.or.ddit.prg.std.service.StdReplyVO">
+		<selectKey keyProperty="replyId" order="BEFORE" resultType="int">
+			SELECT NVL(MAX(REPLY_ID),0)+1 FROM REPLY
+		</selectKey>
+
+		INSERT INTO REPLY(
+		    REPLY_ID
+		    , BOARD_ID
+		    <if test="replyParentId != null and replyParentId != 0">
+		    , REPLY_PARENT_ID
+		    </if>
+		    , MEM_ID
+		    , REPLY_CONTENT
+		    , REPLY_DEL_YN
+		    , REPLY_CREATED_AT
+		    , REPLY_UPDATED_AT
+		) VALUES (
+		    #{replyId}
+		    , #{boardId}
+		    <if test="replyParentId != null and replyParentId != 0">
+		    , #{replyParentId}
+		    </if>
+		    , #{memId}
+		    , #{replyContent}
+		    , 'N'
+		    , SYSDATE
+		    , SYSDATE
+		)
+	</insert>
+	<update id="deleteReply" parameterType="kr.or.ddit.prg.std.service.StdReplyVO">
+		UPDATE REPLY
+		   SET REPLY_DEL_YN = 'Y'
+		 WHERE REPLY_ID = #{replyId}
+		   AND MEM_ID = #{memId}
+		   AND REPLY_DEL_YN = 'N'
+	</update>
+	<update id="deleteStdBoard" parameterType="kr.or.ddit.prg.std.service.StdBoardVO">
+		UPDATE BOARD
+		   SET BOARD_DEL_YN = 'Y'
+		 WHERE BOARD_ID = #{boardId}
+		   AND MEM_ID = #{memId}
+		   AND CC_ID = 'G09005'
+		   AND BOARD_DEL_YN = 'N'
+	</update>
+
+	<update id="updateStdReply" parameterType="kr.or.ddit.prg.std.service.StdReplyVO">
+		UPDATE REPLY
+		   SET REPLY_CONTENT = #{replyContent}
+		     , REPLY_UPDATED_AT = SYSDATE
+		 WHERE REPLY_ID = #{replyId}
+		   AND MEM_ID = #{memId}
+	</update>
+
+	<update id="updateStdBoard" parameterType="kr.or.ddit.prg.std.service.StdBoardVO">
+		UPDATE BOARD
+		   SET BOARD_TITLE = #{boardTitle}
+			 , BOARD_CONTENT = #{boardContent}
+			 , BOARD_UPDATED_AT = SYSDATE
+		 WHERE BOARD_ID = #{boardId}
+		   AND MEM_ID = #{memId}
+		   AND CC_ID = #{ccId}
+	</update>
+</mapper>

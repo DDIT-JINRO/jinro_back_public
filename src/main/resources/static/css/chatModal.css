@@ -1,0 +1,556 @@
+@charset "UTF-8";
+/* ✅ 모달 컨테이너 display none, flex 로 조절 */
+#chat-modal {
+  position: fixed;
+  width: 900px;
+  height: 700px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  display: none;
+  flex-direction: column;
+  z-index: 1000;
+  font-family: sans-serif;
+  overflow: hidden; /* ✅ 강제 clip */
+  right: 20px;
+  bottom: 80px;
+}
+
+.chat-modal__close-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.4rem;
+    color: white;
+}
+
+/* ✅ 모달 상단 헤더 */
+.chat-header {
+  background: #848EFB;
+  color: #fff;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+}
+
+/* ✅ 모달 본문 레이아웃 */
+.chat-content {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+/* ✅ 채팅방 목록 */
+.chat-room-list {
+  width: 250px;
+  border-right: 1px solid #ccc;
+  overflow-y: auto;
+  background: #f8f9fa;
+  color: #5a3fdb;
+}
+
+.chat-room-list div {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #7881f542;
+}
+
+.chat-room-list div:hover {
+  background-color: #717bfb;
+  color: #fff;
+}
+
+.chat-room-list .active {
+  background-color: #717bfb;
+  font-weight: bold;
+  color: #fff;
+}
+
+/* ✅ 메시지 출력 및 입력 영역 */
+.chat-message-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* ✅ flex 내부 스크롤 동작 핵심 */
+  overflow: hidden;
+}
+
+/* ✅ 메시지 출력 영역 - 기존 스타일 그대로 적용 */
+#chat-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+  min-height: 0;
+  border: none;
+}
+
+
+/* ✅ 메시지 입력창 */
+.chat-input {
+  display: none;
+  flex-shrink: 0; /* ✅ 고정 영역, 아래로 밀리지 않도록 */
+  border-top: 1px solid #ccc;
+  padding: 10px;
+  background: #fff;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.chat-input textarea {
+  flex: 1;
+  resize: none;
+  overflow-y: auto;
+  min-height: 40px;
+  max-height: 120px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+}
+.chat-input button {
+  margin-left: 10px;
+  padding: 10px 16px;
+  border: none;
+  background: #848EFB;
+  color: white;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* ✅ 메시지 스타일 (말풍선) - 기존 스타일 유지 */
+.chat-message {
+  max-width: 60%;
+  min-width: 10%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  word-break: break-word;
+  display: inline-block;
+  clear: both;
+}
+
+.chat-message.mine {
+  background-color: #b4afff;
+  color: #000;
+  text-align: left;
+}
+
+.chat-message.other {
+  background-color: #e2e2e2;
+  color: #000;
+  text-align: left;
+}
+
+/* ✅ 채팅방 안읽은 메시지 수 뱃지 스타일 */
+.chat-unread-badge {
+  background-color: red;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 12px;
+  padding: 2px 6px;
+  margin-left: auto;
+  display: inline-block;
+  min-width: 20px;
+  text-align: center;
+  line-height: 1;
+}
+
+.chat-room-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 선택한 채팅방이 없을떄. 모달 처음 오픈했을 때 우측에 표시 */
+.chat-room-no-selected {
+	justify-self: center;
+}
+
+.chat-profile {
+	width : 40px;
+	height: 40px;
+	flex-shrink: 0;
+}
+
+.message-box {
+	display : flex;
+	flex-direction: column;
+	margin-bottom: 15px;
+}
+
+.message-box.mine {
+	align-items: self-end;
+}
+
+.message-box.other {
+	align-items: self-start;
+}
+
+.chat-meta {
+	display: flex;
+	align-items: center;
+}
+
+.chat-meta .chat-nickname {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.chat-time {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.chat-room-meta {
+  display: none;
+  height: 7%;
+  justify-content: center;
+  align-items: center;
+}
+
+.chat-room-meta .chat-title {
+  align-content: center;
+  position: absolute;
+  border-bottom: solid #848efb4a;
+  color: #4b46f9;
+}
+
+.chat-member-list {
+	flex: 1;
+	margin-left: 20px;
+}
+
+.entered-mem-list{
+	width: max-content;
+}
+
+.entered-mem-list:hover{
+	cursor: pointer;
+}
+
+.entered-mem-list-detail {
+	position: fixed;
+	display: none;
+}
+
+.entered-mem-list-detail.open{
+	display: block;
+}
+
+.entered-mem-list-detail li {
+	list-style: none;
+}
+
+/* 시스템 메시지 전체 컨테이너 */
+.message-box.system {
+  display: flex;
+  justify-content: center;   /* 가로 중앙 */
+  margin: 12px 0;            /* 위아래 여유 */
+}
+
+/* 실제 텍스트 박스 */
+.system-message {
+  background-color: #e9ecef;
+  color: #495057;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  text-align: center;
+  margin-left: 25%;
+  margin-right: 25%;
+}
+
+.system-time{
+	text-align: center;
+	padding-left: 30%;
+	font-size: 0.65rem;
+}
+
+.attach-group{
+	display: flex;
+	flex-direction: column;
+	width : 5%;
+	margin-right: 1%;
+	gap: 5px;
+}
+
+.chat-img-btn{
+	filter: brightness(1);
+}
+
+.chat-img-btn:hover{
+	cursor: pointer;
+	filter: brightness(0.5);
+}
+
+.chat-file-btn{
+	filter: brightness(1.4);
+}
+
+.chat-file-btn:hover{
+	cursor: pointer;
+	filter: brightness(0.7);
+}
+
+/* ===== 첨부 미리보기 바 ===== */
+.attach-preview-bar{
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-top: 1px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
+  background: #f8f9fa;
+}
+
+.attach-preview-list{
+  flex: 1;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px; /* 스크롤바 여유 */
+}
+
+.attach-item{
+  position: relative;
+  flex: 0 0 auto;
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  display: grid;
+  place-items: center;
+}
+
+.attach-item img{
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
+
+.attach-remove{
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 50%;
+  background: #00000088;
+  color: #fff;
+  font-size: 12px;
+  line-height: 18px;
+  cursor: pointer;
+}
+
+.attach-progress{
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 4px;
+  background: #848EFB;
+  width: 0%;
+  transition: width .15s linear;
+}
+
+.attach-clear-btn{
+  flex: 0 0 auto;
+  border: 1px solid #ced4da;
+  background: #fff;
+  color: #495057;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* 파일첨부 메시지 */
+/* ===== 파일 메시지 칩 ===== */
+.file-bubble-list{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-item{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #e9ecef;
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.file-icon{
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 10px;
+  background: #eceffd;        /* 채팅 테마에 맞춘 은은한 배경 */
+  color: #4b46f9;
+  text-transform: uppercase;
+}
+
+.file-meta{
+  flex: 1;
+  min-width: 0;               /* 말줄임 가능 */
+}
+
+.file-name{
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-size{
+  font-size: 12px;
+  color: #868e96;
+}
+
+.file-download-btn{
+  flex: 0 0 auto;
+  border: 1px solid #ced4da;
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px 10px;
+  text-decoration: none;
+  font-size: 12px;
+}
+.file-download-btn:hover{ background:#f1f3f5; }
+
+/* ===== 이미지 썸네일(말풍선 내) ===== */
+.img-thumb-wrap{
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid #e9ecef;
+  width: 220px; /* 썸네일 폭 - 필요 시 조정 */
+  max-width: 60vw;
+  cursor: pointer;
+}
+.img-thumb-wrap img{
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.img-more-badge{
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  background: rgba(0,0,0,.65);
+  color: #fff;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+/* ===== 이미지 오버레이(모달 위 덮기) ===== */
+#img-overlay {
+  position: absolute;	/* fixed면 전체, absolute 모달내부 */
+  inset: 0;
+  display: none; /* JS로 flex 토글 */
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.75);
+  z-index: 1100; /* #chat-modal 내부에서 제일 위 */
+}
+.imgov-stage{
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  gap: 12px;
+  padding: 0 8px;
+}
+#imgov-view{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;   /* 가로나 세로 긴 쪽 기준으로 자동 맞춤 */
+  display: block;
+}
+.imgov-btn{
+  background: rgba(255,255,255,.15);
+  border: none;
+  color: #fff;
+  width: 40px; height: 40px;
+  border-radius: 999px;
+  font-size: 20px;
+  display: grid; place-items: center;
+  cursor: pointer;
+}
+.imgov-btn:hover{ background: rgba(255,255,255,.25); }
+
+.imgov-topbar{
+  position: absolute;
+  top: -10px; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  color: #fff; font-size: 14px;
+}
+.imgov-caption{
+  display: flex; align-items: center; gap: 8px;
+}
+.imgov-download{
+  color: #fff; text-decoration: none;
+  border: 1px solid rgba(255,255,255,.5);
+  padding: 4px 8px; border-radius: 6px;
+}
+.imgov-close{
+  background: rgba(255,255,255,.15);
+  border: none; color: #fff;
+  width: 36px; height: 36px; border-radius: 999px;
+  font-size: 18px; cursor: pointer;
+}
+
+/* ⬇️ 핵심: 이미지가 이 박스를 절대 넘지 않게, 가운데 정렬 */
+.imgov-viewport{
+  /* 좌우 버튼이 양옆에 있으니, 가운데 영역을 유연하게 차지 */
+  flex: 1 1 auto;
+  /* ✅ 핵심: 세로 제한을 명확히 — 상단 탑바 공간 조금 빼고 싶다면 calc 사용 가능 */
+  height: 90%;     /* 또는 height: calc(100% - 48px);  */
+  max-height: 90%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0,0,0,.4);
+}
+
+/* 드래그/리사이즈 지원 */
+#chat-modal{
+  /* 이미 fixed/overflow:hidden 있음 */
+  resize: both;                     /* 크기 조절 핸들 */
+  min-width: 480px;
+  min-height: 420px;
+  max-width: calc(100vw - 20px);
+  max-height: calc(100vh - 20px);
+}
+
+.chat-header {
+	cursor: move;
+	user-select: none;
+}
+
+#chat-modal.dragging {
+	cursor: grabbing;
+	user-select: none;
+}

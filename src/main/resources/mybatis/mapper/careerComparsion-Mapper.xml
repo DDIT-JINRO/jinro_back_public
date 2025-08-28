@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.pse.cr.cco.service.impl.CareerComparsionMapper">
+
+	<select id="selectCareerComparsionList" resultType="kr.or.ddit.worldcup.service.JobsVO" parameterType="kr.or.ddit.worldcup.service.JobsVO"> 
+		SELECT
+		    T2.JOB_CODE
+		    , T2.JOB_NAME
+		    , T2.JOB_MAIN_DUTY
+	        <if test="memId != null and memId !=''">
+	        , T2.IS_BOOKMARK
+	        </if>
+		    , T2.JOB_SATIS
+		    , T2.AVERAGE_SAL
+		    , T2.PROSPECT
+		    , T2.JOB_LCL
+		    , T2.JOB_MCL
+		    , T2.EDUCATION
+		    , T2.JOB_TARGET_ID
+		FROM (
+		    SELECT
+		        T1.JOB_NAME                     AS JOB_NAME
+		        , T1.JOB_MAIN_DUTY              AS JOB_MAIN_DUTY
+		        , T1.JOB_CODE                   AS JOB_CODE
+				<if test="memId != null and memId !=''">
+				, (
+					SELECT
+						BM_TARGET_ID
+					FROM
+						BOOKMARK
+					WHERE
+						BM_CATEGORY_ID = 'G03004'
+					AND MEM_ID = #{memId}
+					AND BM_TARGET_ID = JOB_TARGET_ID) AS IS_BOOKMARK
+				</if>
+		        , T1.JOB_SATIS                  AS JOB_SATIS
+		        , CASE
+		            WHEN           TO_NUMBER(REGEXP_SUBSTR(T1.JOB_SAL, '평균\(50%\) ([0-9]+)만원', 1, 1, NULL, 1)) IS NULL THEN NULL
+		            WHEN     TRUNC(TO_NUMBER(REGEXP_SUBSTR(T1.JOB_SAL, '평균\(50%\) ([0-9]+)만원', 1, 1, NULL, 1)) / 10000) > 0 AND MOD(TO_NUMBER(REGEXP_SUBSTR(T1.JOB_SAL, '평균\(50%\) ([0-9]+)만원', 1, 1, NULL, 1)), 10000) > 0
+		                THEN TRUNC(TO_NUMBER(REGEXP_SUBSTR(T1.JOB_SAL, '평균\(50%\) ([0-9]+)만원', 1, 1, NULL, 1)) / 10000) || '억 ' || MOD(TO_NUMBER(REGEXP_SUBSTR(T1.JOB_SAL, '평균\(50%\) ([0-9]+)만원', 1, 1, NULL, 1)), 10000) || '만원'
+		            WHEN     TRUNC(TO_NUMBER(REGEXP_SUBSTR(T1.JOB_SAL, '평균\(50%\) ([0-9]+)만원', 1, 1, NULL, 1)) / 10000) > 0 AND MOD(TO_NUMBER(REGEXP_SUBSTR(T1.JOB_SAL, '평균\(50%\) ([0-9]+)만원', 1, 1, NULL, 1)), 10000) = 0
+		                THEN TRUNC(TO_NUMBER(REGEXP_SUBSTR(T1.JOB_SAL, '평균\(50%\) ([0-9]+)만원', 1, 1, NULL, 1)) / 10000) || '억'
+		            ELSE           TO_NUMBER(REGEXP_SUBSTR(T1.JOB_SAL, '평균\(50%\) ([0-9]+)만원', 1, 1, NULL, 1)) || '만원'
+		        END                             AS AVERAGE_SAL
+		        , CASE GREATEST(NVL(T1.OUTLOOK_INCREASE,0), NVL(T1.OUTLOOK_SLIGHT_INCREASE,0), NVL(T1.OUTLOOK_STABLE,0), NVL(T1.OUTLOOK_SLIGHT_DECREASE,0), NVL(T1.OUTLOOK_DECREASE,0))
+		            WHEN T1.OUTLOOK_INCREASE          THEN '증가'
+		            WHEN T1.OUTLOOK_SLIGHT_INCREASE   THEN '다소 증가'
+		            WHEN T1.OUTLOOK_STABLE            THEN '유지'
+		            WHEN T1.OUTLOOK_SLIGHT_DECREASE   THEN '다소 감소'
+		            WHEN T1.OUTLOOK_DECREASE          THEN '감소'
+		            ELSE '정보 없음'
+		        END                             AS PROSPECT
+		        , L_CAT.CC_NAME                 AS JOB_LCL
+		        , M_CAT.CC_NAME                 AS JOB_MCL
+		        , CASE GREATEST(NVL(T1.EDUBG_MGRADU_UNDR,0), NVL(T1.EDUBG_HGRADU,0), NVL(T1.EDUBG_CGRADU_UNDR,0), NVL(T1.EDUBG_UGRADU,0), NVL(T1.EDUBG_GGRADU,0), NVL(T1.EDUBG_DGRADU,0))
+		            WHEN T1.EDUBG_DGRADU        THEN '박사졸'
+		            WHEN T1.EDUBG_GGRADU        THEN '대학원졸'
+		            WHEN T1.EDUBG_UGRADU        THEN '대졸'
+		            WHEN T1.EDUBG_CGRADU_UNDR   THEN '전문대졸'
+		            WHEN T1.EDUBG_HGRADU        THEN '고졸'
+		            WHEN T1.EDUBG_MGRADU_UNDR   THEN '중졸 이하'
+		            ELSE '정보 없음'
+		        END                             AS EDUCATION
+		        , T1.JOB_TARGET_ID              AS JOB_TARGET_ID
+		    FROM
+		        JOBS T1
+		        LEFT JOIN COM_CODE L_CAT ON T1.JOB_LCL = L_CAT.CC_ID
+		        LEFT JOIN COM_CODE M_CAT ON T1.JOB_MCL = M_CAT.CC_ID
+		    WHERE
+		        T1.JOB_CODE IN (
+		        <foreach collection="jobCodes" item="jobCode" separator=",">
+		            #{jobCode}
+		        </foreach>
+		     	)
+		) T2
+	</select>
+
+</mapper>

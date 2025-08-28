@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.ertds.univ.uvsrch.service.impl.UniversityMapper">
+
+	<select id="selectUniversityList" parameterType="kr.or.ddit.ertds.univ.uvsrch.service.UniversityVO" resultType="kr.or.ddit.ertds.univ.uvsrch.service.UniversityVO">
+		SELECT *
+		FROM (
+			SELECT sub.*, ROWNUM AS RNUM
+			FROM (
+				SELECT
+					UNIV_ID
+			      , CASE
+				 		WHEN UNIV_CAMPUS IN ('제2캠퍼스', '제3캠퍼스', '국제캠퍼스', '서울캠퍼스')
+						THEN UNIV_NAME || '[' || UNIV_CAMPUS || ']'
+						ELSE UNIV_NAME
+				    END AS UNIV_NAME
+				  , COALESCE(CC1.CC_NAME, UNIV_TYPE) AS UNIV_TYPE
+				  , COALESCE(CC2.CC_NAME, UNIV_GUBUN) AS UNIV_GUBUN
+				  , UNIV_URL
+				  , UNIV_REGION
+				  , UNIV_ADDR
+				  , (SELECT COUNT(*) FROM UNIV_DEPT TU WHERE TU.UNIV_ID = U.UNIV_ID) as DEPT_COUNT
+				  <if test="memId != null and memId != ''">
+				  , B.BM_ID
+				  </if>
+				FROM UNIVERSITY U
+				<if test="memId != null and memId != ''">
+				LEFT JOIN (SELECT BM_ID, BM_TARGET_ID FROM BOOKMARK WHERE BM_CATEGORY_ID='G03001' AND MEM_ID=#{memId})B ON U.UNIV_ID = B.BM_TARGET_ID
+				</if>
+				LEFT JOIN COM_CODE CC1 ON U.UNIV_TYPE = CC1.CC_ID
+				LEFT JOIN COM_CODE CC2 ON U.UNIV_GUBUN = CC2.CC_ID
+				<where>
+					<if test="keyword != null and keyword != ''">
+		                AND (U.UNIV_NAME LIKE '%' || #{keyword} || '%')
+		            </if>
+		            <if test="regionIds != null and regionIds.size() > 0">
+			            AND (
+			            <foreach collection="regionIds" item="id" separator="OR">
+			                U.UNIV_REGION LIKE (SELECT CC_ETC || '%' FROM COM_CODE WHERE CC_ID = #{id})
+			            </foreach>
+			            )
+			        </if>
+		            <if test="typeIds != null and typeIds.size() > 0">
+			            AND (
+			            <foreach collection="typeIds" item="id" separator="OR">
+			                U.UNIV_TYPE = #{id}
+			            </foreach>
+			            )
+			        </if>
+		            <if test="gubunIds != null and gubunIds.size() > 0">
+			            AND (
+			            <foreach collection="gubunIds" item="id" separator="OR">
+			                U.UNIV_GUBUN = #{id}
+			            </foreach>
+			            )
+			        </if>
+		        </where>
+		        ORDER BY
+		        <if test="memId != null and memId != ''">
+		        	B.BM_ID,
+		        </if>
+		        <choose>
+		        	<when test="sortOrder == 'nameAsc' ">UNIV_NAME ASC, U.UNIV_ID</when>
+		        	<when test="sortOrder == 'nameDesc' ">UNIV_NAME DESC, U.UNIV_ID</when>
+		        	<when test="sortOrder == 'deptCountDesc' ">DEPT_COUNT DESC, U.UNIV_ID</when>
+		        	<when test="sortOrder == 'deptCountAsc' ">DEPT_COUNT ASC, U.UNIV_ID</when>
+		        	<otherwise>U.UNIV_ID</otherwise>
+		        </choose>
+			) sub
+			WHERE ROWNUM <![CDATA[<=]]> #{endNo}
+		)
+		WHERE RNUM <![CDATA[>]]> #{startNo}
+	</select>
+
+	<select id="selectUniversityTotalCount" resultType="int" parameterType="kr.or.ddit.ertds.univ.uvsrch.service.UniversityVO">
+	  SELECT COUNT(*)
+	  FROM UNIVERSITY U
+	  <where>
+			<if test="keyword != null and keyword != ''">
+                AND (U.UNIV_NAME LIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="regionIds != null and regionIds.size() > 0">
+	            AND (
+	            <foreach collection="regionIds" item="id" separator="OR">
+	                U.UNIV_REGION LIKE (SELECT CC_ETC || '%' FROM COM_CODE WHERE CC_ID = #{id})
+	            </foreach>
+	            )
+	        </if>
+            <if test="typeIds != null and typeIds.size() > 0">
+	            AND (
+	            <foreach collection="typeIds" item="id" separator="OR">
+	                U.UNIV_TYPE = #{id}
+	            </foreach>
+	            )
+	        </if>
+            <if test="gubunIds != null and gubunIds.size() > 0">
+	            AND (
+	            <foreach collection="gubunIds" item="id" separator="OR">
+	                U.UNIV_GUBUN = #{id}
+	            </foreach>
+	            )
+	        </if>
+        </where>
+	</select>
+
+	<select id="selectBookMarkVO" parameterType="kr.or.ddit.mpg.mat.bmk.service.BookMarkVO" resultType="kr.or.ddit.mpg.mat.bmk.service.BookMarkVO">
+		SELECT BM_ID, MEM_ID, BM_CATEGORY_ID, BM_TARGET_ID
+		FROM BOOKMARK
+		WHERE MEM_ID = #{memId}
+		AND BM_CATEGORY_ID =#{bmCategoryId}
+	</select>
+
+	<select id="selectCodeVOUniversityTypeList" resultType="kr.or.ddit.com.ComCodeVO">
+		select CC_ID, CL_CODE, CC_NAME, CC_ETC
+		from COM_CODE
+		where CL_CODE = 'G20'
+	</select>
+
+	<select id="selectCodeVOUniversityGubunList" resultType="kr.or.ddit.com.ComCodeVO">
+		select CC_ID, CL_CODE, CC_NAME, CC_ETC
+		from COM_CODE
+		where CL_CODE = 'G21'
+	</select>
+
+	<select id="selectCodeVORegionList" resultType="kr.or.ddit.com.ComCodeVO">
+		select CC_ID, CL_CODE, CC_NAME, CC_ETC
+		from COM_CODE
+		where CL_CODE = 'G23'
+	</select>
+
+	<select id="selectUnivDeptCount" parameterType="int" resultType="int">
+		SELECT COUNT(*)
+		FROM UNIV_DEPT
+		WHERE UNIV_ID = #{univId}
+	</select>
+
+
+	<!-- 대학 상세 정보 조회 (기본 정보만) -->
+	<select id="selectUniversityDetailInfo" parameterType="int" resultType="kr.or.ddit.ertds.univ.uvsrch.service.UniversityDetailVO">
+	    SELECT
+	        UNIV_ID
+	      , CASE
+	            WHEN UNIV_CAMPUS IN ('제2캠퍼스', '제3캠퍼스', '국제캠퍼스', '서울캠퍼스')
+	            THEN UNIV_NAME || '[' || UNIV_CAMPUS || ']'
+	            ELSE UNIV_NAME
+	        END AS UNIV_NAME
+	      , UNIV_CAMPUS
+	      , COALESCE(CC1.CC_NAME, UNIV_TYPE) AS UNIV_TYPE
+	      , COALESCE(CC2.CC_NAME, UNIV_GUBUN) AS UNIV_GUBUN
+	      , UNIV_URL
+	      , UNIV_REGION
+	      , UNIV_ADDR
+	    FROM UNIVERSITY U
+	    LEFT JOIN COM_CODE CC1 ON U.UNIV_TYPE = CC1.CC_ID
+	    LEFT JOIN COM_CODE CC2 ON U.UNIV_GUBUN = CC2.CC_ID
+	    WHERE U.UNIV_ID = #{univId}
+	</select>
+
+	<!-- 특정 대학의 학과 목록 조회 -->
+	<select id="selectUniversityDeptList" parameterType="int" resultType="kr.or.ddit.ertds.univ.uvsrch.service.UniversityDetailVO$DeptInfo">
+	    SELECT
+	        UD_ID
+	      , UNIV_ID
+	      , UDD_ID
+	      , UD_NAME
+	      , UD_TUITION
+	      , UD_SCHOLAR
+	      , UD_COMPETITION
+	      , UD_EMP_RATE
+	    FROM UNIV_DEPT
+	    WHERE UNIV_ID = #{univId}
+	    ORDER BY UD_NAME
+	</select>
+
+	<!-- 특정 대학의 학과 구분별 통계 조회 -->
+	<select id="selectUniversityDeptStats" parameterType="int" resultType="kr.or.ddit.ertds.univ.uvsrch.service.UniversityDetailVO$DeptInfo">
+	    SELECT
+	        UD.UD_ID,
+	        UD.UNIV_ID,
+	        UD.UDD_ID,
+	        UD.UD_NAME,
+	        UD.UD_TUITION,
+	        UD.UD_SCHOLAR,
+	        UD.UD_COMPETITION,
+	        UD.UD_EMP_RATE,
+
+	        -- 해당 UDD_ID의 전국 평균 등록금
+	        (SELECT ROUND(AVG(UD_TUITION), 0)
+	         FROM UNIV_DEPT
+	         WHERE UDD_ID = UD.UDD_ID
+	           AND UD_TUITION IS NOT NULL) AS AVG_TUITION,
+
+	        -- 해당 UDD_ID의 전국 평균 장학금
+	        (SELECT ROUND(AVG(UD_SCHOLAR), 0)
+	         FROM UNIV_DEPT
+	         WHERE UDD_ID = UD.UDD_ID
+	           AND UD_SCHOLAR IS NOT NULL) AS AVG_SCHOLAR,
+
+	        -- 해당 UDD_ID의 전국 평균 경쟁률 (예: "9.6:1")
+	        (SELECT
+	            CASE
+	                WHEN ROUND(AVG(
+	                    CASE
+	                        WHEN UD_COMPETITION IS NOT NULL
+	                             AND INSTR(UD_COMPETITION, ':') > 0
+	                        THEN TO_NUMBER(SUBSTR(UD_COMPETITION, 1, INSTR(UD_COMPETITION, ':') - 1))
+	                    END
+	                ), 1) IS NOT NULL
+	                THEN ROUND(AVG(
+	                    CASE
+	                        WHEN UD_COMPETITION IS NOT NULL
+	                             AND INSTR(UD_COMPETITION, ':') > 0
+	                        THEN TO_NUMBER(SUBSTR(UD_COMPETITION, 1, INSTR(UD_COMPETITION, ':') - 1))
+	                    END
+	                ), 1) || ':1'
+	            END
+	         FROM UNIV_DEPT
+	         WHERE UDD_ID = UD.UDD_ID
+	           AND UD_COMPETITION IS NOT NULL) AS AVG_COMPETITION,
+
+	        -- 해당 UDD_ID의 전국 평균 취업률 (예: "85.6")
+	        (SELECT ROUND(AVG(
+			   CASE
+			     WHEN UD_EMP_RATE IS NOT NULL
+			          AND TRIM(UD_EMP_RATE) IS NOT NULL
+			          AND LENGTH(TRIM(UD_EMP_RATE)) > 0
+			          AND REGEXP_LIKE(TRIM(REGEXP_REPLACE(UD_EMP_RATE, '%|,|\s', '')), '^[0-9]*\.?[0-9]+$')
+			          AND TO_NUMBER(TRIM(REGEXP_REPLACE(UD_EMP_RATE, '%|,|\s', ''))) >= 0
+			     THEN TO_NUMBER(TRIM(REGEXP_REPLACE(UD_EMP_RATE, '%|,|\s', '')))
+			   END
+			 ), 1)
+	         FROM UNIV_DEPT
+	         WHERE UDD_ID = UD.UDD_ID
+	           AND UD_EMP_RATE IS NOT NULL) AS AVG_EMP_RATE
+
+	    FROM UNIV_DEPT UD
+	    WHERE UD.UNIV_ID = #{univId}
+	    ORDER BY UD.UD_NAME
+	</select>
+
+	<!-- 대학 추가/수정 (MERGE INTO 사용) -->
+	<insert id="updateUniversity" parameterType="kr.or.ddit.ertds.univ.uvsrch.service.UniversityVO">
+	    <selectKey keyProperty="univId" resultType="int" order="BEFORE">
+	        <if test="univId == null or univId == 0">
+	            SELECT NVL(MAX(UNIV_ID), 0) + 1 FROM UNIVERSITY
+	        </if>
+	        <if test="univId != null and univId != 0">
+	            SELECT #{univId} FROM DUAL
+	        </if>
+	    </selectKey>
+
+	    MERGE INTO UNIVERSITY U
+	    USING (
+	        SELECT
+	            #{univId} AS UNIV_ID,
+	            #{univName} AS UNIV_NAME,
+	            #{univCampus} AS UNIV_CAMPUS,
+	            #{univType} AS UNIV_TYPE,
+	            #{univGubun} AS UNIV_GUBUN,
+	            #{univUrl} AS UNIV_URL,
+	            #{univRegion} AS UNIV_REGION,
+	            #{univAddr} AS UNIV_ADDR
+
+	        FROM DUAL
+	    ) S ON (U.UNIV_ID = S.UNIV_ID)
+	    WHEN MATCHED THEN
+	        UPDATE SET
+	            U.UNIV_NAME = S.UNIV_NAME,
+	            U.UNIV_CAMPUS = S.UNIV_CAMPUS,
+	            U.UNIV_TYPE = S.UNIV_TYPE,
+	            U.UNIV_GUBUN = S.UNIV_GUBUN,
+	            U.UNIV_URL = S.UNIV_URL,
+	            U.UNIV_REGION = S.UNIV_REGION,
+	            U.UNIV_ADDR = S.UNIV_ADDR
+
+	    WHEN NOT MATCHED THEN
+	        INSERT (
+	            UNIV_ID, UNIV_NAME, UNIV_CAMPUS, UNIV_TYPE,
+	            UNIV_GUBUN, UNIV_URL, UNIV_REGION, UNIV_ADDR
+
+	        )
+	        VALUES (
+	            S.UNIV_ID, S.UNIV_NAME, S.UNIV_CAMPUS, S.UNIV_TYPE,
+	            S.UNIV_GUBUN, S.UNIV_URL, S.UNIV_REGION, S.UNIV_ADDR
+	        )
+	</insert>
+
+	<!-- 대학 삭제 -->
+	<delete id="deleteUniversity" parameterType="int">
+	    DELETE FROM UNIVERSITY
+	    WHERE UNIV_ID = #{univId}
+	</delete>
+
+	<!-- 대학 ID로 단일 조회 -->
+	<select id="selectUniversityById" parameterType="int" resultType="kr.or.ddit.ertds.univ.uvsrch.service.UniversityVO">
+	    SELECT
+	        UNIV_ID,
+	        UNIV_NAME,
+	        UNIV_CAMPUS,
+	        UNIV_TYPE,
+	        UNIV_GUBUN,
+	        UNIV_URL,
+	        UNIV_REGION,
+	        UNIV_ADDR,
+	        UNIV_LAT,
+	        UNIV_LOT
+	    FROM UNIVERSITY
+	    WHERE UNIV_ID = #{univId}
+	</select>
+
+	<!-- 학과 추가/수정 (MERGE INTO 사용) -->
+	<insert id="updateDepartment" parameterType="kr.or.ddit.ertds.univ.uvsrch.service.UniversityDetailVO$DeptInfo">
+		<selectKey keyProperty="udId" resultType="int" order="BEFORE">
+	        <if test="udId == null or udId == 0">
+	            SELECT NVL(MAX(UD_ID), 0) + 1 FROM UNIV_DEPT
+	        </if>
+	        <if test="udId != null and udId != 0">
+	            SELECT #{udId} FROM DUAL
+	        </if>
+	    </selectKey>
+
+	    MERGE INTO UNIV_DEPT UD
+	    USING (
+	        SELECT
+	            #{udId} AS UD_ID,
+	            #{univId} AS UNIV_ID,
+	            #{uddId} AS UDD_ID,
+	            #{udName} AS UD_NAME,
+	            #{udTuition} AS UD_TUITION,
+	            #{udScholar} AS UD_SCHOLAR,
+	            #{udCompetition} AS UD_COMPETITION,
+	            #{udEmpRate} AS UD_EMP_RATE
+	        FROM DUAL
+	    ) S ON (UD.UD_ID = S.UD_ID)
+	    WHEN MATCHED THEN
+	        UPDATE SET
+	            UD.UNIV_ID = S.UNIV_ID,
+	            UD.UDD_ID = S.UDD_ID,
+	            UD.UD_NAME = S.UD_NAME,
+	            UD.UD_TUITION = S.UD_TUITION,
+	            UD.UD_SCHOLAR = S.UD_SCHOLAR,
+	            UD.UD_COMPETITION = S.UD_COMPETITION,
+	            UD.UD_EMP_RATE = S.UD_EMP_RATE
+	    WHEN NOT MATCHED THEN
+	        INSERT (
+	            UD_ID, UNIV_ID, UDD_ID, UD_NAME,
+	            UD_TUITION, UD_SCHOLAR, UD_COMPETITION, UD_EMP_RATE
+	        )
+	        VALUES (
+	            S.UD_ID, S.UNIV_ID, S.UDD_ID, S.UD_NAME,
+	            S.UD_TUITION, S.UD_SCHOLAR, S.UD_COMPETITION, S.UD_EMP_RATE
+	        )
+	</insert>
+
+	<!-- 학과 삭제 -->
+	<delete id="deleteDepartment" parameterType="int">
+	    DELETE FROM UNIV_DEPT
+	    WHERE UD_ID = #{udId}
+	</delete>
+
+	<!-- 특정 대학의 학과 삭제 -->
+	<delete id="deleteDepartmentsByUnivId" parameterType="int">
+	    DELETE FROM UNIV_DEPT
+	    WHERE UNIV_ID = #{univId}
+	</delete>
+
+	<!-- 학과 ID로 단일 조회 -->
+	<select id="selectDepartmentById" parameterType="int" resultType="kr.or.ddit.ertds.univ.uvsrch.service.UniversityDetailVO$DeptInfo">
+	    SELECT
+	        UD_ID,
+	        UNIV_ID,
+	        UDD_ID,
+	        UD_NAME,
+	        UD_TUITION,
+	        UD_SCHOLAR,
+	        UD_COMPETITION,
+	        UD_EMP_RATE
+	    FROM UNIV_DEPT
+	    WHERE UD_ID = #{udId}
+	</select>
+
+</mapper>

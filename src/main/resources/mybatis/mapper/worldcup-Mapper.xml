@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.worldcup.service.impl.WorldCupMapper">
+
+<!-- 직업분류 선택 32개 or 64 개 이상인 직업분류만-->
+<select id="selectCategories" parameterType="String" resultType="kr.or.ddit.worldcup.service.ComCodeVO">
+    SELECT c.CC_ID, c.CC_NAME
+    FROM COM_CODE c
+    JOIN (
+        SELECT JOB_LCL
+        FROM JOBS
+        GROUP BY JOB_LCL
+        HAVING COUNT(*) >= #{round}
+    ) j ON c.CC_ID = j.JOB_LCL
+    WHERE c.CL_CODE = 'G15'
+    ORDER BY c.CC_ID
+</select>
+
+<!-- 직업 분류에서 받아온 직업 목록 -->
+<select id="selectJobsByCategory" parameterType="kr.or.ddit.worldcup.service.ComCodeVO" resultType="kr.or.ddit.worldcup.service.JobsVO">
+	SELECT JOB_CODE, JOB_NAME, JOB_LCL, JOB_RELATED_CERT, JOB_MAIN_DUTY
+		FROM JOBS
+		WHERE JOB_LCL = #{ccId}
+		ORDER BY 1
+</select>
+
+<!-- 최종 결과 1등 직업 -->
+<select id="selectJobById" parameterType="kr.or.ddit.worldcup.service.JobsVO" resultType="kr.or.ddit.worldcup.service.JobsVO">
+	SELECT JOB_CODE, JOB_NAME, JOB_LCL, JOB_SAL, JOB_SATIS,
+            JOB_WAY, JOB_RELATED_CERT, JOB_MAIN_DUTY
+	FROM JOBS 
+	WHERE JOB_CODE = #{jobCode}
+</select>
+
+<!-- 1등결과 관련 직종 가져오기 -->
+<select id="selectRelatedJobNames" parameterType="kr.or.ddit.worldcup.service.JobsVO" resultType="String">
+	SELECT JOB_NAME AS JOBS_REL
+	FROM JOBS
+	WHERE JOB_CODE IN (SELECT JR_CODE
+						FROM JOBS_REL
+						WHERE JOB_CODE = #{jobCode})
+</select>
+
+<!-- 월드컵 데이터에 삽입 -->
+<insert id="insertWorldcupResult" parameterType="kr.or.ddit.worldcup.service.WorldCupVO">
+    <selectKey keyProperty="wdId" order="BEFORE" resultType="int">
+        SELECT NVL(MAX(WD_ID), 0) + 1 FROM WORLDCUP
+    </selectKey>
+
+    INSERT INTO WORLDCUP (WD_ID, WD_RESULT, CREATED_AT, MEM_ID)
+    VALUES (#{wdId}, #{wdResult}, SYSDATE, #{memId})
+</insert>
+
+<select id="selectComCodeNameByccId" parameterType="kr.or.ddit.worldcup.service.ComCodeVO" resultType="kr.or.ddit.worldcup.service.ComCodeVO">
+	select CC_ID, CL_CODE, CC_NAME, CC_ETC
+	from COM_CODE
+	where CC_ID = #{ccId}
+</select>
+
+
+</mapper>

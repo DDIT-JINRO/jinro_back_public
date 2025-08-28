@@ -1,0 +1,165 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   비교 테이블
+   ========================================================================== */
+.comparison-table {
+	width: 100%;
+	margin: 40px auto; /* 상단 여백 추가 */
+	border-collapse: collapse;
+	table-layout: fixed;
+}
+
+.comparison-table__header .comparison-table__category-header {
+	width: 15%;
+	min-width: 150px;
+}
+
+.comparison-table__job-col-header {
+	border: none;
+	padding: 0 10px 20px 10px;
+	vertical-align: top;
+}
+
+.comparison-table__body .comparison-table__category-header,
+.comparison-table__cell {
+	padding: 18px 15px;
+	text-align: center;
+	font-size: 0.9rem;
+	color: #555;
+	border-bottom: 1px solid #e9ecef;
+	vertical-align: middle;
+	line-height: 1.6;
+	word-break: keep-all;
+}
+
+.comparison-table__body .comparison-table__category-header {
+	background-color: #f8f9fa;
+	font-weight: 500;
+	color: #333;
+	text-align: left;
+	border-right: 1px solid #e9ecef;
+}
+
+.comparison-table__cell--align-left {
+	text-align: left;
+}
+
+.comparison-table__body .comparison-table__row:last-child .comparison-table__category-header,
+.comparison-table__body .comparison-table__row:last-child .comparison-table__cell {
+	border-bottom: none;
+}
+
+/* --- 정렬 기능 --- */
+.comparison-table__category-header--sortable {
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.comparison-table__category-header--sortable:hover {
+	background-color: #e9ecef;
+}
+
+.comparison-table__category-header--sort-active {
+	color: #007bff;
+	font-weight: 700;
+}
+
+/* --- 최고값 강조 --- */
+.comparison-table__cell--highlighted {
+	background-color: #e7f5ff;
+	font-weight: 700;
+	color: #007bff;
+}
+
+/* ==========================================================================
+   직업 카드
+   ========================================================================== */
+.job-card-condensed {
+	background-color: #fff;
+	border: 1px solid #e9ecef;
+	border-radius: 8px;
+	padding: 20px;
+	text-align: center;
+	position: relative;
+	transition: all 0.2s ease-in-out;
+	height: 100%;
+}
+
+.job-card-condensed:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.07);
+	border-color: #007bff;
+}
+
+.job-card-condensed__title {
+	font-size: 1rem;
+	font-weight: 600;
+	color: #212529;
+	margin: 10px 0;
+}
+
+.job-card-condensed__remove {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	background: none;
+	border: none;
+	font-size: 1.5rem;
+	color: #aaa;
+	cursor: pointer;
+	line-height: 1;
+}
+
+.job-card-condensed__remove:hover {
+	color: #333;
+}
+
+.job-card-condensed__detail-link {
+	display: inline-block;
+	padding: 6px 16px;
+	font-size: 0.8rem;
+	font-weight: 500;
+	color: #007bff;
+	background-color: #e7f5ff;
+	border: 1px solid transparent;
+	border-radius: 16px;
+	text-decoration: none;
+	transition: all 0.2s;
+	margin-top: 10px;
+}
+
+.job-card-condensed__detail-link:hover {
+	background-color: #007bff;
+	color: #fff;
+}
+
+/* ==========================================================================
+   반응형 스타일
+   ========================================================================== */
+@media ( max-width : 1024px) {
+	.public-wrapper {
+		width: 95%;
+	}
+}
+
+@media ( max-width : 768px) {
+	.table-responsive-wrapper {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		border: 1px solid #e9ecef;
+		border-radius: 8px;
+	}
+	.comparison-table {
+		min-width: 1000px;
+		margin: 0;
+	}
+	.comparison-table__body .comparison-table__category-header,
+		.comparison-table__cell {
+		font-size: 0.85rem;
+		padding: 12px 10px;
+	}
+	.job-card-condensed__title {
+		font-size: 0.9rem;
+	}
+}

@@ -1,0 +1,88 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   페이지 레이아웃: Content List 5열 구조 재정의
+   ========================================================================== */
+.content-list__header, .content-list__item {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+}
+
+.content-list__header {
+	padding: 12px 24px;
+}
+
+.content-list__item {
+	padding: 20px 24px;
+	text-decoration: none;
+}
+
+.content-list__col {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* --- 각 컬럼 너비 지정 --- */
+.content-list__col--school-name {
+	flex: 4;
+	justify-content: flex-start;
+	text-align: left;
+}
+
+.content-list__col--coed {
+	flex: 1;
+	justify-content: left;
+}
+
+.content-list__col--type {
+	flex: 1;
+	justify-content: left;
+}
+
+.content-list__col--found {
+	flex: 1;
+}
+
+.content-list__col--region {
+	flex: 1.2;
+	justify-content: left;
+}
+
+/* ==========================================================================
+   반응형 스타일
+   ========================================================================== */
+@media ( max-width : 768px) {
+	.content-list__header {
+		display: none;
+	}
+	.content-list__item {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+	}
+	.content-list__col {
+		width: 100%;
+		justify-content: flex-start;
+		padding: 5px 0;
+		border-bottom: 1px dashed #eee;
+	}
+	.content-list__item .content-list__col:last-child {
+		border-bottom: none;
+	}
+	.content-list__col::before {
+		content: attr(data-label);
+		font-weight: 600;
+		color: #6b7280;
+		width: 80px;
+		flex-shrink: 0;
+	}
+	.content-list__col--school-name::before {
+		display: none;
+	}
+	.content-list__col--school-name {
+		border-bottom: none;
+		padding-bottom: 5px;
+	}
+}

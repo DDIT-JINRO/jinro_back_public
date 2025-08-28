@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.empt.ema.service.impl.EmploymentAdvertisementMapper">
+
+
+	<select id="selectFilteredHireList" parameterType="kr.or.ddit.empt.ema.service.HireVO" resultType="kr.or.ddit.empt.ema.service.HireVO">
+	    SELECT
+	        hire_id, hire_title, hire_description, hire_start_date, hire_end_date, hire_url, cp_name, cp_region, hire_type_name, hire_class_code_name
+	    FROM (
+	        SELECT
+	            ROWNUM AS RNUM,
+	            a.*
+	        FROM (
+	            SELECT
+	                a.hire_id,
+	                a.hire_title,
+	                a.hire_description,
+	                a.hire_start_date,
+	                a.hire_end_date,
+	                a.hire_url,
+	                b.cp_name,
+	                b.cp_region,
+	                c.cc_name AS hire_type_name,
+	                d.cc_name AS hire_class_code_name
+	                <if test="memId != null and memId != ''">
+	                	,e.BM_ID
+	                </if>
+	            FROM hire a
+	                JOIN company b ON a.cp_id = b.cp_id
+	                JOIN COM_CODE c ON a.HIRE_TYPE = c.CC_ID
+	                LEFT JOIN COM_CODE d ON a.HIRE_CLASS_CODE = d.CC_ID
+	                <if test="memId != null and memId != ''">
+	            	LEFT JOIN (SELECT BM_ID, BM_TARGET_ID FROM BOOKMARK WHERE BM_CATEGORY_ID='G03003' AND MEM_ID=#{memId})e ON a.HIRE_ID = e.BM_TARGET_ID
+	            	</if>
+	            <where>
+	            	<if test="cpHiringStatus != null">
+			        	AND TRUNC(SYSDATE) &lt; TRUNC(a.HIRE_END_DATE)
+			        </if>
+	                <if test="keyword != null and keyword != ''">
+	                    (a.hire_title LIKE '%' || #{keyword} || '%' OR b.cp_name LIKE '%' || #{keyword} || '%')
+	                </if>
+	                <if test="hireTypeNames != null and hireTypeNames.size() > 0">
+	                    AND c.cc_id IN
+	                    <foreach collection="hireTypeNames" item="typeName" open="(" separator="," close=")">
+	                        #{typeName}
+	                    </foreach>
+	                </if>
+	                <if test="hireClassCodeNames != null and hireClassCodeNames.size() > 0">
+	                    AND d.cc_id IN
+	                    <foreach collection="hireClassCodeNames" item="className" open="(" separator="," close=")">
+	                        #{className}
+	                    </foreach>
+	                </if>
+	                <if test="regions != null and regions.size() > 0">
+	                    AND (
+	                        <foreach collection="regions" item="region" separator="OR">
+	                            b.cp_region LIKE (SELECT cc_etc || '%' FROM com_code WHERE cc_id = #{region})
+	                        </foreach>
+	                        )
+	                </if>
+
+	            </where>
+	            ORDER BY
+	            <if test="memId != null and memId != ''">
+	            e.BM_ID,
+	            </if>
+	            <choose>
+	            	<when test="sortOrder == 'hireEndDesc'">
+	            	CASE
+				        WHEN a.hire_end_date >= TRUNC(SYSDATE) THEN 0
+				        ELSE 1
+				    END ASC,
+		            a.hire_start_date DESC
+	            	</when>
+	            	<when test="sortOrder == 'createdDesc'">
+	            	a.hire_start_date DESC
+	            	</when>
+	            	<when test="sortOrder == 'createdAsc'">
+	            	a.hire_start_date ASC
+	            	</when>
+	            	<otherwise>
+		            CASE
+				        WHEN a.hire_end_date >= TRUNC(SYSDATE) THEN 0
+				        ELSE 1
+				    END ASC,
+		            a.hire_start_date DESC
+		            </otherwise>
+	            </choose>
+	            , a.HIRE_ID
+	        ) a
+   	        WHERE ROWNUM &lt;= #{endNo}
+	    )
+	    WHERE RNUM &gt; #{startNo}
+	</select>
+
+	<select id="selectFilteredHireTotalCount" parameterType="kr.or.ddit.empt.ema.service.HireVO" resultType="int">
+	    SELECT
+	        COUNT(*)
+	    FROM
+	        hire a
+	        JOIN company b ON a.cp_id = b.cp_id
+	        JOIN COM_CODE c ON a.HIRE_TYPE = c.CC_ID
+	        LEFT JOIN COM_CODE d ON a.HIRE_CLASS_CODE = d.CC_ID
+	    <where>
+	    	<if test="cpHiringStatus != null">
+	        	AND TRUNC(SYSDATE) &lt; TRUNC(a.HIRE_END_DATE)
+	        </if>
+	        <if test="keyword != null and keyword != ''">
+	            (a.hire_title LIKE '%' || #{keyword} || '%' OR b.cp_name LIKE '%' || #{keyword} || '%')
+	        </if>
+	        <if test="hireTypeNames != null and hireTypeNames.size() > 0">
+	            AND c.cc_id IN
+	            <foreach collection="hireTypeNames" item="typeName" open="(" separator="," close=")">
+	                #{typeName}
+	            </foreach>
+	        </if>
+	        <if test="hireClassCodeNames != null and hireClassCodeNames.size() > 0">
+	            AND d.cc_id IN
+	            <foreach collection="hireClassCodeNames" item="className" open="(" separator="," close=")">
+	                #{className}
+	            </foreach>
+	        </if>
+	        <if test="regions != null and regions.size() > 0">
+	            AND (
+	                <foreach collection="regions" item="region" separator="OR">
+	                    b.cp_region LIKE (SELECT cc_etc || '%' FROM com_code WHERE cc_id = #{region})
+	                </foreach>
+	                )
+	        </if>
+	    </where>
+	</select>
+
+    <select id="selectCodeVOList" parameterType="kr.or.ddit.worldcup.service.ComCodeVO" resultType="kr.or.ddit.com.ComCodeVO">
+    	select CC_ID, CL_CODE, CC_NAME, CC_ETC
+		from COM_CODE
+		where CL_CODE = #{clCode}
+    </select>
+
+    <select id="selectHireByBookMarkMemId" parameterType="String" resultType="kr.or.ddit.empt.ema.service.HireVO">
+		SELECT A.HIRE_ID, A.CP_ID, A.HIRE_TITLE, A.HIRE_END_DATE, B.CP_NAME
+			FROM HIRE A
+			JOIN COMPANY B
+			ON A.CP_ID = B.CP_ID
+			WHERE HIRE_ID IN
+			    (SELECT BM_TARGET_ID
+			    FROM BOOKMARK
+			    WHERE MEM_ID = #{memId}
+			    AND BM_CATEGORY_ID ='G03003')
+    </select>
+
+    <select id="getAllUserIds" resultType="String">
+    	select distinct mem_id
+			from BOOKMARK
+			where BM_CATEGORY_ID ='G03003'
+    </select>
+
+    <select id="checkHireByHireId" parameterType="kr.or.ddit.empt.ema.service.HireVO" resultType="kr.or.ddit.empt.ema.service.HireVO">
+	    select *
+			from hire
+			where HIRE_ID = #{hireId}
+    </select>
+
+    <select id="getMaxHireId" resultType="int">
+    	SELECT NVL(MAX(HIRE_ID),0)+1
+		FROM HIRE
+    </select>
+
+    <update id="updateEmploymentAdvertisement" parameterType="kr.or.ddit.empt.ema.service.HireVO">
+		 MERGE INTO HIRE H
+	    USING DUAL
+	    ON (H.HIRE_ID = #{hireId})
+	    WHEN MATCHED THEN
+	        UPDATE
+	        <set>
+	            <if test="hireTitle != null">
+	                H.HIRE_TITLE = #{hireTitle},
+	            </if>
+	            <if test="hireDescription != null">
+	                H.HIRE_DESCRIPTION = #{hireDescription},
+	            </if>
+	            <if test="hireType != null">
+	                H.HIRE_TYPE = #{hireType},
+	            </if>
+   	            <if test="hireStartDate != null">
+	                H.HIRE_START_DATE = #{hireStartDate},
+	            </if>
+   	            <if test="hireEndDate != null">
+	                H.HIRE_END_DATE = #{hireEndDate},
+	            </if>
+   	            <if test="hireUrl != null">
+	                H.HIRE_URL = #{hireUrl},
+	            </if>
+   	            <if test="hireClassCode != null">
+	                H.HIRE_CLASS_CODE = #{hireClassCode},
+	            </if>
+       		</set>
+
+    WHEN NOT MATCHED THEN
+        INSERT (HIRE_ID, CP_ID
+            <if test="hireTitle != null and hireTitle != ''">, HIRE_TITLE</if>
+            <if test="hireDescription != null and hireDescription != ''">, HIRE_DESCRIPTION</if>
+            <if test="hireType != null and hireType != ''">, HIRE_TYPE</if>
+            <if test="hireStartDate != null">, HIRE_START_DATE</if>
+            <if test="hireEndDate != null">, HIRE_END_DATE</if>
+            <if test="hireUrl != null and hireUrl != ''">, HIRE_URL</if>
+            <if test="hireClassCode != null and hireClassCode != ''">, HIRE_CLASS_CODE</if>
+        )
+        VALUES (#{hireId}, #{cpId}
+            <if test="hireTitle != null and hireTitle != ''">, #{hireTitle}</if>
+            <if test="hireDescription != null and hireDescription != ''">, #{hireDescription}</if>
+            <if test="hireType != null and hireType != ''">, #{hireType}</if>
+            <if test="hireStartDate != null">, #{hireStartDate}</if>
+            <if test="hireEndDate != null">, #{hireEndDate}</if>
+            <if test="hireUrl != null and hireUrl != ''">, #{hireUrl}</if>
+            <if test="hireClassCode != null and hireClassCode != ''">, #{hireClassCode}</if>
+        )
+	</update>
+
+	<delete id="deleteEmploymentAdvertisement" parameterType="kr.or.ddit.empt.ema.service.HireVO">
+		DELETE HIRE
+		WHERE HIRE_ID = #{hireId}
+	</delete>
+</mapper>

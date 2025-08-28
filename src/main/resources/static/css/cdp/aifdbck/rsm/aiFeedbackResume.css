@@ -1,0 +1,769 @@
+@charset "UTF-8";
+
+/* =================================================== */
+/* AI 피드백 이력서 페이지 (페이지 틀만 테마 적용) */
+/* =================================================== */
+
+/* 컨테이너 - 기존 패딩/테두리 제거 (public-wrapper-main이 담당) */
+.aifb-container {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.aifb-title {
+	font-size: 24px; /* 테마에 맞게 폰트 크기 조정 */
+	font-weight: 600;
+	text-align: center;
+	color: #111827; /* 테마에 맞게 폰트 색상 조정 */
+	margin-bottom: 16px;
+}
+
+/* 드롭다운 (이력서 선택) - 테마 적용 */
+.self-intro-select {
+	width: 100%;
+	padding: 12px 16px;
+	font-size: 16px;
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	background-color: #fff;
+	appearance: none;
+	background-image:
+		url("data:image/svg+xml;utf8,<svg fill='%239D9D9D' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+	background-repeat: no-repeat;
+	background-position: right 16px center;
+	background-size: 18px;
+	cursor: pointer;
+}
+
+/* 메인 콘텐츠 */
+.aifb-content-wrapper {
+	display: flex;
+	gap: 24px;
+	width: 100%;
+	align-items: flex-start;
+}
+
+.aifb-section, .aifb-feedback-wrapper {
+	flex: 1;
+	border: 1px solid #e5e7eb; /* 테두리 스타일 통일 */
+	border-radius: 12px; /* 둥근 모서리 통일 */
+	padding: 24px;
+	background-color: #fff;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	height: 80vh; /* 화면 높이의 80%를 차지하도록 설정 */
+	box-sizing: border-box;
+	overflow-y: auto;
+}
+
+/* 섹션 헤더 (이력서 / 피드백 공통) */
+.aifb-section-header, .aifb-feedback-header {
+	padding-bottom: 16px;
+	border-bottom: 1px solid #e5e7eb; /* 헤더 구분선 스타일 통일 */
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px;
+	min-height: auto;
+}
+
+.aifb-section-header h2, .aifb-feedback-header h2 {
+	font-family: 'Noto Sans KR', sans-serif;
+	font-weight: 600;
+	font-size: 18px;
+	color: #1f2937;
+	margin: 0;
+	white-space: nowrap;
+}
+
+/* 내용 영역 */
+.aifb-questions-wrapper, .aifb-feedback-area {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	white-space: pre-wrap;
+	font-family: 'Noto Sans KR', sans-serif;
+	font-size: 14px;
+	line-height: 1.6;
+}
+
+/* 버튼 그룹 */
+.aifb-button-group {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+.aifb-button {
+	padding: 8px 16px;
+	font-family: 'Noto Sans KR', sans-serif;
+	font-weight: 600;
+	font-size: 14px;
+	border-radius: 8px;
+	border: 1px solid #d1d5db;
+	cursor: pointer;
+	background-color: #f3f4f6;
+	color: #374151;
+	transition: all 0.2s ease;
+	white-space: nowrap;
+}
+
+.aifb-button:hover {
+	background-color: #e5e7eb;
+}
+
+/* 하단 버튼 영역 */
+.aifb-footer-wrapper {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	margin-top: 32px;
+	padding-top: 24px;
+	border-top: 1px solid #e5e7eb;
+}
+
+.ai-feedback-section {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+}
+
+.powered-by-text {
+	font-family: 'Noto Sans KR', sans-serif;
+	font-size: 12px;
+	color: #9ca3af;
+	font-weight: 400;
+}
+
+.aifb-button.feedback {
+	background-color: #7881f5;
+	color: #fff;
+	border-color: #7881f5;
+	padding: 10px 20px;
+}
+
+.aifb-button.feedback:hover {
+	background-color: #6366f1;
+}
+
+.aifb-button.proofread {
+	background-color: #fff;
+	color: #7881f5;
+	border-color: #7881f5;
+	padding: 10px 20px;
+}
+
+.aifb-button.proofread:hover {
+	background-color: #7881f5;
+	color: #fff;
+}
+
+/* 스피너 구현 */
+.spinner-wrapper {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding: 40px 20px;
+	min-height: 250px;
+	text-align: center;
+	color: #666;
+	gap: 50px;
+}
+
+.spinner-border {
+	width: 2.5rem;
+	height: 2.5rem;
+	border: 0.25em solid #7881f5;
+	border-right-color: transparent;
+	border-radius: 50%;
+	animation: spinner-spin .75s linear infinite;
+	display: block;
+}
+
+@keyframes spinner-spin {to { transform:rotate(360deg);
+	
+}
+
+}
+
+/* ===== Modal ===== */
+.ai-modal-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(20, 24, 28, 0.45);
+	display: none;
+	z-index: 3000; /* 캐릭터 이미지 등 어떤 요소보다 위로 (요청 이력 반영) */
+}
+
+.ai-modal {
+	position: fixed;
+	left: 50%;
+	top: 80px; /* 원하는 상단 위치 */
+	transform: translateX(-50%);
+	width: 420px;
+	max-width: 90vw;
+	background: #fff;
+	border-radius: 16px;
+	padding: 20px;
+	display: none;
+	z-index: 3010;
+	box-shadow: 0 30px 90px rgba(0, 0, 0, 0.25), 0 8px 24px
+		rgba(0, 0, 0, 0.2);
+}
+
+.ai-modal h4 {
+	margin: 2px 0 16px;
+	font-size: 18px;
+	font-weight: 800;
+	text-align: center;
+}
+
+.ai-modal p {
+	color: #4f5965;
+	line-height: 1.5;
+}
+
+.ai-modal .row {
+	display: flex;
+	gap: 10px;
+	margin-top: 16px;
+	justify-content: flex-end;
+}
+
+.ai-kv {
+	margin: 10px 0;
+	background: #f8fafb;
+	border: 1px dashed #e4e9ee;
+	border-radius: 12px;
+	padding: 10px 12px;
+	color: #47515b;
+}
+
+.ai-kv>div+div {
+	margin-top: 12px;
+}
+
+.btn {
+	appearance: none;
+	border: none;
+	border-radius: 12px;
+	padding: 11px 18px;
+	font-weight: 800;
+	cursor: pointer;
+	background: #6a82fb;
+	color: #fff;
+	transition: all .15s ease;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.btn.secondary {
+	background: #f3f5f7;
+	color: #202427;
+}
+
+/* ========================================================================== */
+/* 가져온 이력서 HTML (.personal-info-form) 스타일 정리 */
+/* ========================================================================== */
+
+/* Section Styling */
+.section-header, .JobWish-header, .Skills-header, .education-header,
+	.certificate-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 5px;
+	padding-bottom: 10px;
+	border-bottom: 2px solid #007bff;
+}
+
+h2 {
+	color: #007bff;
+	font-size: 1.8em;
+	margin: 0;
+}
+
+.required-info {
+	color: #888;
+	font-size: 0.9em;
+}
+
+.required-asterisk {
+	color: red;
+	margin-left: 2px;
+}
+
+/* Form Group Layouts */
+.form-profile-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 5px;
+}
+
+.form-group {
+	display: flex;
+	flex-direction: column;
+}
+
+/* Label and Input/Select Styles */
+label {
+	font-weight: 600;
+	margin-bottom: 5px;
+	color: #555;
+	display: block;
+}
+
+input[type="text"], input[type="email"], input[type="tel"], input[type="date"],
+	select {
+	width: 100%;
+	padding: 12px 15px;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	font-size: 1em;
+	box-sizing: border-box;
+	transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus,
+	input[type="date"]:focus, select:focus {
+	border-color: #007bff;
+	outline: none;
+	box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.error-message {
+	color: #e74c3c;
+	font-size: 0.85em;
+	margin-top: 5px;
+	display: none;
+}
+
+.address-group, .form-JobWish, .form-Skills, .form-Education,
+	.form-certificate, .certificate-input-container {
+	margin-bottom: 5px;
+}
+
+/* Specific Group Adjustments */
+.name-group, .email-group, .mobile-phone-group {
+	grid-column: span 1;
+}
+
+.address-group {
+	grid-column: 1/-1;
+}
+
+/* Photo Upload */
+.photo-group {
+	grid-column: span 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.photo-upload-area {
+	width: 180px;
+	aspect-ratio: 1/1;
+	border-radius: 50%;
+	border: 2px dashed #ccc;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	background-color: #f9f9f9;
+}
+
+.photo-upload-area img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+}
+
+.photo-upload-area:hover {
+	border-color: #007bff;
+	background-color: #e9f5ff;
+}
+
+.photo-upload-area img#photo-preview {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 50%;
+}
+
+.upload-placeholder {
+	text-align: center;
+	color: #888;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	width: 100%;
+}
+
+.upload-placeholder i {
+	font-size: 2em;
+	margin-bottom: 5px;
+}
+
+/* Input with Icon (Address Search) */
+.input-with-icon {
+	position: relative;
+	width: 100%;
+}
+
+.input-with-icon input {
+	padding-right: 40px;
+}
+
+.input-with-icon .icon-search {
+	position: absolute;
+	right: 15px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #888;
+	cursor: pointer;
+	font-size: 1.1em;
+}
+
+/* Dynamic Input Groups */
+.job-input-group, .skills-input-group, .education-input-container,
+	.certificate-input-container, .activities-input-container {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin-top: 15px;
+}
+
+.input-container {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	width: 100%;
+	margin-bottom: 15px;
+}
+
+.input-container input[type="text"], .input-container select {
+	flex-grow: 1;
+}
+
+/* Education specific adjustments */
+.education-input-group {
+	display: flex;
+	gap: 5px;
+	align-items: center;
+}
+
+.education-input-group select {
+	flex-basis: 35%;
+}
+
+.education-input-group input {
+	flex-basis: 65%;
+}
+
+.delete-button {
+	background-color: #ff6262;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	font-size: 0.9rem;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.delete-button:hover {
+	background-color: #d9363e;
+}
+
+/* Utility Classes */
+.hidden {
+	display: none !important;
+}
+
+/* 편집 관련 버튼들 모두 숨김 */
+.aifb-questions-wrapper #add-job, .aifb-questions-wrapper #add-skill,
+	.aifb-questions-wrapper #add-education, .aifb-questions-wrapper #add-certificate,
+	.aifb-questions-wrapper .delete-button, .aifb-questions-wrapper #photo-delete-btn,
+	.aifb-questions-wrapper .btn-group, .aifb-questions-wrapper .load-button-group,
+	.aifb-questions-wrapper .resume-title {
+	display: none;
+}
+
+/* 주소 검색 아이콘도 숨김 */
+.aifb-questions-wrapper .icon-search {
+	display: none;
+}
+
+/* 필수 입력 표시(*), 오류 메시지 등도 숨김 */
+.aifb-questions-wrapper .required-asterisk, .aifb-questions-wrapper .error-message
+	{
+	display: none;
+}
+
+/* 이력서 사진 크기 조정 (삭제 버튼은 위에서 숨겨짐) */
+.aifb-questions-wrapper .form-group.photo-group .photo-upload-area img {
+	display: block;
+	width: 100px;
+	height: 100px;
+}
+
+/* resumeWriter.css 오버라이드 (이력서 내용 스타일) */
+.aifb-questions-wrapper .personal-info-form .section-header {
+	display: none;
+}
+
+.aifb-questions-wrapper .personal-info-form .form-profile-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 5px 10px;
+}
+
+/* ==========================================================================
+   AI 피드백 이력서 페이지 - 이력서 내용 보완 스타일 (최소 버전)
+   ========================================================================== */
+
+/* #questionsWrapper 안에 있는 모든 버튼과 편집용 UI를 숨깁니다. */
+#questionsWrapper .personal-info-form button, #questionsWrapper .personal-info-form .icon-search,
+	#questionsWrapper .personal-info-form .required-asterisk,
+	#questionsWrapper .personal-info-form .error-message, #questionsWrapper .personal-info-form .load-button-group
+	{
+	display: none !important;
+}
+
+/* 사진 삭제 버튼, 사진 추가 텍스트 등도 숨깁니다. */
+#questionsWrapper #photo-delete-btn, #questionsWrapper .upload-placeholder
+	{
+	display: none !important;
+}
+
+/* 인적사항 섹션의 "필수 입력 정보" 문구도 숨깁니다. */
+#questionsWrapper .personal-info-form .required-info {
+	display: none !important;
+}
+
+/* 모든 입력 필드(input, select, textarea)를 읽기 전용 텍스트처럼 보이게 합니다. */
+#questionsWrapper .personal-info-form input:not([type="hidden"]),
+	#questionsWrapper .personal-info-form select, #questionsWrapper .personal-info-form textarea
+	{
+	cursor: default !important;
+	pointer-events: none !important; /* 마우스 이벤트 비활성화 */
+}
+
+/* select의 드롭다운 화살표와 textarea의 크기 조절 핸들러를 숨깁니다. */
+#questionsWrapper .personal-info-form select {
+	appearance: none !important;
+	background-image: none !important;
+	padding-right: 0 !important;
+}
+
+#questionsWrapper .personal-info-form textarea {
+	resize: none !important;
+}
+
+/* ==========================================================================
+   AI 피드백 페이지에 로드된 이력서 내용 스타일 재정의
+   ========================================================================== */
+
+/* 이력서 폼 전체 컨테이너 스타일 */
+#questionsWrapper .personal-info-form {
+	padding: 0;
+	border: none;
+	background-color: transparent;
+	box-shadow: none;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+/* 인적사항 그리드 레이아웃 조정 */
+#questionsWrapper .personal-info-form .form-profile-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 15px 20px;
+}
+
+#questionsWrapper .personal-info-form .form-profile-grid .form-group {
+	display: grid;
+	grid-template-columns: 80px 1fr;
+	gap: 10px;
+	align-items: center;
+}
+/* 주소 그룹은 2열을 모두 차지하도록 함 */
+#questionsWrapper .personal-info-form .address-group {
+	grid-column: span 2;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	align-items: flex-start;
+}
+
+/* 동적으로 추가된 항목들의 컨테이너 레이아웃 재정의 */
+#questionsWrapper .personal-info-form .form-JobWish, #questionsWrapper .personal-info-form .form-Skills,
+	#questionsWrapper .personal-info-form .form-Education,
+	#questionsWrapper .personal-info-form .form-certificate,
+	#questionsWrapper .personal-info-form .form-activities {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+/* 동적 항목의 헤더 스타일 */
+#questionsWrapper .personal-info-form .JobWish-header, #questionsWrapper .personal-info-form .Skills-header,
+	#questionsWrapper .personal-info-form .education-header,
+	#questionsWrapper .personal-info-form .certificate-header,
+	#questionsWrapper .personal-info-form .Activities-header {
+	display: flex !important; /* flex로 설정하여 라벨과 버튼이 나란히 정렬 */
+	justify-content: space-between !important;
+	align-items: center !important;
+	padding-bottom: 8px !important;
+	border-bottom: 1px solid #e5e7eb !important;
+	margin-top: 20px !important;
+	margin-bottom: 8px !important;
+}
+
+/* 모든 라벨 스타일을 통일 */
+#questionsWrapper .personal-info-form label {
+	font-weight: 600;
+	color: #4b5563;
+	margin-bottom: 5px;
+	display: flex;
+	text-align: left;
+}
+
+/* 모든 입력 필드를 읽기 전용으로 스타일링 */
+#questionsWrapper .personal-info-form input:not([type="hidden"]),
+	#questionsWrapper .personal-info-form select, #questionsWrapper .personal-info-form textarea
+	{
+	border: 1px solid #d1d5db;
+	padding: 8px 12px;
+	background-color: #f3f4f6;
+	border-radius: 6px;
+	box-shadow: none;
+	color: #333;
+	font-size: 14px;
+	line-height: 1.5;
+	min-height: auto;
+	width: 100%;
+	cursor: default;
+	pointer-events: none;
+}
+
+/* 불필요한 편집용 UI 숨기기 */
+#questionsWrapper .personal-info-form .resume-title, #questionsWrapper .personal-info-form .icon-search,
+	#questionsWrapper .personal-info-form .required-asterisk,
+	#questionsWrapper .personal-info-form .error-message, #questionsWrapper .personal-info-form .load-button-group,
+	#questionsWrapper .personal-info-form button {
+	display: none !important;
+}
+
+/* 주소 영역의 라벨과 입력 필드 정렬을 위한 스타일 */
+#questionsWrapper .personal-info-form .address-group {
+	display: grid;
+	grid-template-columns: 100px 1fr; /* 라벨과 내용이 2열로 깔끔하게 정렬 */
+	gap: 10px; /* 라벨과 입력 필드 간 간격 */
+	align-items: center; /* 세로 중앙 정렬 */
+}
+
+/* 주소 검색 아이콘을 포함하는 input 그룹을 2번째 열에 배치 */
+#questionsWrapper .personal-info-form .address-group .input-with-icon {
+	grid-column: 2/3; /* 2번째 열에 위치 */
+}
+
+/* 상세 주소 입력란을 2번째 열에 배치 */
+#questionsWrapper .personal-info-form .address-group input[name="address-detail"]
+	{
+	grid-column: 2/3; /* 2번째 열에 위치 */
+}
+
+/* 최종 수정: 희망직무와 스킬 헤더 정렬 문제 해결 */
+#questionsWrapper .form-JobWish .JobWish-header,
+#questionsWrapper .form-Skills .Skills-header {
+	display: flex !important;
+	justify-content: space-between !important;
+	align-items: center !important;
+	padding-bottom: 8px !important;
+	border-bottom: 1px solid #e5e7eb !important;
+	margin-top: 20px !important;
+	margin-bottom: 8px !important;
+	width: 100% !important;
+}
+
+/* 헤더 내부 label 스타일 통일 */
+#questionsWrapper .form-JobWish .JobWish-header label,
+#questionsWrapper .form-Skills .Skills-header label {
+	font-weight: 600 !important;
+	color: #4b5563 !important;
+	margin: 0 !important;
+	text-align: left !important;
+	flex: 1 !important; /* 가용 공간을 모두 사용하여 왼쪽 정렬 */
+}
+
+/* 동적으로 추가된 input-container들이 헤더에 영향주지 않도록 */
+#questionsWrapper .form-JobWish .job-input-group,
+#questionsWrapper .form-Skills .skills-input-group {
+	display: flex !important;
+	flex-direction: column !important;
+	gap: 10px !important;
+	margin-top: 10px !important;
+}
+
+/* input-container 내부 요소들 정렬 */
+#questionsWrapper .input-container {
+	display: flex !important;
+	align-items: center !important;
+	gap: 5px !important;
+	width: 100% !important;
+	margin-bottom: 10px !important;
+}
+#questionsWrapper .form-Skills .Skills-header label,
+#questionsWrapper .form-JobWish .JobWish-header label {
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+/* ai피드백 */
+.feedback-section {
+    margin-bottom: 32px;
+}
+
+.feedback-section h3 {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+    margin-top: 32px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 4px;
+}
+
+/* 첫 번째 h3만 상단 여백 제거 */
+.feedback-section h3:first-of-type {
+    margin-top: 0;
+}
+
+/* 두 번째 이후 h3는 위 여백 넉넉하게 - 클래스명 제거하고 :not(:first-of-type) 사용 */
+.feedback-section h3:not(:first-of-type) {
+    margin-top: 80px !important; /* 필요하면 36~48px 사이에서 조정 */
+}
+
+.feedback-section strong {
+    display: block;
+    margin-top: 12px;
+    font-weight: 600;
+    color: #444;
+}
+
+.feedback-section p {
+    margin: 6px 0 12px 0;
+    line-height: 1.6;
+}

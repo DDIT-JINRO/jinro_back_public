@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.chat.service.impl.ChatMapper">
+
+	<!-- 현재 내가 참여한 채팅방 목록 (스터디그룹만) -->
+	<select id="findRoomsByMemId" resultType="kr.or.ddit.chat.service.ChatRoomVO" parameterType="String" >
+		SELECT
+		       CR.CR_ID
+		     , CC_ID
+		     , TARGET_ID
+		     , CR_TITLE
+		     , CR_MAX_CNT
+		     , CREATED_AT
+		     , CM.JOINED_AT AS MEM_JOINED_AT
+		  FROM CHAT_ROOM CR
+		 INNER JOIN CHAT_MEMBER CM
+		          ON CR.CR_ID = CM.CR_ID
+		 WHERE CM.MEM_ID = #{memId}
+		   AND CR.CC_ID = 'G04001'
+		   AND CM.IS_EXITED = 'N'
+		 ORDER BY CM.JOINED_AT DESC --가장 최근에 입장한 채팅방 위로 올리기
+	</select>
+
+	<!-- 채팅방 개설. ccId와 targetId를 전달 받아야함. 종류가 상담인 경우에는 crTitle과 crMaxCnt는 null, 2 로 각각 처리-->
+	<insert id="insertChatRoom" parameterType="kr.or.ddit.chat.service.ChatRoomVO">
+		<selectKey keyProperty="crId" order="BEFORE" resultType="int">
+			SELECT NVL(MAX(CR_ID),0)+1
+			  FROM CHAT_ROOM
+		</selectKey>
+		INSERT INTO CHAT_ROOM(
+		    CR_ID, CC_ID, TARGET_ID
+		    , CR_TITLE, CR_MAX_CNT, CREATED_AT
+		)VALUES(
+		   #{crId}, #{ccId}, #{targetId}, #{crTitle}, #{crMaxCnt}, SYSTIMESTAMP
+		)
+	</insert>
+
+	<!-- 채팅방 입장 및 재입장 merge구문 -->
+	<update id="insertAndUpdateChatMember" parameterType="kr.or.ddit.chat.service.ChatMemberVO">
+		MERGE INTO CHAT_MEMBER CM
+		USING DUAL
+		ON (
+		    CM.MEM_ID = #{memId}
+		    AND CM.CR_ID = #{crId}
+		    )
+		WHEN MATCHED THEN
+		    UPDATE
+		    SET  CM.JOINED_AT = SYSTIMESTAMP
+		        , EXITED_AT = NULL
+		        , IS_EXITED = 'N'
+		WHEN NOT MATCHED THEN
+		    INSERT
+		    VALUES(#{memId},#{crId},SYSTIMESTAMP, SYSTIMESTAMP, NULL, 'N')
+	</update>
+
+	<!-- 채팅방 퇴장 (종료 아니고 퇴장임) -->
+	<update id="chatMemberExitChatRoomUpdate" parameterType="kr.or.ddit.chat.service.ChatMemberVO">
+		UPDATE  CHAT_MEMBER
+		   SET  EXITED_AT = SYSTIMESTAMP
+		        , IS_EXITED = 'Y'
+		 WHERE  MEM_ID = #{memId}
+		   AND  CR_ID = #{crId}
+	</update>
+
+	<!-- 채팅방 입장 시 해당 채팅방 메시지 전체 불러오기 (상담에서 사용) -->
+	<select id="selectAllChatMsgByChatRoomId" parameterType="kr.or.ddit.chat.service.ChatMessageVO">
+		SELECT
+		       CM.MSG_ID
+		       , CM.CR_ID
+		       , CM.MEM_ID
+		       , CM.MESSAGE
+		       , CM.SENT_AT
+		       , CM.MESSAGE_TYPE
+		       , CM.FILE_GROUP_ID
+		       , M.FILE_BADGE
+		       , M.FILE_PROFILE
+		       , M.FILE_SUB
+		       , M.MEM_NICKNAME
+		  FROM CHAT_MESSAGE CM
+		  JOIN MEMBER M ON M.MEM_ID = CM.MEM_ID
+		 WHERE CR_ID = #{crId}
+	</select>
+
+	<!-- 채팅방 입장 시 해당 채팅방 메시지 입장유저의 입장일시 기준으로 불러오기 -->
+	<select id="selectChatMsgByChatRoomIdAndMemId" parameterType="kr.or.ddit.chat.service.ChatMessageVO">
+		SELECT
+		       CM.MSG_ID
+		       , CM.CR_ID
+		       , CM.MEM_ID
+		       , CM.MESSAGE
+		       , CM.SENT_AT
+		       , CM.MESSAGE_TYPE
+		       , CM.FILE_GROUP_ID
+		       , M.FILE_PROFILE
+		       , M.FILE_BADGE
+		       , M.FILE_SUB
+		       , M.MEM_NICKNAME
+		       , M.MEM_NAME
+		  FROM CHAT_MESSAGE CM
+		  JOIN MEMBER M ON CM.MEM_ID = M.MEM_ID
+		 WHERE CM.CR_ID = #{crId}
+		   AND CM.SENT_AT >= (SELECT JOINED_AT
+		                       FROM CHAT_MEMBER
+		                      WHERE CR_ID = #{crId}
+		                        AND MEM_ID = #{memId})
+	     ORDER BY CM.SENT_AT , MSG_ID
+	</select>
+
+	<!-- 입장한 채팅방 읽음시각 현재시간으로 수정하기 -->
+	<update id="lastReadTimeUpdate" parameterType="kr.or.ddit.chat.service.ChatMemberVO">
+	    UPDATE CHAT_MEMBER
+	       SET LAST_READ_TIME = SYSTIMESTAMP
+	     WHERE CR_ID = #{crId}
+	       AND MEM_ID = #{memId}
+	       AND IS_EXITED = 'N'
+	</update>
+
+	<!-- 채팅 수신테이블 (안읽음 추적을 위함) 삽입 -->
+	<insert id="insertChatReceiver" parameterType="kr.or.ddit.chat.service.ChatReceiverVO">
+		INSERT INTO CHAT_RECEIVER(
+			MSG_ID, RECEIVER_ID, READ_AT
+		)VALUES(
+			#{msgId}, #{receiverId}, #{readAt}
+		)
+	</insert>
+
+	<!-- 현재 입장한 채팅방 수신된 메시지 읽음 시각 전체 업데이트 -->
+	<update id="receiverReadAtUpdate" parameterType="kr.or.ddit.chat.service.ChatMemberVO">
+		UPDATE CHAT_RECEIVER
+		   SET READ_AT = SYSTIMESTAMP
+		 WHERE RECEIVER_ID = #{memId}
+		   AND MSG_ID IN (SELECT MSG_ID
+		                    FROM CHAT_MESSAGE
+		                   WHERE CR_ID = #{crId})
+		   AND READ_AT IS NULL
+	</update>
+
+
+	<!-- 채팅메시지 테이블에 삽입 -->
+	<insert id="insertChatMessage" parameterType="kr.or.ddit.chat.service.ChatMessageVO">
+		<selectKey keyProperty="msgId" order="BEFORE" resultType="int">
+			SELECT NVL(MAX(MSG_ID),0)+1
+			FROM CHAT_MESSAGE
+		</selectKey>
+		INSERT INTO CHAT_MESSAGE(
+		    MSG_ID, CR_ID, MEM_ID, MESSAGE
+		    , SENT_AT, MESSAGE_TYPE, FILE_GROUP_ID
+		)VALUES(
+		    #{msgId}, #{crId}, #{memId}, #{message}
+		    , SYSTIMESTAMP, #{messageType}, #{fileGroupId}
+		)
+	</insert>
+
+	<!-- 안읽은 메시지가 존재하는지 체크. 특정 멤버 전체 채팅방 안읽은 갯수 조회 -->
+	<select id="selectUnreadMsgCount" resultType="int" parameterType="kr.or.ddit.chat.service.ChatMemberVO">
+		SELECT COUNT(*)
+		  FROM CHAT_RECEIVER
+		 WHERE RECEIVER_ID = #{memId}
+		   AND READ_AT IS NULL
+	</select>
+
+	<!-- 채팅방에 입장해있는지 체크 -->
+	<select id="selectChatMember" resultType="kr.or.ddit.chat.service.ChatMemberVO" parameterType="kr.or.ddit.chat.service.ChatMemberVO">
+		SELECT MEM_ID, CR_ID, LAST_READ_TIME
+			 , JOINED_AT, EXITED_AT, IS_EXITED
+		  FROM CHAT_MEMBER
+		 WHERE MEM_ID = #{memId}
+		   AND CR_ID = #{crId}
+		   AND IS_EXITED = 'N'
+	</select>
+
+	<!-- 채팅방 번호로 해당 채팅방 멤버id 리스트로 뽑아오기 (수신자 테이블 삽입을 위함) -->
+	<select id="findChatMemberIdsByCrId" resultType="int" parameterType="int">
+	    SELECT MEM_ID
+	      FROM CHAT_MEMBER
+	     WHERE CR_ID = #{crId}
+	       AND IS_EXITED = 'N'
+	</select>
+
+	<!-- 수신자테이블에서 전체회원 회원별로 안읽은 갯수 뽑아오기 -->
+	<select id="selectUnreadCountGroupByMemId" resultType="kr.or.ddit.chat.service.ChatReceiverVO">
+		SELECT
+		       COUNT(*) UNREAD_CNT
+		     , RECEIVER_ID
+		  FROM CHAT_RECEIVER
+		 WHERE READ_AT IS NULL
+		 GROUP BY RECEIVER_ID
+	</select>
+
+	<!-- 수신자테이블에서 특정회원의 전체 안읽은 갯수 뽑아오기 -->
+	<select id="selectUnreadCountByMemId" resultType="kr.or.ddit.chat.service.ChatReceiverVO" parameterType="int">
+		SELECT
+		       COUNT(*) UNREAD_CNT
+		     , RECEIVER_ID
+		  FROM CHAT_RECEIVER
+		 WHERE RECEIVER_ID = #{memId}
+		   AND READ_AT IS NULL
+		 GROUP BY RECEIVER_ID
+	</select>
+
+	<!-- 수신자테이블에서 특정회원 채팅방별 안읽은 갯수 뽑아오기 -->
+	<select id="selectUnreadCountOfRoomsByMemId" parameterType="int" resultType="kr.or.ddit.chat.service.ChatReceiverVO">
+	  SELECT
+	      	 M.CR_ID
+	       , COUNT(*) AS UNREAD_CNT
+	    FROM CHAT_RECEIVER R
+	    JOIN CHAT_MESSAGE M
+	      ON R.MSG_ID = M.MSG_ID
+	   WHERE R.RECEIVER_ID = #{memId}
+	     AND R.READ_AT IS NULL
+	   GROUP BY M.CR_ID
+	</select>
+
+	<!-- 채팅방 삭제 업데이트 처리 crId만 제공받음 -->
+	<delete id="deleteChatRoom" parameterType="kr.or.ddit.chat.service.ChatRoomVO">
+		UPDATE CHAT_ROOM
+		   SET CR_DEL_YN = 'Y'
+		 WHERE CR_ID = #{crId}
+	</delete>
+
+	<select id="selectChatRoom" parameterType="int">
+		SELECT
+		       CR_ID
+		     , CC_ID
+		     , TARGET_ID
+		     , CR_TITLE
+		     , CR_MAX_CNT
+		     , CREATED_AT
+		     , CR_DEL_YN
+		  FROM CHAT_ROOM
+		 WHERE CR_ID = #{crId}
+		   AND CR_DEL_YN = 'N'
+	</select>
+
+	<update id="updateChatRoom" parameterType="kr.or.ddit.chat.service.ChatRoomVO">
+		UPDATE CHAT_ROOM
+		   SET CR_TITLE = #{crTitle}
+		     , CR_MAX_CNT = #{crMaxCnt}
+		 WHERE CR_ID = #{crId}
+		   AND CC_ID = #{ccId}
+	</update>
+
+	<select id="selectChatMessage" resultType="kr.or.ddit.chat.service.ChatMessageVO" parameterType="int">
+		SELECT
+		       CM.MSG_ID
+		       , CM.CR_ID
+		       , CM.MEM_ID
+		       , CM.MESSAGE
+		       , CM.SENT_AT
+		       , CM.MESSAGE_TYPE
+		       , CM.FILE_GROUP_ID
+		       , M.FILE_PROFILE
+		       , M.FILE_BADGE
+		       , M.FILE_SUB
+		       , M.MEM_NICKNAME
+		       , M.MEM_NAME
+		  FROM CHAT_MESSAGE CM
+		  JOIN MEMBER M ON CM.MEM_ID = M.MEM_ID
+		 WHERE CM.MSG_ID = #{msgId}
+	</select>
+
+	<select id="selectMemInfoForCounsel" resultType="kr.or.ddit.main.service.MemberVO" parameterType="int">
+		SELECT
+		       MEM_PHONE_NUMBER
+		     , MEM_NAME
+		     , MEM_ID
+		     , MEM_ROLE
+		     , MEM_EMAIL
+		     , FILE_PROFILE
+		  FROM MEMBER
+		 WHERE MEM_ID = #{memId}
+	</select>
+
+	<select id="selectCounselInfoByCrId" resultType="kr.or.ddit.cns.service.CounselingVO" parameterType="int">
+		SELECT
+		       COUNSEL_ID
+		     , MEM_ID
+		     , COUNSEL
+		     , COUNSEL_CATEGORY
+		     , COUNSEL_METHOD
+		     , COUNSEL_TITLE
+		     , COUNSEL_DESCRIPTION
+		     , COUNSEL_STATUS
+		     , COUNSEL_REQ_DATETIME
+		     , COUNSEL_URL_COU
+		     , COUNSEL_REVIEWD
+		     , COUNSEL_CREATED_AT
+		     , COUNSEL_UPDATED_AT
+		     , COUNSEL_URL_USER
+		FROM COUNSELING C
+		JOIN CHAT_ROOM CR ON CR.TARGET_ID = C.COUNSEL_ID
+		WHERE CR.CC_ID = 'G04002'
+		AND   CR.CR_ID = #{crId}
+	</select>
+</mapper>

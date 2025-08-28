@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.pse.cr.crr.service.impl.CareerEncyclopediaRcmMapper">
+
+	<select id="selectInterestCnList" parameterType="int" resultType="String">
+		SELECT
+			CC_NAME
+		FROM
+			COM_CODE
+		WHERE
+			CC_ID IN (SELECT IC_CODE
+				FROM
+					INTEREST_CN
+				WHERE
+					MEM_ID = #{memId}
+			)
+	</select>
+
+	<select id="selectCareerRcmList" parameterType="kr.or.ddit.worldcup.service.JobsVO" resultType="kr.or.ddit.worldcup.service.JobsVO">
+		WITH INTEREST_KEYWORD AS (
+			SELECT
+				CC_NAME
+			FROM
+				COM_CODE
+			WHERE
+				CC_ID IN (SELECT IC_CODE
+					FROM
+						INTEREST_CN
+					WHERE
+						MEM_ID = #{memId}
+				)
+		)
+		SELECT
+			JOB_CODE
+			, JOB_NAME
+			, JOB_MAIN_DUTY
+			, JOB_SATIS
+			, JOB_TARGET_ID
+			, IS_BOOKMARK
+	        , CASE PROSPECT_SCORE
+	            WHEN 5 THEN '증가'
+	            WHEN 4 THEN '다소 증가'
+	            WHEN 3 THEN '유지'
+	            WHEN 2 THEN '다소 감소'
+	            WHEN 1 THEN '감소'
+	        END AS PROSPECT
+	        , CASE
+	            WHEN AVG_SALARY <![CDATA[<]]> 10000 THEN
+	            	TO_CHAR(ROUND(AVG_SALARY / 1000)) || '천만원'
+	            WHEN AVG_SALARY <![CDATA[>=]]> 10000 THEN
+	                TRUNC(AVG_SALARY / 10000) || '억' ||
+	                CASE
+	                	WHEN MOD(AVG_SALARY, 10000) <![CDATA[>]]> 0 THEN
+	                		' ' || TO_CHAR(ROUND(MOD(AVG_SALARY, 10000) / 1000)) || '천만원'
+	                	ELSE
+	                		'' END
+	            ELSE
+	            	TO_CHAR(AVG_SALARY) || '만원'
+	        END AS AVERAGE_SAL
+		FROM
+			(
+				SELECT
+					B.*
+					, ROWNUM AS RNUM
+				FROM
+					(
+						SELECT
+							JOB_CODE
+							, JOB_NAME
+							, JOB_MAIN_DUTY
+							, ROUND(JOB_SATIS) AS JOB_SATIS
+							, PROSPECT_SCORE
+							, AVG_SALARY
+							, JOB_TARGET_ID
+							, IS_BOOKMARK
+						FROM
+							(
+								SELECT
+									JOB_CODE
+									, JOB_NAME
+									, JOB_MAIN_DUTY
+									, JOB_SATIS
+									, JOB_WAY
+									, JOB_LCL
+									, JOB_SAL
+									, JOB_TARGET_ID
+									, (
+				                        SELECT
+				                        	BM_TARGET_ID
+				                        FROM
+				                        	BOOKMARK
+				                        WHERE
+				                        	BM_CATEGORY_ID = 'G03004'
+				                        	AND MEM_ID = #{memId}
+				                        	AND BM_TARGET_ID = JOB_TARGET_ID
+				                    ) AS IS_BOOKMARK
+									, ROUND(
+										(OUTLOOK_INCREASE * 5 + OUTLOOK_SLIGHT_INCREASE * 4 + OUTLOOK_STABLE * 3 + OUTLOOK_SLIGHT_DECREASE * 2 + OUTLOOK_DECREASE * 1)
+										/ NVL((OUTLOOK_INCREASE + OUTLOOK_SLIGHT_INCREASE + OUTLOOK_STABLE + OUTLOOK_SLIGHT_DECREASE + OUTLOOK_DECREASE), 1)
+									) AS PROSPECT_SCORE
+									, TO_NUMBER(
+										TRIM(SUBSTR(JOB_SAL, INSTR(JOB_SAL, '평균(50%)') + 7, INSTR(JOB_SAL, '만원', INSTR(JOB_SAL, '평균(50%)')) -(INSTR(JOB_SAL, '평균(50%)') + 7)))
+										) AS AVG_SALARY
+									FROM
+										JOBS
+										, INTEREST_KEYWORD
+									WHERE(
+										JOB_NAME LIKE '%'             || INTEREST_KEYWORD.CC_NAME || '%'
+										OR JOB_MAIN_DUTY LIKE '%'     || INTEREST_KEYWORD.CC_NAME || '%'
+										OR JOB_WAY LIKE '%'           || INTEREST_KEYWORD.CC_NAME || '%'
+										OR JOB_RELATED_MAJOR LIKE '%' || INTEREST_KEYWORD.CC_NAME || '%'
+										OR JOB_RELATED_CERT LIKE '%'  || INTEREST_KEYWORD.CC_NAME || '%'
+									)
+					                <if test = "keyword != null and keyword != ''">
+										<choose>
+											<when test="status == 'title'">
+												AND JOB_NAME LIKE '%' || UPPER(#{keyword}) || '%'
+											</when>
+											<when test="status == 'content'">
+												AND (
+													JOB_MAIN_DUTY LIKE '%' || UPPER(#{keyword}) || '%'
+													OR JOB_WAY LIKE '%' || UPPER(#{keyword}) || '%'
+												)
+											</when>
+											<otherwise>
+												AND (
+													JOB_NAME LIKE '%' || UPPER(#{keyword}) || '%'
+													OR JOB_MAIN_DUTY LIKE '%' || UPPER(#{keyword}) || '%'
+													OR JOB_WAY LIKE '%' || UPPER(#{keyword}) || '%'
+												)
+											</otherwise>
+										</choose>
+									</if>
+					                <if test="jobLcls != null and !jobLcls.isEmpty()">
+					                    AND JOB_LCL IN
+					                    <foreach collection="jobLcls" item="lclItem" open="(" close=")" separator=",">
+					                        #{lclItem}
+					                    </foreach>
+					                </if>
+							) A
+						WHERE 1=1
+		                <if test="jobSals != null and !jobSals.isEmpty()">
+		                    AND (
+		                        <foreach collection="jobSals" item="salItem" separator=" OR ">
+		                            <choose>
+		                                <when test="salItem == 'sal1'"> (AVG_SALARY <![CDATA[<]]> 3000) </when>
+		                                <when test="salItem == 'sal2'"> (AVG_SALARY BETWEEN 3000 AND 4999) </when>
+		                                <when test="salItem == 'sal3'"> (AVG_SALARY BETWEEN 5000 AND 9999) </when>
+		                                <when test="salItem == 'sal4'"> (AVG_SALARY <![CDATA[>]]> 10000) </when>
+		                            </choose>
+		                        </foreach>
+		                    )
+		                </if>
+						ORDER BY
+							 IS_BOOKMARK,
+							<choose>
+			                 	<when test="sortOrder == 'salDesc'">
+			                 		A.AVG_SALARY DESC, JOB_NAME ASC
+			                 	</when>
+			                 	<when test="sortOrder == 'prospectDesc'">
+			                 		PROSPECT_SCORE DESC, JOB_NAME DESC
+			                 	</when>
+			                 	<when test="sortOrder == 'staisDesc'">
+			                 		JOB_SATIS DESC, JOB_NAME ASC
+			                 	</when>
+			                 	<otherwise>
+			                    	JOB_SATIS DESC, JOB_NAME ASC
+			                 	</otherwise>
+			                 </choose>
+					) B
+				WHERE
+					ROWNUM <![CDATA[<=]]> #{endRow}
+			)
+		WHERE
+			RNUM <![CDATA[>=]]> #{startRow}
+	</select>
+
+	<select id="selectCareerRcmTotal" parameterType="kr.or.ddit.worldcup.service.JobsVO" resultType="int">
+		WITH INTEREST_KEYWORD AS (
+			SELECT
+				CC_NAME
+			FROM
+				COM_CODE
+			WHERE
+				CC_ID IN (SELECT IC_CODE
+					FROM
+						INTEREST_CN
+					WHERE
+						MEM_ID = #{memId}
+				)
+		)
+		SELECT
+			COUNT(JOB_CODE)
+		FROM
+			(
+				SELECT
+					JOB_CODE
+					, TO_NUMBER(
+						TRIM(SUBSTR(JOB_SAL, INSTR(JOB_SAL, '평균(50%)') + 7, INSTR(JOB_SAL, '만원', INSTR(JOB_SAL, '평균(50%)')) -(INSTR(JOB_SAL, '평균(50%)') + 7)))
+					) AS AVG_SALARY
+					FROM
+						JOBS
+						, INTEREST_KEYWORD
+					WHERE(
+						JOB_NAME LIKE '%'             || INTEREST_KEYWORD.CC_NAME || '%'
+						OR JOB_MAIN_DUTY LIKE '%'     || INTEREST_KEYWORD.CC_NAME || '%'
+						OR JOB_WAY LIKE '%'           || INTEREST_KEYWORD.CC_NAME || '%'
+						OR JOB_RELATED_MAJOR LIKE '%' || INTEREST_KEYWORD.CC_NAME || '%'
+						OR JOB_RELATED_CERT LIKE '%'  || INTEREST_KEYWORD.CC_NAME || '%'
+					)
+	                <if test = "keyword != null and keyword != ''">
+						<choose>
+							<when test="status == 'title'">
+								AND JOB_NAME LIKE '%' || UPPER(#{keyword}) || '%'
+							</when>
+							<when test="status == 'content'">
+								AND (
+									JOB_MAIN_DUTY LIKE '%' || UPPER(#{keyword}) || '%'
+									OR JOB_WAY LIKE '%' || UPPER(#{keyword}) || '%'
+								)
+							</when>
+							<otherwise>
+								AND (
+									JOB_NAME LIKE '%' || UPPER(#{keyword}) || '%'
+									OR JOB_MAIN_DUTY LIKE '%' || UPPER(#{keyword}) || '%'
+									OR JOB_WAY LIKE '%' || UPPER(#{keyword}) || '%'
+								)
+							</otherwise>
+						</choose>
+					</if>
+	                <if test="jobLcls != null and !jobLcls.isEmpty()">
+	                    AND JOB_LCL IN
+	                    <foreach collection="jobLcls" item="lclItem" open="(" close=")" separator=",">
+	                        #{lclItem}
+	                    </foreach>
+	                </if>
+			)
+			WHERE 1=1
+            <if test="jobSals != null and !jobSals.isEmpty()">
+                AND (
+                    <foreach collection="jobSals" item="salItem" separator=" OR ">
+                        <choose>
+                            <when test="salItem == 'sal1'"> (AVG_SALARY <![CDATA[<]]> 3000) </when>
+                            <when test="salItem == 'sal2'"> (AVG_SALARY BETWEEN 3000 AND 4999) </when>
+                            <when test="salItem == 'sal3'"> (AVG_SALARY BETWEEN 5000 AND 9999) </when>
+                            <when test="salItem == 'sal4'"> (AVG_SALARY <![CDATA[>]]> 10000) </when>
+                        </choose>
+                    </foreach>
+                )
+            </if>
+	</select>
+</mapper>

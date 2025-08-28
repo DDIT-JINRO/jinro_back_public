@@ -1,0 +1,104 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   페이지 전용 스타일
+   ========================================================================== */
+
+/* --- 지도 --- */
+#map {
+	width: 100%;
+	height: 350px;
+	border-radius: 8px;
+	border: 1px solid #dee2e6;
+}
+
+/* --- 상세 정보 테이블 --- */
+.info-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 15px;
+}
+
+.info-table th, .info-table td {
+	padding: 15px;
+	text-align: left;
+	border-bottom: 1px solid #f1f3f5;
+}
+
+.info-table th {
+	width: 180px;
+	background-color: #f8f9fa;
+	color: #495057;
+	font-weight: 500;
+}
+
+.info-table td {
+	color: #212529;
+}
+
+.info-table a {
+	color: #1971c2;
+	text-decoration: none;
+	font-weight: 500;
+}
+
+.info-table a:hover {
+	text-decoration: underline;
+}
+
+/* --- 하단 버튼 그룹 --- */
+.page-actions {
+	display: flex;
+	justify-content: flex-end; /* 기본 오른쪽 정렬 */
+	gap: 12px;
+	margin-top: 20px;
+}
+
+.page-actions--center {
+	justify-content: center; /* 중앙 정렬이 필요할 때 사용 */
+}
+
+.page-actions__button {
+	padding: 14px 40px;
+	border-radius: 8px;
+	font-weight: 600;
+	font-size: 16px;
+	text-decoration: none;
+	border: 1px solid transparent;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.page-actions__button--primary {
+	background-color: #5c68d9;
+	color: white;
+}
+
+.page-actions__button--secondary {
+	background-color: #fff;
+	color: #5c68d9;
+	border-color: #5c68d9;
+}
+
+.page-actions__button--dark {
+	background-color: #495057;
+	color: white;
+}
+
+/* ==========================================================================
+   반응형 스타일
+   ========================================================================== */
+@media ( max-width : 768px) {
+	#map {
+		height: 250px;
+	}
+	.info-table th {
+		width: 120px;
+	}
+	.page-actions {
+		flex-direction: column;
+		align-items: stretch; /* 버튼이 전체 너비를 차지하도록 */
+		text-align: center;
+	}
+}
+

@@ -1,0 +1,306 @@
+@charset "UTF-8";
+.template-container{
+	flex-direction: row;
+}
+
+/* ──────────────────────────────────────────────────────────
+   리스트 테이블
+──────────────────────────────────────────────────────────*/
+.table-wrapper {
+	flex: 1;
+	overflow-y: auto;
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   기본정보 테이블 (오른쪽 패널)
+──────────────────────────────────────────────────────────*/
+.template-panel[style*="flex: 1.5"] > form {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	box-sizing: border-box;
+}
+
+.panel-footer.button-group {
+	margin-top: auto;
+	display: flex;
+	justify-content: flex-end;
+	border-top: 1px solid #e0e0e0;
+	padding-top: 16px;
+}
+
+/* ──────────────────────────────────────────────────────────
+   상세/작성 폼
+──────────────────────────────────────────────────────────*/
+.template-panel form > div {
+	display: flex;
+	align-items: center;
+}
+
+.template-panel form label {
+	width: 100px;
+	font-size: 14px;
+	color: #333;
+}
+
+.template-panel form input[type="text"],
+.template-panel form textarea {
+	flex: 1;
+	padding: 6px 10px;
+	font-size: 14px;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	box-sizing: border-box;
+}
+
+.template-panel form textarea {
+	height: 180px;
+}
+
+form{
+	margin-bottom: 0;
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   버튼 그룹 (삭제/초기화/저장)
+──────────────────────────────────────────────────────────*/
+.template-panel .btn-delete,
+.template-panel .btn-reset,
+.template-panel .btn-confirm,
+.template-panel .btn-save {
+	padding: 8px 16px;
+	font-size: 14px;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	min-width: 85px;
+}
+
+.template-panel .btn-delete,
+.template-panel .btn-reset {
+	background: #C00003;
+	color: #fff;
+	margin-right: 8px;
+}
+
+.template-panel .btn-delete:hover,
+.template-panel .btn-reset:hover {
+	background: #A00002;
+}
+
+.template-panel .btn-confirm {
+	background: #07223D;
+	color: #fff;
+	margin-left: 2%;
+}
+.template-panel .btn-save {
+	background: #07223D;
+	color: #fff;
+	margin-left: auto;
+}
+
+.template-panel .btn-confirm:hover,
+.template-panel .btn-save:hover {
+	background: #07223D;
+}
+
+/* ──────────────────────────────────────────────────────────
+   하단 페이지네이션 고정
+──────────────────────────────────────────────────────────*/
+.card-footer {
+	margin-top: auto;
+}
+
+.panel-footer.pagination {
+	display: flex;
+	flex-wrap: nowrap;
+	list-style: none;
+	gap: 0.5rem;
+	justify-content: center;
+	align-items: center;
+	padding: 1rem 0;
+}
+
+.panel-footer.pagination a {
+	padding: 0.4rem 0.75rem;
+	border-radius: 5px;
+	text-decoration: none;
+	color: black;
+	font-weight: 500;
+}
+
+.panel-footer.pagination a:hover {
+	background-color: #f0f0f0;
+}
+
+.panel-footer.pagination .active {
+	background-color: #2C2C2C;
+	color: white;
+	pointer-events: none;
+}
+
+.panel-footer.pagination .disabled {
+	color: #757575;
+	pointer-events: none;
+}
+
+/* ──────────────────────────────────────────────────────────
+   CKEditor 개선: label 포함 정렬 및 너비 고정
+──────────────────────────────────────────────────────────*/
+.template-panel form .noticeFormGroup,
+.template-panel form > div.ck-row {
+	display: flex;
+	align-items: flex-start;
+	margin: 12px;
+}
+
+.template-panel form > div.ck-row label {
+	width: 100px;
+	font-size: 14px;
+	color: #333;
+	padding-top: 10px;
+}
+
+.template-panel form > div.ck-row .ck-editor {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.template-panel .ck-editor .ck-editor__editable_inline {
+	width: 100%;
+	min-height: 300px;
+	max-height: 320px;
+	overflow-y: auto;
+	box-sizing: border-box;
+	padding: 6px 10px;
+}
+
+.template-panel .ck-editor .ck-content {
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	word-break: break-word;
+	overflow-x: auto;
+}
+
+.template-panel .ck-editor .ck-content pre {
+	white-space: pre;
+	overflow-x: auto;
+}
+
+/* 리스트 스타일 제거 */
+li {
+	list-style-type: none;
+}
+
+/* ──────────────────────────────────────────────────────────
+   기존 첨부파일 리스트 스타일
+──────────────────────────────────────────────────────────*/
+.existing-files {
+	height: 100px;
+	overflow: scroll;
+	list-style: none;
+	padding: 0;
+	margin: 8px 0;
+}
+
+.existing-files li {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 6px 10px;
+	margin-bottom: 4px;
+	border: 1px solid #e0e0e0;
+	border-radius: 6px;
+	background-color: #fafafa;
+	transition: background-color 0.2s ease;
+}
+
+.existing-files li:hover {
+	background-color: #f5f9ff;
+	transform: none;
+}
+
+.existing-files li a {
+	color: #007bff;
+	text-decoration: none;
+	flex-grow: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-size: 14px;
+}
+
+.existing-files li a:hover {
+	color: #0056b3;
+	text-decoration: underline;
+}
+
+.existing-files li button {
+	background: #dc3545;
+	border: none;
+	color: #fff;
+	padding: 4px 12px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 12px;
+	transition: background-color 0.2s ease;
+}
+
+.existing-files li button:hover {
+	background: #c82333;
+	transform: none;
+	box-shadow: none;
+}
+
+.noticeFormGroup > div > label,
+.noticeFormGroup > label {
+	display: block;
+	font-weight: bold;
+	margin-bottom: 4px;
+	font-size: 14px;
+}
+
+#notice-list tr:hover {
+	cursor: pointer;
+}
+
+.template-panel .cl-content .ck-editor .ck-editor__editable_inline {
+  /* 일지 영역의 높이 설정 */
+  min-height: 200px;
+  max-height: 200px;
+}
+.template-panel .cl-etc .ck-editor .ck-editor__editable_inline {
+  /* 비고 영역의 높이 설정 */
+  min-height: 150px;
+  max-height: 150px;
+}
+
+
+.filter-box.vacSearch{
+    justify-content: flex-end;
+}
+
+.filter-box.vacRadio p {
+	display: flex;
+    justify-content: flex-start;
+    margin: 0;
+    font-weight: bold;
+    color: black;
+}
+
+.filter-box.vacRadio input {
+  display: inline-block;
+  width: 20px; /* 원하는 너비로 조절하세요 */
+  height: 20px; /* 원하는 높이로 조절하세요 */
+  margin: 0 5px; /* 양옆 간격 조절 */
+}
+
+th{
+	padding: 12px 12px; 
+}
+
+.noticeFormGroup{}

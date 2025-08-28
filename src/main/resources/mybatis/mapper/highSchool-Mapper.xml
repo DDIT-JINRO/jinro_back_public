@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.ertds.hgschl.service.impl.HighSchoolMapper">
+
+	<!--
+	// 모든 고등학교 정보를 조회하는 메서드 (주소 포함)
+	public List<HighSchoolVO> highSchoolList(HighSchoolVO highSchoolVO);
+	 -->
+	 <select id="highSchoolList" parameterType="kr.or.ddit.ertds.hgschl.service.HighSchoolVO" resultType="kr.or.ddit.ertds.hgschl.service.HighSchoolVO">
+		 SELECT * FROM (
+			SELECT ROWNUM AS RNUM, B.*
+			FROM (
+			 SELECT
+			    HS.HS_ID									AS hsId
+			  , HS.HS_CODE									AS hsCode
+			  , HS.HS_NAME									AS hsName
+			  , REGION.CC_NAME								AS hsRegion
+			  , JURIS.CC_ETC								AS hsJurisCode
+			  , FOUND.CC_NAME								AS hsFoundType
+			  , HS.HS_ZIPCODE								AS hsZipcode
+			  , HS.HS_ADDR									AS hsAddr
+			  , HS.HS_TEL									AS hsTel
+			  , HS.HS_HOMEPAGE								AS hsHomepage
+			  , COEDU.CC_NAME								AS hsCoeduType
+			  , TYPE.CC_NAME								AS hsTypeName
+			  , GENERAL.CC_NAME								AS hsGeneralType
+			  , TO_CHAR(HS.HS_FOUND_DATE, 'YYYY. MM. DD')	AS hsFoundDate
+			  , TO_CHAR(HS.HS_ANNIV_AT, 'YYYY. MM. DD')		AS hsAnnivAt
+			  , HS.HS_LAT									AS hsLat
+			  , HS.HS_LOT									AS hsLot
+			FROM
+			    HIGH_SCHOOL HS
+			LEFT JOIN
+			    COM_CODE REGION
+			    ON HS.HS_REGION_CODE = REGION.CC_ID
+			    AND REGION.CL_CODE = 'G23'
+			LEFT JOIN
+			    COM_CODE JURIS
+			    ON HS.HS_JURIS_CODE = JURIS.CC_ID
+			    AND JURIS.CL_CODE = 'G22'
+			LEFT JOIN
+			    COM_CODE FOUND
+			    ON HS.HS_FOUND_TYPE = FOUND.CC_ID
+			    AND FOUND.CL_CODE = 'G21'
+			LEFT JOIN
+			    COM_CODE COEDU
+			    ON HS.HS_COEDU_TYPE = COEDU.CC_ID
+			    AND COEDU.CL_CODE = 'G24'
+			LEFT JOIN
+			    COM_CODE TYPE
+			    ON HS.HS_TYPE_NAME = TYPE.CC_ID
+			    AND TYPE.CL_CODE = 'G25'
+			LEFT JOIN
+			    COM_CODE GENERAL
+			    ON HS.HS_GENERAL_TYPE = GENERAL.CC_ID
+			    AND GENERAL.CL_CODE = 'G26'
+			<where>
+				HS.HS_DEL_YN = 'N'
+
+			    <if test="keyword != null and keyword != ''">
+			        AND HS.HS_NAME LIKE '%' || #{keyword} || '%'
+			    </if>
+			    <if test="regionFilter != null and regionFilter.size() > 0">
+			        AND HS.HS_REGION_CODE IN
+			        <foreach item="item" collection="regionFilter" open="(" close=")" separator=",">
+			            #{item}
+			        </foreach>
+			    </if>
+
+			    <if test="schoolType != null and schoolType.size() > 0">
+			        AND HS.HS_TYPE_NAME IN
+			        <foreach item="item" collection="schoolType" open="(" close=")" separator=",">
+			            #{item}
+			        </foreach>
+			    </if>
+
+			    <if test="coedTypeFilter != null and coedTypeFilter.size() > 0">
+			        AND HS.HS_COEDU_TYPE IN
+			        <foreach item="item" collection="coedTypeFilter" open="(" close=")" separator=",">
+			            #{item}
+			        </foreach>
+			    </if>
+			</where>
+			ORDER BY
+			<choose>
+			 <when test="sortOrder == 'nameAsc' ">HS.HS_NAME ASC</when>
+			 <when test="sortOrder == 'nameDesc' ">HS.HS_NAME DESC</when>
+			 <otherwise>
+			 HS.HS_NAME ASC
+			 </otherwise>
+			 </choose>
+			) B
+			WHERE ROWNUM <![CDATA[<=]]> #{endRow}
+		 )
+  		  WHERE RNUM <![CDATA[>]]> #{startRow}
+	 </select>
+
+
+
+	<!-- 갯수 조회 하기  -->
+	<select id="selectHighSchoolCount" parameterType="kr.or.ddit.ertds.hgschl.service.HighSchoolVO" resultType="int">
+	    SELECT
+	    	COUNT(*)
+	    FROM
+	    	HIGH_SCHOOL HS
+	    LEFT JOIN
+	    	COM_CODE REGION
+	    	ON HS.HS_REGION_CODE = REGION.CC_ID
+	    	AND REGION.CL_CODE = 'G23'
+	    LEFT JOIN
+	    	COM_CODE JURIS
+	    	ON HS.HS_JURIS_CODE = JURIS.CC_ID
+	    	AND JURIS.CL_CODE = 'G22'
+	    LEFT JOIN
+	    	COM_CODE FOUND
+	    	ON HS.HS_FOUND_TYPE = FOUND.CC_ID
+	    	AND FOUND.CL_CODE = 'G21'
+	    LEFT JOIN
+	    	COM_CODE COEDU
+	    	ON HS.HS_COEDU_TYPE = COEDU.CC_ID
+	    	AND COEDU.CL_CODE = 'G24'
+	    LEFT JOIN
+	    	COM_CODE TYPE
+	    	ON HS.HS_TYPE_NAME = TYPE.CC_ID
+	    	AND TYPE.CL_CODE = 'G25'
+	    LEFT JOIN
+	    	COM_CODE GENERAL
+	    	ON HS.HS_GENERAL_TYPE = GENERAL.CC_ID
+	    	AND GENERAL.CL_CODE = 'G26'
+	    <where>
+	    	HS.HS_DEL_YN = 'N'
+
+		    <if test="keyword != null and keyword != ''">
+		        AND HS.HS_NAME LIKE '%' || #{keyword} || '%'
+		    </if>
+		    <if test="regionFilter != null and regionFilter.size() > 0">
+		        AND HS.HS_REGION_CODE IN
+		        <foreach item="item" collection="regionFilter" open="(" close=")" separator=",">
+		            #{item}
+		        </foreach>
+		    </if>
+
+		    <if test="schoolType != null and schoolType.size() > 0">
+		        AND HS.HS_TYPE_NAME IN
+		        <foreach item="item" collection="schoolType" open="(" close=")" separator=",">
+		            #{item}
+		        </foreach>
+		    </if>
+
+		    <if test="coedTypeFilter != null and coedTypeFilter.size() > 0">
+		        AND HS.HS_COEDU_TYPE IN
+		        <foreach item="item" collection="coedTypeFilter" open="(" close=")" separator=",">
+		            #{item}
+		        </foreach>
+		    </if>
+		</where>
+	</select>
+
+	<!--
+	//지역 필터 옵션 목록 조회
+	public List<ComCodeVO> selectRegionList()
+	 -->
+	<select id="selectRegionList" resultType="kr.or.ddit.com.ComCodeVO">
+		SELECT
+			CC_ID
+		  , CL_CODE
+		  , CC_NAME
+		FROM
+			COM_CODE
+		WHERE
+			CL_CODE = 'G23'
+		ORDER BY
+			CC_ID
+	</select>
+
+	<!--
+	학교 유형 필터 옵션 목록 조회
+	public List<ComCodeVO> selectSchoolTypeList()
+	 -->
+	 <select id="selectSchoolTypeList" resultType="kr.or.ddit.com.ComCodeVO">
+		SELECT
+			CC_ID
+		  , CL_CODE
+		  , CC_NAME
+		FROM
+			COM_CODE
+		WHERE
+			CL_CODE = 'G25'
+		ORDER BY
+			CC_ID
+	</select>
+
+	<!--
+	공학 여부 필터 옵션 목록 조회
+	public List<ComCodeVO> selectCoedTypeList()
+	 -->
+	 <select id="selectCoedTypeList" resultType="kr.or.ddit.com.ComCodeVO">
+		SELECT
+			CC_ID
+		  , CL_CODE
+		  , CC_NAME
+		FROM
+			COM_CODE
+		WHERE
+			CL_CODE = 'G24'
+		ORDER BY
+			CC_ID
+	</select>
+
+	<!--
+    //특정 고등학교 상세 정보를 조회
+	public HighSchoolVO highSchoolDetail(@Param("hsId") int hsId);
+     -->
+     <select id="highSchoolDetail" resultType="kr.or.ddit.ertds.hgschl.service.HighSchoolVO">
+		 SELECT
+		    HS.HS_ID									AS hsId
+		  , HS.HS_CODE									AS hsCode
+		  , HS.HS_NAME									AS hsName
+		  , REGION.CC_NAME								AS hsRegion
+		  , JURIS.CC_ETC								AS hsJurisCode
+		  , FOUND.CC_NAME								AS hsFoundType
+		  , HS.HS_ZIPCODE								AS hsZipcode
+		  , HS.HS_ADDR									AS hsAddr
+		  , HS.HS_TEL									AS hsTel
+		  , HS.HS_HOMEPAGE								AS hsHomepage
+		  , COEDU.CC_NAME								AS hsCoeduType
+		  , TYPE.CC_NAME								AS hsTypeName
+		  , GENERAL.CC_NAME								AS hsGeneralType
+		  , TO_CHAR(HS.HS_FOUND_DATE, 'YYYY. MM. DD')	AS hsFoundDate
+		  , TO_CHAR(HS.HS_ANNIV_AT, 'YYYY. MM. DD')		AS hsAnnivAt
+		  , HS.HS_LAT									AS hsLat
+		  , HS.HS_LOT									AS hsLot
+		FROM
+		    HIGH_SCHOOL HS
+		LEFT JOIN
+		    COM_CODE REGION
+		    ON HS.HS_REGION_CODE = REGION.CC_ID
+		    AND REGION.CL_CODE = 'G23'
+		LEFT JOIN
+		    COM_CODE JURIS
+		    ON HS.HS_JURIS_CODE = JURIS.CC_ID
+		    AND JURIS.CL_CODE = 'G22'
+		LEFT JOIN
+		    COM_CODE FOUND
+		    ON HS.HS_FOUND_TYPE = FOUND.CC_ID
+		    AND FOUND.CL_CODE = 'G21'
+		LEFT JOIN
+		    COM_CODE COEDU
+		    ON HS.HS_COEDU_TYPE = COEDU.CC_ID
+		    AND COEDU.CL_CODE = 'G24'
+		LEFT JOIN
+		    COM_CODE TYPE
+		    ON HS.HS_TYPE_NAME = TYPE.CC_ID
+		    AND TYPE.CL_CODE = 'G25'
+		LEFT JOIN
+		    COM_CODE GENERAL
+		    ON HS.HS_GENERAL_TYPE = GENERAL.CC_ID
+		    AND GENERAL.CL_CODE = 'G26'
+        WHERE
+        	HS_ID = #{hsId}
+        AND	HS.HS_DEL_YN = 'N'
+    </select>
+
+    <!--
+    //특정 고등학교의 학과 목록 조회
+    public List<HighSchoolDeptVO> selectDeptsBySchoolId(int hsId)
+     -->
+    <select id="selectDeptsBySchoolId" parameterType="int" resultType="kr.or.ddit.ertds.hgschl.service.HighSchoolDeptVO">
+    SELECT
+	        HSD_ID      AS hsdId,
+	        HS_ID       AS hsId,
+	        HSD_CODE    AS hsdCode,
+	        HSD_NAME    AS hsdName,
+	        HSD_TRACK_NAME AS hsdTrackName
+	    FROM
+	        HIGH_SCHOOL_DEPT
+	    WHERE
+	        HS_ID = #{hsId}
+        AND	HSD_DEL_YN = 'N'
+	    ORDER BY
+	        HSD_NAME
+	</select>
+
+	<!--
+
+    // 고등학교 정보 논리적 삭제
+    public int highSchoolDelete(int hsId);
+    -->
+    <update id="highSchoolDelete" parameterType="int">
+    UPDATE	HIGH_SCHOOL
+    SET		HS_DEL_YN = 'Y'
+    WHERE	HS_ID = #{hsId}
+	</update>
+    <!--
+    // 학과 정보 논리적 삭제
+    public int highSchoolDeptDelete(int hsdId);
+	 -->
+	 <update id="highSchoolDeptDelete" parameterType="int">
+	    UPDATE	HIGH_SCHOOL_DEPT
+	    SET		HSD_DEL_YN = 'Y'
+	    WHERE	HSD_ID = #{hsdId}
+	</update>
+
+	<!--
+	// 고등학교 정보 입력
+    public int highSchoolInsert(HighSchoolVO highSchoolVO);
+     -->
+	<insert id="highSchoolInsert" parameterType="kr.or.ddit.ertds.hgschl.service.HighSchoolVO">
+		INSERT INTO HIGH_SCHOOL  (
+	            HS_ID
+			  , HS_CODE
+			  , HS_NAME
+			  , HS_REGION_CODE
+			  , HS_JURIS_CODE
+			  , HS_FOUND_TYPE
+			  , HS_ZIPCODE
+			  , HS_ADDR
+			  , HS_TEL
+			  , HS_HOMEPAGE
+			  , HS_COEDU_TYPE
+			  , HS_TYPE_NAME
+			  , HS_GENERAL_TYPE
+			  , HS_FOUND_DATE
+			  , HS_ANNIV_AT
+			  , HS_LAT
+			  , HS_LOT
+	) VALUES (
+	            HIGH_SCHOOL_SEQ.NEXTVAL
+	          , #{hsCode, jdbcType=VARCHAR}
+	          , #{hsName}
+	          , #{hsRegionCode}
+	          , #{hsJurisCode}
+	          , #{hsFoundTypeCode}
+	          , #{hsZipcode}
+	          , #{hsAddr}
+	          , #{hsTel, jdbcType=VARCHAR}
+	          , #{hsHomepage, jdbcType=VARCHAR}
+	          , #{hsCoeduTypeCode}
+	          , #{hsTypeNameCode}
+	          , #{hsGeneralTypeCode}
+	          , #{hsFoundDate, jdbcType=DATE}
+	          , #{hsAnnivAt, jdbcType=DATE}
+	          , #{hsLat, jdbcType=DOUBLE}
+	          , #{hsLot, jdbcType=DOUBLE}
+	)
+	</insert>
+
+	<!--
+	//고등학교 학과 입력
+    public int highSchoolDeptInsert(HighSchoolDeptVO highSchoolDeptVO);
+     -->
+	 <insert id="highSchoolDeptInsert" parameterType="kr.or.ddit.ertds.hgschl.service.HighSchoolDeptVO">
+        INSERT INTO HIGH_SCHOOL_DEPT (HSD_ID, HS_ID, HSD_NAME)
+        VALUES (HIGH_SCHOOL_DEPT_SEQ.NEXTVAL, #{hsId}, #{hsdName})
+    </insert>
+
+    <select id="selectAllHighSchoolsForCoords" resultType="kr.or.ddit.ertds.hgschl.service.HighSchoolVO">
+        SELECT HS_ID, HS_NAME, HS_ADDR, HS_LAT, HS_LOT
+        FROM HIGH_SCHOOL
+        WHERE HS_DEL_YN = 'N' AND HS_ADDR IS NOT NULL AND (HS_LAT IS NULL OR HS_LOT IS NULL)
+    </select>
+
+	<!--
+	// 고등학교 정보 수정
+    public int highSchoolUpdate(HighSchoolVO highSchoolVO);
+     -->
+	<update id="highSchoolUpdate" parameterType="kr.or.ddit.ertds.hgschl.service.HighSchoolVO">
+	    UPDATE HIGH_SCHOOL
+	    <set>
+	         <if test="hsCode != null">, HS_CODE = #{hsCode}</if>
+             <if test="hsName != null">, HS_NAME = #{hsName}</if>
+             <if test="hsRegionCode != null">, HS_REGION_CODE = #{hsRegionCode}</if>
+             <if test="hsJurisCode != null">, HS_JURIS_CODE = #{hsJurisCode}</if>
+             <if test="hsFoundTypeCode != null">, HS_FOUND_TYPE = #{hsFoundTypeCode}</if>
+             <if test="hsZipcode != null">, HS_ZIPCODE = #{hsZipcode}</if>
+             <if test="hsAddr != null">, HS_ADDR = #{hsAddr}</if>
+             <if test="hsAddrDetail != null">, HS_ADDR_DETAIL = #{hsAddrDetail}</if>
+             <if test="hsTel != null">, HS_TEL = #{hsTel}</if>
+             <if test="hsHomepage != null">, HS_HOMEPAGE = #{hsHomepage}</if>
+             <if test="hsCoeduTypeCode != null">, HSselectAllCommonCodes_COEDU_TYPE = #{hsCoeduTypeCode}</if>
+             <if test="hsTypeNameCode != null">, HS_TYPE_NAME = #{hsTypeNameCode}</if>
+             <if test="hsGeneralTypeCode != null">, HS_GENERAL_TYPE = #{hsGeneralTypeCode}</if>
+             <if test="hsFoundDate != null">, HS_FOUND_DATE = #{hsFoundDate, jdbcType=DATE}</if>
+             <if test="hsAnnivAt != null">, HS_ANNIV_AT = #{hsAnnivAt, jdbcType=DATE}</if>
+             <if test="hsLat != null">, HS_LAT = #{hsLat, jdbcType=DOUBLE}</if>
+             <if test="hsLot != null">, HS_LOT = #{hsLot, jdbcType=DOUBLE}</if>
+	        </set>
+	    WHERE HS_ID = #{hsId}
+	</update>
+
+	<!--
+	// 모든 공통 코드를 조회 (캐싱 로직에 필요)
+	public List<ComCodeVO> selectAllCommonCodes();
+	 -->
+	<select id="selectAllCommonCodes" resultType="kr.or.ddit.com.ComCodeVO">
+        SELECT
+            CC_ID AS ccId,
+            CL_CODE AS clCode,
+            CC_NAME AS ccName,
+            CC_ETC AS ccEtc
+        FROM COM_CODE
+        WHERE USE_YN = 'Y'
+    </select>
+
+    <!--
+    // 공통 코드를 이름과 분류코드로 조회
+	public ComCodeVO selectCommonCodeByCcNameAndClCode(@Param("ccName") String ccName, @Param("clCode") String clCode);
+     -->
+    <select id="selectCommonCodeByCcNameAndClCode" resultType="kr.or.ddit.com.ComCodeVO">
+        SELECT CC_ID
+        FROM COM_CODE
+        WHERE CC_NAME = #{ccName} AND CL_CODE = #{clCode} AND USE_YN = 'Y'
+    </select>
+
+	<!--
+	//고등학교 학과 수정
+    public int highSchoolDeptUpdate(HighSchoolDeptVO highSchoolDeptVO);
+     -->
+     <update id="highSchoolDeptUpdate" parameterType="int">
+        UPDATE HIGH_SCHOOL_DEPT
+        <set>
+            <if test="hsdName != null"> HSD_NAME = #{hsdName}, </if>
+            <if test="hsdTrackName != null"> HSD_TRACK_NAME = #{hsdTrackName}, </if>
+        </set>
+        WHERE HSD_ID = #{hsdId}
+    </update>
+
+    <!--
+    // 관할 교육청 코드를 이름으로 조회
+	String selectJurisCodeByRegionName(@Param("regionName") String regionName);
+	-->
+	<select id="selectJurisCodeByRegionName" parameterType="string" resultType="string">
+	    SELECT CC_ID
+	    FROM COM_CODE
+	    WHERE CC_NAME = #{regionName} AND CL_CODE = 'G23' AND USE_YN = 'Y'
+	</select>
+</mapper>

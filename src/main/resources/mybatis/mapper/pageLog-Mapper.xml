@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.admin.las.service.impl.VisitLogMapper">
+
+	<insert id="insertPageLog"
+		parameterType="kr.or.ddit.admin.las.service.PageLogVO">
+		INSERT INTO PAGE_LOG (
+		PL_ID
+		, MEM_ID
+		, PL_URL
+		, PL_TITLE
+		, PL_REFERER_URL
+		, PL_CREATED_AT
+		) VALUES (
+		(SELECT NVL(MAX(PL_ID),0)+1 FROM PAGE_LOG)
+		, #{memId}
+		, #{plUrl}
+		, #{plTitle}
+		, #{plRefererUrl}
+		, SYSDATE
+		)
+	</insert>
+
+</mapper>

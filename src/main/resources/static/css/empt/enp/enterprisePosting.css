@@ -1,0 +1,491 @@
+/* ========================================================================== 
+   기업정보 페이지 전용 스타일 
+   (userCommon.css와 통일성을 유지하며 고유 스타일만 정의)
+   ========================================================================== */
+
+/* ==========================================================================
+   아코디언 헤더 및 아이템 정렬
+   ========================================================================== */
+
+/* 헤더와 아이템의 gap을 동일하게 맞춤 */
+.accordion-list__header {
+	gap: 15px;
+}
+
+.accordion-list__item-header {
+	padding: 20px 24px;
+	gap: 15px;
+}
+
+/* ==========================================================================
+   컬럼별 클래스 정의 (정렬 통일)
+   ========================================================================== */
+
+/* 기업 이미지 컬럼 */
+.accordion-list__col--image {
+	flex: 1 1 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-width: 130px;
+}
+
+/* 기업명 컬럼 */
+.accordion-list__col--name {
+	flex: 1 1 0;
+	display: flex;
+	justify-content: left;
+	align-items: center;
+	font-weight: 600;
+}
+
+/* 기업규모 컬럼 */
+.accordion-list__col--scale {
+	flex: 1 1 0;
+	display: flex;
+	justify-content: left;
+	align-items: center;
+}
+
+/* 홈페이지 컬럼 */
+.accordion-list__col--website {
+	flex: 1 1 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/* 북마크 컬럼 */
+.accordion-list__col--bookmark {
+	flex: 0 0 80px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-width: 80px;
+	max-width: 80px;
+}
+
+/* 토글 컬럼 */
+.accordion-list__col--toggle {
+	flex: 0 0 30px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-width: 30px;
+	max-width: 30px;
+}
+
+/* ==========================================================================
+   기업 정보 고유 스타일
+   ========================================================================== */
+
+/* 기업 이미지 */
+.company-image {
+	width: 130px;
+	height: 60px;
+	object-fit: contain;
+	border-radius: 4px;
+	border: 1px solid #e5e7eb;
+	background-color: #fff;
+	padding: 3px;
+}
+
+/* 홈페이지 링크 */
+.homepage-link {
+	display: inline-block;
+	padding: 8px 16px;
+	border: 1px solid #d1d5db;
+	border-radius: 20px;
+	background-color: #f3f4f6;
+	font-size: 0.9rem;
+	color: #4b5563;
+	text-decoration: none;
+	transition: all 0.2s ease;
+	white-space: nowrap;
+}
+
+.homepage-link:hover {
+	background-color: #eef2ff;
+	border-color: #818cf8;
+	color: #4338ca;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+	text-decoration: none;
+}
+
+/* 홈페이지가 없는 경우 */
+.no-homepage {
+	padding: 8px 16px;
+	font-size: 0.9rem;
+	color: #9ca3af;
+	background-color: #f9fafb;
+	border: 1px dashed #e0e0e0;
+	border-radius: 20px;
+	cursor: default;
+	white-space: nowrap;
+}
+
+/* ==========================================================================
+   아코디언 내용 섹션 스타일
+   ========================================================================== */
+
+/* 섹션 제목 (h4) */
+.company-description-section h4, .company-address-section h4,
+	.company-hiring-status-section h4, .company-review-section h4 {
+	font-size: 16px;
+	font-weight: 600;
+	color: #333;
+	margin: 0 0 12px 0;
+	padding: 8px 0 8px 12px;
+	border-left: 4px solid #7881f5;
+}
+
+/* 섹션 컨테이너 */
+.company-description-section, .company-address-section,
+	.company-hiring-status-section, .company-review-section {
+	padding: 16px;
+}
+
+/* 섹션 내 텍스트 */
+.company-description-section p, .company-address-section p,
+	.company-hiring-status-section p {
+	font-size: 14px;
+	line-height: 1.5;
+	color: #495057;
+	margin: 0;
+	padding: 8px 0;
+	white-space: pre-wrap;
+}
+
+/* 채용공고 바로가기 버튼 */
+.hiring-link {
+	display: inline-block;
+	padding: 10px 20px;
+	background-color: #8c8df9;
+	color: #fff;
+	border-radius: 8px;
+	font-size: 0.95rem;
+	font-weight: 600;
+	text-align: center;
+	text-decoration: none;
+	border: none;
+	cursor: pointer;
+	transition: background-color 0.2s, box-shadow 0.2s;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.hiring-link:hover {
+	background-color: #5c68d9;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+	text-decoration: none;
+}
+
+.hiring-link:active {
+	background-color: #3730a3;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+	transform: translateY(1px);
+}
+
+/* ==========================================================================
+   면접 후기 스타일
+   ========================================================================== */
+/* 개별 후기 아이템 */
+.review-item {
+	background: #ffffff;
+	border: 1px solid #e2e8f0;
+	border-radius: 16px;
+	padding: 20px;
+	margin-bottom: 16px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+	transition: all 0.2s ease;
+	position: relative;
+	overflow: hidden;
+}
+
+.review-item:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+	border-color: #c4b5fd;
+}
+
+/* 후기 메타 정보 (작성자, 별점, 날짜) */
+.review-meta {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 16px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #f1f5f9;
+}
+
+.review-author-rating {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.review-item .review-author {
+	font-size: 1rem;
+	font-weight: 600;
+	color: #333;
+}
+
+/* 별점 표시 개선 */
+.review-rating {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+/* 별점 별들 컨테이너 */
+.review-stars {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+}
+
+/* 개별 별 스타일 */
+.review-star {
+	font-size: 1rem;
+	color: #fbbf24;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+	transition: all 0.2s ease;
+}
+
+/* 채워진 별 */
+.review-star.filled {
+	color: #f59e0b;
+}
+
+/* 빈 별 */
+.review-star.empty {
+	color: #d1d5db;
+}
+
+/* 별점 수치 표시 */
+.review-rating-text {
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: #7881f5;
+	margin-left: 4px;
+	white-space: nowrap;
+}
+
+/* 호버 효과 */
+.review-rating:hover .review-star.filled {
+	transform: scale(1.1);
+	filter: brightness(1.1);
+}
+
+/* 후기 날짜 */
+.review-date {
+	font-size: 0.85rem;
+	color: #64748b;
+	font-weight: 500;
+	margin: 0;
+}
+
+/* 후기 내용 */
+.review-content {
+	font-size: 1rem;
+	color: #374151;
+	line-height: 1.7;
+	white-space: pre-wrap;
+	margin: 0;
+	padding: 16px 30px;
+	background: #f8fafc;
+	border-radius: 12px;
+	border-left: 3px solid #e2e8f0;
+	position: relative;
+}
+
+.review-content::before {
+	content: '"';
+	position: absolute;
+	top: 8px;
+	left: 8px;
+	font-size: 2rem;
+	color: #c4b5fd;
+	font-family: serif;
+	line-height: 1;
+}
+
+.review-content::after {
+	content: '"';
+	position: absolute;
+	top: 8px;
+	right: 12px;
+	font-size: 2rem;
+	color: #c4b5fd;
+	font-family: serif;
+	line-height: 1;
+}
+
+/* 후기가 없는 경우 메시지 */
+.no-review-message {
+	color: #64748b;
+	padding: 35px 20px;
+	text-align: center;
+	border: 2px dashed #cbd5e1;
+	border-radius: 16px;
+	font-size: 1rem;
+	font-weight: 500;
+	position: relative;
+}
+
+.no-review-message::before {
+	content: '💭';
+	display: block;
+	font-size: 2rem;
+	margin-bottom: 12px;
+	opacity: 0.6;
+}
+
+.no-review-message::after {
+	content: '첫 번째 면접 후기를 남겨보세요!';
+	display: block;
+	font-size: 0.9rem;
+	color: #94a3b8;
+	margin-top: 8px;
+}
+
+/* ==========================================================================
+   반응형 스타일 (모바일)
+   ========================================================================== */
+@media ( max-width : 768px) {
+	/* 아코디언 헤더 숨김 (모바일에서는 테이블 헤더 불필요) */
+	.accordion-list__header {
+		display: none;
+	}
+
+	/* 아이템 헤더 레이아웃 변경 */
+	.accordion-list__item-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+		padding: 16px 20px;
+		position: relative;
+	}
+
+	/* 토글 아이콘을 우상단으로 */
+	.accordion-list__col--toggle {
+		position: absolute;
+		top: 16px;
+		right: 20px;
+	}
+
+	/* 기업명을 최상단으로 */
+	.accordion-list__col--name {
+		width: 100%;
+		padding-right: 40px; /* 토글 아이콘 공간 확보 */
+		justify-content: flex-start;
+		font-size: 1.1rem;
+		font-weight: 600;
+		order: 1;
+	}
+
+	/* 기업 이미지를 두번째로 */
+	.accordion-list__col--image {
+		width: 100%;
+		justify-content: flex-start;
+		order: 2;
+	}
+
+	/* 메타 정보 영역을 한 줄로 */
+	.accordion-list__col--scale, .accordion-list__col--website,
+		.accordion-list__col--bookmark {
+		flex: none;
+		font-size: 0.85rem;
+		order: 3;
+	}
+	.accordion-list__col--scale {
+		width: 33%;
+	}
+	.accordion-list__col--website {
+		width: 33%;
+	}
+	.accordion-list__col--bookmark {
+		width: 33%;
+		flex: 0 0 auto;
+	}
+
+	/* 메타 정보들을 하나의 행으로 묶기 */
+	.accordion-list__item-header::after {
+		content: "";
+		display: flex;
+		width: 100%;
+		justify-content: space-between;
+		padding-top: 8px;
+		border-top: 1px solid #f0f0f0;
+		order: 3;
+	}
+
+	/* 섹션별 반응형 */
+	.company-description-section, .company-address-section,
+		.company-hiring-status-section, .company-review-section {
+		padding: 12px;
+	}
+	.company-description-section h4, .company-address-section h4,
+		.company-hiring-status-section h4, .company-review-section h4 {
+		font-size: 14px;
+		padding: 6px 0 6px 8px;
+	}
+	.company-description-section p, .company-address-section p,
+		.company-hiring-status-section p {
+		font-size: 13px;
+	}
+	.hiring-link {
+		width: 100%;
+		justify-content: center;
+		padding: 12px 16px;
+	}
+
+	/* 기업 이미지 모바일 크기 조정 */
+	.company-image {
+		width: 100px;
+		height: 50px;
+	}
+	.review-item {
+		padding: 16px;
+		margin-bottom: 12px;
+	}
+	.review-meta {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px;
+		margin-bottom: 12px;
+	}
+	.review-author-rating {
+		width: 100%;
+		justify-content: space-between;
+	}
+	.review-date {
+		align-self: flex-end;
+		font-size: 0.8rem;
+	}
+	.review-content {
+		font-size: 0.9rem;
+		padding: 12px;
+		line-height: 1.6;
+	}
+	.review-content::before, .review-content::after {
+		font-size: 1.5rem;
+	}
+	.no-review-message {
+		padding: 30px 16px;
+		font-size: 0.9rem;
+	}
+	.no-review-message::before {
+		font-size: 2rem;
+		margin-bottom: 8px;
+	}
+	.review-rating {
+		padding: 4px 10px;
+		gap: 6px;
+	}
+	.review-star {
+		font-size: 0.9rem;
+	}
+	.review-rating-text {
+		font-size: 0.8rem;
+	}
+}

@@ -1,0 +1,76 @@
+/* 기존 코드를 이렇게 정리 */
+@charset "UTF-8";
+
+/* 검정고시 전용 공고문 스타일 */
+.notice-content {
+	border: 2px solid #333;
+	border-radius: 8px;
+	padding: 25px;
+	margin: 20px 0;
+	background-color: #fff;
+	font-size: 14px;
+	line-height: 1.6;
+}
+
+/* 검정고시 상세 페이지 전용 스타일 */
+.exam-notice {
+	margin: 0 40px;
+}
+
+/* 검정고시 메타 정보 오버라이드 */
+.exam-notice .detail__meta {
+	border-bottom: none;
+	padding-bottom: 0;
+	margin-bottom: 0;
+}
+
+/* 검정고시 공고문 내부 스타일 */
+.exam-notice h1 {
+	font-size: 20px !important;
+	text-align: center !important;
+}
+
+.exam-notice h2 {
+	font-size: 18px !important;
+}
+
+.exam-notice h3 {
+	font-size: 16px !important;
+}
+
+.exam-notice ul {
+	padding-left: 40px !important;
+}
+
+.exam-notice p {
+	padding-left: 20px !important;
+}
+
+.exam-notice p:nth-last-of-type(2) {
+	text-align: center;
+	font-size: 18px !important;
+	font-weight: bold;
+	margin-top: 24px;
+	padding-top: 12px;
+	color: #666;
+}
+
+.exam-notice p:last-of-type {
+	text-align: center;
+	font-size: 22px !important;
+	font-weight: bold;
+	padding-top: 12px;
+	color: #666;
+}
+
+/* 모바일 대응 */
+@media ( max-width : 768px) {
+	.exam-notice {
+		margin: 0 10px;
+	}
+	.notice-content {
+		padding: 15px;
+		margin: 15px 0;
+		font-size: 13px;
+	}
+}

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.admin.service.impl.AdminCommonChartMapper">
+
+	<select id="liveUserCount" resultType="int">
+	    WITH LAST_LOG AS (
+	        SELECT
+	            MEM_ID,
+	            LL_STATUS,
+	            ROW_NUMBER() OVER (PARTITION BY MEM_ID ORDER BY LL_CREATED_AT DESC) AS rn
+	        FROM LOGIN_LOG
+	    )
+	    SELECT COUNT(*)
+	    FROM LAST_LOG
+	    WHERE rn = 1
+	    AND LL_STATUS = 'I'
+	</select>
+	
+	<select id="monthUserCount" resultType="kr.or.ddit.admin.service.AdminCommonChartVO">
+		SELECT
+	        (
+	         SELECT COUNT(DISTINCT MEM_ID)
+	         FROM LOGIN_LOG
+	         WHERE LL_STATUS = 'I'
+	           AND LL_CREATED_AT &gt;= TRUNC(SYSDATE, 'MM')
+	           AND LL_CREATED_AT &lt; ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1)) AS THIS_MONTH_USER_COUNT,
+	        (
+	         SELECT COUNT(DISTINCT MEM_ID)
+	         FROM LOGIN_LOG
+	         WHERE LL_STATUS = 'I'
+	           AND LL_CREATED_AT &gt;= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -1)
+	           AND LL_CREATED_AT &lt; TRUNC(SYSDATE, 'MM')) AS LAST_MONTH_USER_COUNT
+    	FROM DUAL
+	</select>
+	
+	<select id="allUserCount" resultType="kr.or.ddit.admin.service.AdminCommonChartVO">
+		SELECT
+	    (
+	     SELECT COUNT(*)
+	     FROM MEMBER
+	     WHERE DEL_YN = 'N') AS THIS_MONTH_TOTAL_COUNT,
+	    (
+	     SELECT COUNT(*)
+	     FROM MEMBER A
+	     LEFT JOIN MEM_DEL B ON A.MEM_ID = B.MEM_ID
+	     WHERE A.CREATED_AT &lt;= TRUNC(SYSDATE, 'MM') - 1
+		        AND (A.DEL_YN = 'N' OR (B.MD_STATUS = 'S01003' AND B.MD_DELETED_AT &gt;= TRUNC(SYSDATE, 'MM')))) AS LAST_MONTH_TOTAL_COUNT
+		 FROM DUAL
+	</select>
+	
+	<select id="getMonthlyData" resultType="map">
+		SELECT
+		    TO_CHAR(T1.MONTH_END_DATE, 'MM') AS "MONTH",
+		    (SELECT COUNT(*)
+		     FROM MEMBER T2
+		     WHERE T2.DEL_YN = 'N'
+		       AND T2.CREATED_AT &lt;= T1.MONTH_END_DATE) AS "CUMULATIVE_USER_COUNT"
+		FROM (
+		    SELECT
+		        ADD_MONTHS(TRUNC(SYSDATE, 'YYYY'), LEVEL) - 1 AS MONTH_END_DATE
+		    FROM
+		        DUAL
+		    CONNECT BY
+		        LEVEL &lt;= TO_NUMBER(TO_CHAR(SYSDATE, 'MM'))
+		) T1
+		ORDER BY "MONTH"
+	</select>
+	
+	<select id="getNewUserData" resultType="map">
+		WITH CALENDAR_MONTHS AS (
+		    SELECT
+		        ADD_MONTHS(TRUNC(SYSDATE, 'YYYY'), LEVEL - 1) AS MONTH_START_DATE
+		    FROM
+		        DUAL
+		    CONNECT BY
+		        LEVEL &lt;= TO_NUMBER(TO_CHAR(SYSDATE, 'MM'))
+		)
+		SELECT
+		    TO_CHAR(T1.MONTH_START_DATE, 'MM') AS "MONTH",
+		    NVL(COUNT(T2.MEM_ID), 0) AS "MONTHLY_USER_COUNT"
+		FROM
+		    CALENDAR_MONTHS T1
+		LEFT JOIN
+		    MEMBER T2 ON TRUNC(T2.CREATED_AT, 'MM') = T1.MONTH_START_DATE AND T2.DEL_YN = 'N'
+		GROUP BY
+		    T1.MONTH_START_DATE
+		ORDER BY
+    "MONTH"
+	</select>
+	
+	<select id="getSecessionData" resultType="map">
+		WITH CALENDAR_MONTHS AS (
+		    SELECT
+		        ADD_MONTHS(TRUNC(SYSDATE, 'YYYY'), LEVEL - 1) AS MONTH_START_DATE
+		    FROM
+		        DUAL
+		    CONNECT BY
+		        LEVEL &lt;= TO_NUMBER(TO_CHAR(SYSDATE, 'MM'))
+		)
+		SELECT
+		    TO_CHAR(T1.MONTH_START_DATE, 'MM') AS "MONTH",
+		    NVL(COUNT(T2.MD_ID), 0) AS "MONTHLY_DELETION_COUNT"
+		FROM
+		    CALENDAR_MONTHS T1
+		LEFT JOIN
+		    MEM_DEL T2 ON TRUNC(T2.MD_DELETED_AT, 'MM') = T1.MONTH_START_DATE AND T2.MD_STATUS = 'S01003'
+		GROUP BY
+		    T1.MONTH_START_DATE
+		ORDER BY
+		    "MONTH"
+	</select>
+	
+	<select id="getContentsUseChart" parameterType="String" resultType="map">
+		WITH category AS (
+		    SELECT '/roadmap' AS pl_url, '로드맵' AS title FROM dual UNION ALL
+		    SELECT '/worldcup', '월드컵' FROM dual UNION ALL
+		    SELECT '/careerAptitudeTest', '심리검사' FROM dual UNION ALL
+		    SELECT '/aiImitaionInterview', '모의면접' FROM dual UNION ALL
+		    SELECT '/aiResume', 'AI 피드백' FROM dual UNION ALL
+		    SELECT '/aiSelfIntro', 'AI 피드백' FROM dual
+		),
+		filtered AS (
+		    SELECT p.pl_url
+		    FROM page_log p
+		    JOIN member m ON m.mem_id = p.mem_id
+		    <if test="param == 'teen'">
+		    WHERE FLOOR(MONTHS_BETWEEN(p.pl_created_at, m.mem_birth)/12) &gt;= 19
+		    </if>
+		    <if test="param == 'youth'">
+		    WHERE FLOOR(MONTHS_BETWEEN(p.pl_created_at, m.mem_birth)/12) &lt; 19
+		    </if>
+		)
+		SELECT c.title as "title",
+		       NVL(COUNT(f.pl_url), 0) AS "cnt"
+		FROM category c
+		LEFT JOIN filtered f
+		  ON f.pl_url = c.pl_url
+		GROUP BY c.title
+		ORDER BY "cnt"
+	</select>
+</mapper>

@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mpg.pay.service.impl.MemberSubscriptionMapper">
+
+	<!-- 
+	// 구독 등록
+	int insertMemberSubscription(MemberSubscriptionVO memberSubscriptionVO);
+	-->
+	<insert id="insertMemberSubscription" parameterType="kr.or.ddit.mpg.pay.service.MemberSubscriptionVO">
+		<selectKey keyProperty="msId" resultType="int" order="BEFORE">
+			SELECT MEMBER_SUBSCRIPTION_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+		
+		INSERT INTO member_subscription (
+		    MS_ID
+		    , MEM_ID
+		    , SUB_ID
+		    , CUSTOMER_UID
+		    , SUB_STATUS
+		    , SUB_START_DT
+		    , SUB_END_DT
+		    , LAST_PAY_DT
+		    , RECUR_PAY_CNT
+		    , CREATED_DT
+		    , UPDATED_DT
+		) VALUES (
+		      #{msId}
+		    , #{memId}
+		    , #{subId}
+		    , #{customerUid}
+		    , 'Y'
+		    , SYSDATE
+		    , #{subEndDt}
+		    , SYSDATE
+		    , 1
+		    , SYSDATE
+		    , SYSDATE
+		)  
+	</insert>
+	
+	<!--
+	// 회원 ID로 구독 정보 조회
+	MemberSubscriptionVO selectByMemberId(int memId);
+	-->
+	<select id="selectByMemberId" resultType="kr.or.ddit.mpg.pay.service.MemberSubscriptionVO">
+		SELECT  A.MS_ID
+			  , A.MEM_ID
+			  , A.SUB_ID
+			  , A.CUSTOMER_UID
+			  , A.SUB_STATUS
+			  , A.SUB_START_DT
+			  , A.SUB_END_DT
+			  , A.LAST_PAY_DT
+			  , A.RECUR_PAY_CNT
+			  , B.SUB_PRICE 
+		FROM	MEMBER_SUBSCRIPTION A
+		JOIN	SUBSCRIBE B ON(A.SUB_ID=B.SUB_ID)
+		WHERE	A.RECUR_PAY_CNT <![CDATA[ > ]]> 0
+		AND		A.MEM_ID = #{memId}
+		AND		SUB_END_DT <![CDATA[ >= ]]> TRUNC(SYSDATE)
+		ORDER BY A.MS_ID DESC
+		FETCH FIRST 1 ROWS ONLY
+	</select>
+	
+
+	<!-- 
+	// 오늘 정기결제해야 할 예약된 구독 목록 조회
+    public List<MemberSubscriptionVO> findSubscriptionsDueForToday();
+    -->
+    <select id="findSubscriptionsDueForToday" resultType="kr.or.ddit.mpg.pay.service.MemberSubscriptionVO">
+	    SELECT	a.MS_ID
+			  , a.MEM_ID
+			  , a.SUB_ID
+			  , a.CUSTOMER_UID
+			  , a.SUB_STATUS
+			  , a.SUB_START_DT
+			  , a.SUB_END_DT
+			  , a.LAST_PAY_DT
+			  , a.RECUR_PAY_CNT
+			  , a.CREATED_DT
+			  , a.UPDATED_DT
+			  , b.SUB_PRICE
+	    FROM	MEMBER_SUBSCRIPTION a
+	    JOIN	SUBSCRIBE b ON (A.SUB_ID = B.SUB_ID)
+	    WHERE	SUB_STATUS = 'Y'
+	    AND		TRUNC(SUB_END_DT) = TRUNC(SYSDATE)
+	</select>
+    
+     
+    <!-- 
+    // 정기결제 성공 후 구독 정보 업데이트
+	public int updateAfterRecurringPayment(int msId);
+    -->
+	<update id="updateAfterRecurringPayment">
+	    UPDATE	MEMBER_SUBSCRIPTION
+	    SET		RECUR_PAY_CNT = RECUR_PAY_CNT + 1,
+	        	LAST_PAY_DT = SYSDATE,
+	        	SUB_END_DT = ADD_MONTHS(SUB_END_DT, 1), -- 다음 결제일을 한 달 뒤로
+	        	UPDATED_DT = SYSDATE
+	    WHERE	MS_ID = #{msId}
+	</update>
+	
+	<!-- 
+	// 구독 상태를 '취소'로 변경
+	public int updateStatusToCancelled(int msId);
+	 -->
+	<update id="updateStatusToCancelled" parameterType="int">
+	    UPDATE	MEMBER_SUBSCRIPTION
+	    SET		SUB_STATUS = 'N',          -- 구독 비활성화
+	        	UPDATED_DT = SYSDATE
+	    WHERE	MS_ID = #{msId}
+	</update>
+	
+	<!-- 
+	//새로운 구독정보를 db에 insert
+	public int insertNewSubscription(MemberSubscriptionVO newSub);
+	 -->
+	<insert id="insertNewSubscription" parameterType="kr.or.ddit.mpg.pay.service.MemberSubscriptionVO">
+		<selectKey keyProperty="msId" resultType="int" order="BEFORE">
+			SELECT MEMBER_SUBSCRIPTION_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+		
+		INSERT INTO member_subscription (
+		    MS_ID
+		    , MEM_ID
+		    , SUB_ID
+		    , CUSTOMER_UID
+		    , SUB_STATUS
+		    , SUB_START_DT
+		    , SUB_END_DT
+		    , LAST_PAY_DT
+		    , RECUR_PAY_CNT
+		    , CREATED_DT
+		    , UPDATED_DT
+		) VALUES (
+		      #{msId}
+		    , #{memId}
+		    , #{subId}
+		    , #{customerUid}
+		    , 'Y'
+		    , #{subStartDt}
+		    , #{subEndDt}
+		    , #{lastPayDt}
+		    , 0
+		    , SYSDATE
+		    , SYSDATE
+		)  
+	</insert>
+	
+	<!-- 
+	// 예약된 구독 정보 조회
+	public MemberSubscriptionVO findReservedSubscriptionByMemberId(int memId);
+	 -->
+	<select id="findReservedSubscriptionByMemberId" resultType="kr.or.ddit.mpg.pay.service.MemberSubscriptionVO">
+	    SELECT	MS_ID
+		      , MEM_ID
+		      , SUB_ID
+		      , CUSTOMER_UID
+		      , SUB_STATUS
+		      , SUB_START_DT
+		      , SUB_END_DT
+		      , LAST_PAY_DT
+		      , RECUR_PAY_CNT
+		      , CREATED_DT
+		      , UPDATED_DT
+	    FROM	MEMBER_SUBSCRIPTION
+	    WHERE	MEM_ID = #{memId}
+	    AND		RECUR_PAY_CNT = 0
+	</select>
+	
+	<!-- 
+	//이전에 취소했던 원래 구독 정보 조회(가장 최신 'n' 상태 구독)
+		public MemberSubscriptionVO findCancelledOriginalSubscription(int memId);
+	 -->
+	<select id="findCancelledOriginalSubscription" resultType="kr.or.ddit.mpg.pay.service.MemberSubscriptionVO">
+	        SELECT	MS_ID
+			      , MEM_ID
+			      , SUB_ID
+			      , CUSTOMER_UID
+			      , SUB_STATUS
+			      , SUB_START_DT
+			      , SUB_END_DT
+			      , LAST_PAY_DT
+			      , RECUR_PAY_CNT
+			      , CREATED_DT
+			      , UPDATED_DT
+		    FROM	MEMBER_SUBSCRIPTION
+	        WHERE	MEM_ID = #{memId}
+	          AND	SUB_STATUS = 'N'
+	          AND	SUB_END_DT <![CDATA[ > ]]> TRUNC(SYSDATE)
+	        ORDER	BY MS_ID DESC
+			FETCH FIRST 1 ROWS ONLY
+	</select>
+	
+	<!-- 
+	//예약된 구독은 DB에서 삭제
+		public void deleteSubscriptionById(int msId);
+	 -->
+	<delete id="deleteSubscriptionById">
+	    DELETE FROM MEMBER_SUBSCRIPTION 
+	    WHERE  MS_ID = #{msId}
+	</delete>
+	
+	<!-- 
+	//원래 구독의 상태를 다시 'Y'로 복원
+		public void reactivateSubscriptionById(int msId);
+		 -->
+	<update id="reactivateSubscriptionById">
+	    UPDATE	MEMBER_SUBSCRIPTION 
+	    SET		SUB_STATUS = 'Y'
+	    WHERE	MS_ID = #{msId}
+	</update>
+	
+	<!-- 
+	//내일이 결제일인 구독 목록을 DB에서 조회
+	public List<MemberSubscriptionVO> findSubscriptionsDueTomorrow();
+	 -->
+	<select id="findSubscriptionsDueTomorrow" resultType="kr.or.ddit.mpg.pay.service.MemberSubscriptionVO">
+	    SELECT	a.MS_ID
+			  , a.MEM_ID
+			  , a.SUB_ID
+			  , a.CUSTOMER_UID
+			  , a.SUB_STATUS
+			  , a.SUB_START_DT
+			  , a.SUB_END_DT
+			  , a.LAST_PAY_DT
+			  , a.RECUR_PAY_CNT
+			  , a.CREATED_DT
+			  , a.UPDATED_DT
+			  , b.SUB_PRICE
+	    FROM	MEMBER_SUBSCRIPTION a
+	    JOIN	SUBSCRIBE b ON (A.SUB_ID = B.SUB_ID)
+	    WHERE	SUB_STATUS = 'Y'
+	    AND		TRUNC(SUB_END_DT) = TRUNC(SYSDATE+1)
+	</select>
+</mapper>

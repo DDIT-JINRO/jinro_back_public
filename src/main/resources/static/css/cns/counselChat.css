@@ -1,0 +1,175 @@
+@charset "UTF-8";
+/* ===== 기본 ===== */
+:root{
+  --bg:#f6f8fb;
+  --panel:#ffffff;
+  --line:#e9eef5;
+  --text:#1f2837;
+  --sub:#6b7684;
+  --brand:#5b8def;
+  --brand-weak:#ecf2ff;
+  --other:#f1f3f5;
+  --mine:#e7f0ff;
+  --shadow:0 8px 24px rgba(20,31,52,.06);
+  --radius:16px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body.counsel-chat-body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font:14px/1.4 "Pretendard","Noto Sans KR",system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,sans-serif;
+}
+
+/* ===== 앱 레이아웃 ===== */
+.counsel-chat-app{
+  height:100vh;
+  width:100%;
+  padding:16px;
+  display:grid;
+  grid-template-columns: 7fr 3fr; /* 70:30 */
+  gap:16px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ===== 좌측 채팅 ===== */
+.chat-pane{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  min-width:0;
+  box-shadow:var(--shadow);
+  display:grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-height: 0;
+}
+
+/* 헤더 */
+.chat-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 16px;
+  border-bottom:1px solid var(--line);
+}
+.chat-header .peer{
+  display:flex; gap:12px; align-items:center;
+}
+.avatar{width:36px;height:36px;border-radius:50%;object-fit:cover}
+.peer-meta .peer-name{font-weight:700}
+.peer-meta .peer-sub{color:var(--sub); font-size:12px;margin-top:2px}
+.header-actions{display:flex;gap:8px}
+.icon-btn{
+  border:1px solid var(--line);
+  background:#fff;border-radius:10px;padding:6px 10px;cursor:pointer;
+}
+.icon-btn:hover{background:#fafbff}
+
+/* 메시지 스크롤 영역 */
+.chat-scroll{
+  padding:16px 16px 8px;
+  overflow:auto;
+  background:linear-gradient(#fff,#fff) padding-box,
+             linear-gradient(180deg,#fff 0,#f7f9fc 100%) border-box;
+  height: 100%;
+  overscroll-behavior: contain;
+}
+.sys-msg{
+  text-align:center;color:var(--sub);font-size:12px;margin:12px 0;
+}
+
+/* 버블 */
+.msg-row{display:flex;gap:8px;margin:8px 0;max-width:80%}
+.msg-row.other{align-items:flex-start}
+.msg-row.mine{margin-left:auto;justify-content:flex-end}
+.bubble-avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;margin-top:4px}
+.bubble{
+  background:var(--other);
+  border-radius:14px;
+  padding:10px 12px;
+  position:relative;
+  box-shadow:0 2px 8px rgba(0,0,0,.03);
+  max-width:100%;
+  word-break:break-word;
+}
+.msg-row.mine .bubble{background:var(--mine)}
+.bubble-name{font-size:12px;color:var(--sub);margin-bottom:4px}
+.bubble-text{font-size:14px;white-space:pre-wrap}
+.bubble-meta{margin-top:6px;font-size:11px;color:var(--sub);display:flex;gap:6px;align-items:center}
+.bubble-meta .dot{opacity:.6}
+
+/* 입력영역 */
+.chat-input{
+  border-top:1px solid var(--line);
+  padding:12px;
+  background:#fff;
+  border-radius:0 0 var(--radius) var(--radius);
+}
+.input-wrap{
+  display:flex; gap:8px; align-items:flex-end;
+  background:#fff; border:1px solid var(--line);
+  border-radius:12px; padding:8px;
+}
+#chatMessage{
+  flex:1; min-height:40px; max-height:160px; resize:none; border:0; outline:none;
+  font-size:14px; line-height:1.5; padding:6px 8px;
+}
+.input-actions{display:flex;gap:6px;align-items:center}
+.file-label{display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:10px;border:1px solid var(--line);cursor:pointer}
+.file-label:hover{background:#fafafa}
+.send-btn{
+  height:36px; padding:0 14px; border:0; cursor:pointer;
+  background:var(--brand); color:#fff; border-radius:10px; font-weight:700;
+}
+.send-btn:hover{filter:brightness(1.03)}
+
+/* ===== 우측 정보 패널 ===== */
+.side-pane{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:16px;
+  overflow:auto;
+  min-width:0;
+  box-shadow:var(--shadow);
+  display:flex; flex-direction:column; gap:14px;
+  min-height: 0;
+}
+.profile-card{
+  display:flex; gap:12px; align-items:center;
+  padding:12px; border:1px solid var(--line); border-radius:12px; background:#fff;
+}
+.avatar-lg{width:48px;height:48px;border-radius:50%;object-fit:cover}
+.p-meta .p-name{font-weight:800}
+.p-meta .p-sub{font-size:12px;color:var(--sub);margin-top:2px}
+
+.info-block{
+  border:1px solid var(--line);
+  border-radius:12px; background:#fff; padding:12px;
+}
+.blk-title{
+  font-weight:800; margin-bottom:10px;
+  display:flex; align-items:center; gap:8px;
+}
+.kv{display:grid; grid-template-columns:90px 1fr; row-gap:8px; column-gap:8px}
+.kv dt{color:var(--sub)}
+.kv dd{margin:0}
+.desc-box{
+  border:1px dashed var(--line); border-radius:10px;
+  background:var(--brand-weak);
+  padding:10px; color:#2b3553; line-height:1.6; white-space:pre-wrap;
+}
+
+.chat-mem-profile{
+	width : 50px;
+	height: 50px;
+}
+
+@media (max-width: 1100px){
+  .counsel-chat-app{grid-template-columns: 1fr}
+  .side-pane{order:-1}
+}

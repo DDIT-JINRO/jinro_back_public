@@ -1,0 +1,109 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   페이지 레이아웃: Content List 4열 구조 재정의
+   ========================================================================== */
+.content-list__total-count {
+	font-size: 0.9rem;
+	color: #6b7280;
+	margin-bottom: 15px;
+	text-align: right;
+}
+
+.content-list__header, .content-list__item {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+}
+
+.content-list__header {
+	padding: 12px 24px;
+}
+
+.content-list__item {
+	padding: 20px 24px;
+	text-decoration: none;
+}
+
+.content-list__title {
+	font-size: 1rem;	
+}
+
+.content-list__col {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* --- 각 컬럼 너비 지정 --- */
+.content-list__col--no {
+	flex: 0 0 80px;
+}
+
+.content-list__col--title {
+	flex: 3;
+	justify-content: flex-start;
+}
+
+.content-list__header .content-list__col--title {
+	justify-content: center;
+}
+
+.content-list__col--agency {
+	flex: 1;
+	justify-content: left;
+}
+
+.content-list__col--date {
+	flex: 1;
+}
+
+/* --- 페이지 전용 컴포넌트 --- */
+.badge--number {
+	background-color: #eef2ff;
+	color: #4338ca;
+	font-weight: 600;
+	text-align: center;
+	padding: 6px 12px;
+	border-radius: 20px;
+	display: inline-block;
+	min-width: 30px;
+	font-size: 13px;
+}
+
+/* ==========================================================================
+   반응형 스타일
+   ========================================================================== */
+@media ( max-width : 768px) {
+	.content-list__header {
+		display: none;
+	}
+	.content-list__item {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+	}
+	.content-list__col {
+		width: 100%;
+		justify-content: flex-start;
+		padding: 5px 0;
+		border-bottom: 1px dashed #eee;
+	}
+	.content-list__item .content-list__col:last-child {
+		border-bottom: none;
+	}
+	.content-list__col::before {
+		content: attr(data-label);
+		font-weight: 600;
+		color: #6b7280;
+		width: 80px;
+		flex-shrink: 0;
+	}
+	.content-list__col--title::before {
+		display: none;
+	}
+	.content-list__col--title {
+		border-bottom: none;
+		padding-bottom: 5px;
+	}
+}

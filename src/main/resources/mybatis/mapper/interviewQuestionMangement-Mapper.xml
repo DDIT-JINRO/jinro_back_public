@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.ddit.cdp.imtintrvw.intrvwqestnmn.service.impl.InterviewQuestionMangementMapper">
+
+   <!--
+    // 사용자 면접질문 갯수
+	public int selectInterviewQuestionTotalBymemId(InterviewDetailListVO interviewDetailListVO);
+    -->
+    <select id="selectInterviewQuestionTotalBymemId" parameterType="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.InterviewDetailListVO" resultType="int">
+		SELECT COUNT(*)
+		FROM INTERVIEW_DETAIL_LIST
+		WHERE MEM_ID = #{memId}
+		  <if test="keyword != null and keyword != ''">
+	      AND IDL_TITLE LIKE '%' || #{keyword} || '%'
+	    </if>
+	    <if test="status != null and status != ''">
+	      AND IDL_STATUS = #{status}
+    </if>
+	</select>
+
+	<!--
+	// 사용자 면접질문 리스트
+	public List<InterviewDetailListVO> selectInterviewQuestionBymemId(InterviewDetailListVO interviewDetailListVO);
+	 -->
+	 <select id="selectInterviewQuestionBymemId" parameterType="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.InterviewDetailListVO" resultType="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.InterviewDetailListVO">
+	SELECT * FROM (
+		SELECT ROWNUM AS RNUM, B.*
+		FROM (
+			SELECT
+				IDL_ID,
+				IDL_TITLE,
+				IDL_STATUS,
+				IDL_UPDATED_AT
+			FROM
+				INTERVIEW_DETAIL_LIST
+			WHERE
+				MEM_ID = #{memId}
+				<if test="keyword != null and keyword != ''">
+					AND IDL_TITLE LIKE '%' || #{keyword} || '%'
+				</if>
+				<if test="status != null and status != ''">
+					AND IDL_STATUS = #{status}
+				</if>
+			ORDER BY
+			<choose>
+				<when test="sortOrder=='updatedAtDesc'">
+				IDL_UPDATED_AT DESC
+				</when>
+				<when test="sortOrder=='updatedAtAsc'">
+				IDL_UPDATED_AT ASC
+				</when>
+				<otherwise>
+				IDL_UPDATED_AT DESC
+				</otherwise>
+			</choose>
+			) B
+		WHERE ROWNUM <![CDATA[<=]]> #{endNo}
+	)
+	WHERE RNUM<![CDATA[>]]> #{startNo}
+  </select>
+
+  <!--
+  // 면접질문 정보 가져오기
+	public InterviewDetailListVO selectByInterviewQuestionId(InterviewDetailListVO interviewDetailListVO);
+	 -->
+	<select id="selectByInterviewQuestionId" parameterType="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.InterviewDetailListVO" resultType="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.InterviewDetailListVO">
+		SELECT IDL_ID, MEM_ID, IDL_TITLE, IDL_STATUS
+		FROM INTERVIEW_DETAIL_LIST
+		WHERE IDL_ID= #{idlId}
+	</select>
+
+	<!--
+	// 항목별 질문내용가져오기
+	public List<InterviewDetailVO> selectByInterviewQuestionContentIdList(InterviewDetailListVO interviewDetailListVO);
+	 -->
+	<select id="selectByInterviewQuestionContentIdList" parameterType="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.InterviewDetailListVO" resultType="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.InterviewDetailVO">
+		SELECT ID_ID      AS idId
+			 , IDL_ID     AS idlId
+			 , IQ_ID      AS iqId
+			 , ID_CUSTUM  AS idCustum
+			 , ID_ANSWER  AS idAnswer
+			 , ID_ORDER   AS idOrder
+		FROM   INTERVIEW_DETAIL
+		WHERE  IDL_ID = #{idlId}
+		ORDER BY ID_ORDER
+	</select>
+
+	<!--
+	//질문 가져오기
+	public InterviewQuestionVO selectByInterviewQuestionQId(InterviewDetailVO interviewDetailVO);
+	 -->
+	<select id="selectByInterviewQuestionQId" parameterType="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.InterviewDetailVO" resultType="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.InterviewQuestionVO">
+		SELECT IQ_ID
+			 , IQ_GUBUN
+			 , IQ_CONTENT
+		FROM   INTERVIEW_QUESTION
+		WHERE  IQ_ID = #{iqId}
+	</select>
+
+	<!--
+	public int selectMaxInterviewQuestionId();
+	 -->
+	<select id="selectMaxInterviewQuestionId" resultType="int">
+		SELECT	NVL(MAX(IDL_ID),0)+1
+		FROM	INTERVIEW_DETAIL_LIST
+	</select>
+
+	<!--
+	//카트 선택한 질문들 저장
+	public void insertInterviewQuestion(InterviewDetailListVO interviewDetailListVO);
+	 -->
+	 <insert id="insertInterviewQuestion" parameterType="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.InterviewDetailListVO">
+	  INSERT INTO INTERVIEW_DETAIL_LIST (
+	      IDL_ID
+		 ,MEM_ID
+		 ,IDL_TITLE
+		 ,IDL_STATUS
+	  ) VALUES (
+	      #{idlId},
+	      #{memId},
+	      #{idlTitle,jdbcType=VARCHAR},
+	      <choose>
+	        <when test="idlStatus != null and idlStatus != ''">
+	          #{idlStatus}
+	        </when>
+	        <otherwise>
+	          '작성중'
+	        </otherwise>
+	      </choose>
+	  )
+	</insert>
+
+	<!--
+	public int selectMaxInterviewDetailId();
+	 -->
+	 <select id="selectMaxInterviewDetailId" resultType="int">
+		  SELECT NVL(MAX(ID_ID),0)+1 FROM INTERVIEW_DETAIL
+	 </select>
+
+	<!--
+	public void insertInterviewDetail(InterviewDetailVO interviewDetailListVO);
+	 -->
+	 <insert id="insertInterviewDetail" parameterType="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.InterviewDetailVO">
+		  INSERT INTO INTERVIEW_DETAIL (
+		      ID_ID
+		    , IDL_ID
+		    , IQ_ID
+		    , ID_CUSTUM
+		    , ID_ANSWER
+		    , ID_ORDER
+		  ) VALUES (
+		      #{idId}
+		    , #{idlId}
+		    , #{iqId}
+		    , NULL
+		    , #{idAnswer}
+		    , #{idOrder}
+		  )
+	</insert>
+
+	<!--
+	public void updateInterview(InterviewDetailListVO interviewDetailListVO);
+	 -->
+	<update id="updateInterview" parameterType="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.InterviewDetailListVO">
+	  UPDATE 	INTERVIEW_DETAIL_LIST
+	     SET 	IDL_TITLE = #{idlTitle}
+	          , IDL_STATUS = #{idlStatus}
+	          , IDL_UPDATED_AT = SYSDATE
+	   WHERE	IDL_ID = #{idlId}
+	     AND 	MEM_ID = #{memId}
+	</update>
+
+	<!--
+	public void updateInterviewDetail(int idId, int iqId, String answer, int order);
+	 -->
+
+	<update id="updateInterviewDetail" parameterType="map">
+	  UPDATE 	INTERVIEW_DETAIL
+	     SET 	IQ_ID     = #{iqId}
+	           ,ID_ANSWER = #{idAnswer}
+	           ,ID_ORDER  = #{idOrder}
+	   WHERE 	ID_ID     = #{idId}
+	</update>
+
+	<!--
+	//상세삭제
+	public void deleteInterviewQuestionContent(InterviewDetailListVO interviewDetailListVO);
+	 -->
+	<delete id="deleteInterviewQuestionContent" parameterType="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.InterviewDetailListVO">
+		DELETE FROM INTERVIEW_DETAIL
+		WHERE IDL_ID = #{idlId}
+	</delete>
+
+	<!--
+	//삭제
+	public void deleteInterviewQuestion(InterviewDetailListVO interviewDetailListVO);  -->
+	<delete id="deleteInterviewQuestion" parameterType="kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.InterviewDetailListVO">
+		DELETE FROM INTERVIEW_DETAIL_LIST
+		WHERE IDL_ID = #{idlId}
+	</delete>
+</mapper>

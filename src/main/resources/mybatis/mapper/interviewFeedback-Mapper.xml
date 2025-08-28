@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.empt.ivfb.service.impl.InterviewFeedbackMapper">
+
+	<select id="selectInterviewFeedbackList" resultType="kr.or.ddit.empt.enp.service.InterviewReviewVO" parameterType="kr.or.ddit.empt.enp.service.InterviewReviewVO">
+		SELECT
+			*
+		FROM (
+			SELECT
+				A.IR_ID
+				, M.MEM_ID
+				, M.MEM_NICKNAME
+				, CASE
+					WHEN A.IR_TYPE = 'G02001' THEN U.UNIV_NAME
+					WHEN A.IR_TYPE = 'G02002' THEN C.CP_NAME
+					ELSE '알 수 없음'
+				END AS TARGET_NAME
+				, A.TARGET_ID
+				, A.IR_CONTENT
+				, A.IR_CREATED_AT
+				, A.IR_MOD_AT
+				, A.IR_RATING
+				, A.IR_APPLICATION
+				, A.IR_INTERVIEW_AT
+				, A.IR_STATUS
+				, A.IR_TYPE
+			FROM
+				INTERVIEW_REVIEW A
+				LEFT JOIN MEMBER M ON A.MEM_ID = M.MEM_ID
+				LEFT JOIN UNIVERSITY U ON A.TARGET_ID = U.UNIV_ID
+				LEFT JOIN COMPANY C ON A.TARGET_ID = C.CP_ID
+		) T
+		WHERE
+			IR_STATUS = #{irStatus} AND
+			IR_TYPE = #{irType}
+			<if test="keyword != null and keyword != ''">
+				<choose>
+					<when test="status == 'targetName'">
+						AND TARGET_NAME LIKE '%' || #{keyword} || '%'
+					</when>
+					<when test="status == 'content'">
+						AND IR_CONTENT LIKE '%' || #{keyword} || '%'
+					</when>
+					<when test="status == 'writer'">
+						AND MEM_NICKNAME LIKE '%' || #{keyword} || '%'
+					</when>
+					<otherwise>
+						AND (
+						TARGET_NAME LIKE '%' || #{keyword} || '%'
+						OR IR_CONTENT LIKE '%' || #{keyword} || '%'
+						OR MEM_NICKNAME LIKE '%' || #{keyword} || '%'
+						)
+					</otherwise>
+				</choose>
+			</if>
+			<if test="targetId != null and targetId != 0">
+				AND TARGET_ID = #{targetId}
+			</if>
+		ORDER BY
+			<choose>
+				<when test="sortOrder=='InterviewedAtDesc' ">
+					IR_INTERVIEW_AT DESC, IR_CREATED_AT DESC
+				</when>
+				<when test="sortOrder=='InterviewedAtAsc' ">
+					IR_INTERVIEW_AT ASC, IR_CREATED_AT ASC
+				</when>
+				<when test="sortOrder=='createdAtDesc' ">
+					IR_CREATED_AT DESC, IR_INTERVIEW_AT DESC
+				</when>
+				<when test="sortOrder=='createdAtAsc' ">
+					IR_CREATED_AT ASC, IR_INTERVIEW_AT ASC
+				</when>
+				<when test="sortOrder=='reviewRateDesc' ">
+					IR_RATING DESC
+				</when>
+				<otherwise>
+					IR_INTERVIEW_AT DESC, IR_CREATED_AT DESC
+				</otherwise>
+			</choose>
+		OFFSET
+			#{startRow} - 1 ROWS
+		FETCH NEXT
+			#{endRow} - #{startRow} + 1 ROWS ONLY
+	</select>
+
+	<select id="selectInterviewReviewListTotal" parameterType="kr.or.ddit.empt.enp.service.InterviewReviewVO" resultType="int">
+	    SELECT
+	        COUNT(*)
+	    FROM
+	        INTERVIEW_REVIEW A
+	        LEFT JOIN MEMBER M ON A.MEM_ID = M.MEM_ID
+            LEFT JOIN UNIVERSITY U ON A.TARGET_ID = U.UNIV_ID
+            LEFT JOIN COMPANY C ON A.TARGET_ID = C.CP_ID
+	    WHERE
+	        IR_STATUS = #{irStatus}
+	    AND
+	        IR_TYPE = #{irType}
+	    <if test="keyword != null and keyword != ''">
+	        <choose>
+	            <when test="status == 'targetName'">
+	                AND
+	                    CASE
+	                        WHEN A.IR_TYPE = 'G02001' THEN U.UNIV_NAME
+	                        WHEN A.IR_TYPE = 'G02002' THEN C.CP_NAME
+	                    END LIKE '%' || #{keyword} || '%'
+	            </when>
+	            <when test="status == 'content'">
+	                AND A.IR_CONTENT LIKE '%' || #{keyword} || '%'
+	            </when>
+	            <when test="status == 'writer'">
+	                AND M.MEM_NICKNAME LIKE '%' || #{keyword} || '%'
+	            </when>
+	            <otherwise>
+	                AND (
+	                    CASE
+	                        WHEN A.IR_TYPE = 'G02001' THEN U.UNIV_NAME
+	                        WHEN A.IR_TYPE = 'G02002' THEN C.CP_NAME
+	                    END LIKE '%' || #{keyword} || '%'
+	                    OR A.IR_CONTENT LIKE '%' || #{keyword} || '%'
+	                    OR M.MEM_NICKNAME LIKE '%' || #{keyword} || '%'
+	                )
+	            </otherwise>
+	        </choose>
+	    </if>
+	</select>
+
+	<select id="selectCompanyList" resultType="kr.or.ddit.empt.enp.service.CompanyVO" parameterType="string">
+		SELECT
+		    CP_ID
+		    , CP_NAME
+		    , (
+		    	SELECT
+		    		CC_NAME
+		    	FROM
+		    		COM_CODE
+		    	WHERE
+		    		CC_ID = CP_SCALE
+		    ) AS CP_SCALE
+		    , SUBSTR(CP_REGION, 0, 2) AS CP_REGION
+		FROM
+		    COMPANY
+		<if test="cpName != null and cpName != ''">
+        WHERE
+            CP_NAME LIKE '%' || #{cpName} || '%'
+		</if>
+	</select>
+
+	<select id="selectUniversityList" parameterType="string" resultType="kr.or.ddit.ertds.univ.uvsrch.service.UniversityVO">
+		SELECT
+		    UNIV_ID
+		    , UNIV_NAME
+		    , UNIV_CAMPUS
+		    , UNIV_REGION
+		FROM
+		    UNIVERSITY
+  		<if test="univName != null and univName != ''">
+        WHERE
+            UNIV_NAME LIKE '%' || #{univName} || '%'
+		</if>
+	</select>
+
+	<update id="updateInterviewFeedback" parameterType="kr.or.ddit.empt.enp.service.InterviewReviewVO">
+	    <selectKey keyProperty="irId" resultType="int" order="BEFORE">
+	      SELECT NVL(MAX(IR_ID), 0) + 1 AS IR_ID FROM INTERVIEW_REVIEW
+	    </selectKey>
+
+		MERGE INTO
+			INTERVIEW_REVIEW A
+		USING DUAL
+		ON (IR_ID = #{irId})
+			WHEN MATCHED THEN
+				UPDATE SET
+					A.IR_CONTENT = #{irContent}
+					, A.IR_RATING = #{irRating}
+					, A.IR_MOD_AT = SYSDATE
+			WHEN NOT MATCHED THEN
+				INSERT(
+				    IR_ID
+				    , MEM_ID
+				    , IR_TYPE
+				    , TARGET_ID
+				    , IR_CONTENT
+				    , IR_CREATED_AT
+				    , IR_MOD_AT
+				    , IR_RATING
+				    , IR_APPLICATION
+				    , IR_INTERVIEW_AT
+				    , IR_STATUS
+				) VALUES (
+					#{irId}
+					, #{memId}
+					, #{irType}
+					, #{targetId}
+					, #{irContent}
+					, SYSDATE
+					, SYSDATE
+					, #{irRating}
+					, #{irApplication}
+					, #{irInterviewAt}
+					, 'S06002'
+				)
+	</update>
+
+	<update id="updateVerification" parameterType="kr.or.ddit.mpg.mif.inq.service.VerificationVO">
+		MERGE INTO
+			VERIFICATION A
+		USING DUAL
+		ON (VERI_ID = #{veriId})
+			WHEN MATCHED THEN
+				UPDATE SET
+					A.FILE_GROUP_ID = #{fileGroupId}
+					, A.VERI_STATUS = #{veriStatus}
+					, A.VERI_REASON = #{veriReason}
+			WHEN NOT MATCHED THEN
+				INSERT(
+				    VERI_ID
+				    , MEM_ID
+				    , VERI_CREATED_AT
+				    , FILE_GROUP_ID
+				    , VERI_STATUS
+				    , VERI_CATEGORY
+				) VALUES (
+					#{veriId}
+					, #{memId}
+				    , SYSDATE
+				    , #{fileGroupId}
+				    , #{veriStatus}
+				    , #{veriCategory}
+				)
+	</update>
+
+	<update id="deleteInterviewFeedback" parameterType="int">
+		UPDATE
+			INTERVIEW_REVIEW
+		SET
+			IR_STATUS = 'S06003'
+		WHERE
+			IR_ID = #{irId}
+	</update>
+
+	<select id="selectInterviewFeedback" parameterType="int" resultType="kr.or.ddit.empt.enp.service.InterviewReviewVO">
+		SELECT
+		    A.IR_ID
+		    , M.MEM_ID
+		    , CASE
+		        WHEN A.IR_TYPE = 'G02001' THEN U.UNIV_NAME
+		        WHEN A.IR_TYPE = 'G02002' THEN C.CP_NAME
+		        ELSE '알 수 없음'
+		    END AS TARGET_NAME
+		    , A.IR_CONTENT
+		    , A.IR_RATING
+		    , A.IR_APPLICATION
+		    , A.IR_INTERVIEW_AT
+		FROM
+		    INTERVIEW_REVIEW A
+		    LEFT JOIN MEMBER M ON A.MEM_ID = M.MEM_ID
+		    LEFT JOIN UNIVERSITY U ON A.TARGET_ID = U.UNIV_ID
+		    LEFT JOIN COMPANY C ON A.TARGET_ID = C.CP_ID
+		WHERE
+		    IR_ID = #{irId}
+	</select>
+</mapper>

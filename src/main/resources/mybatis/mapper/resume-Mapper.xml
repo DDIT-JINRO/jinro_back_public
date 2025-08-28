@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.cdp.rsm.rsm.service.impl.ResumeMapper">
+	<select id="getElement" parameterType="kr.or.ddit.cdp.rsm.rsm.service.ResumeSectionVO" resultType="String">
+	SELECT RS_TEMPLATE
+		FROM RESUME_SECTION
+		WHERE RS_ID =#{rsId}
+	</select>
+
+	<select id="selectNextResumeId" resultType="int">
+    	SELECT NVL(MAX(RESUME_ID), 0) + 1 FROM RESUME
+	</select>
+
+	<update id="mergeIntoResume" parameterType="kr.or.ddit.cdp.rsm.rsm.service.ResumeVO">
+	    MERGE INTO RESUME r
+	    USING DUAL
+	    ON (r.RESUME_ID = #{resumeId})
+	    WHEN MATCHED THEN
+	        UPDATE
+	        <set>
+	            <if test="resumeTitle != null">
+	                r.RESUME_TITLE = #{resumeTitle},
+	            </if>
+	            <if test="resumeIsTemp != null">
+	                r.RESUME_IS_TEMP = #{resumeIsTemp},
+	            </if>
+	            <if test="fileGroupId != null">
+	                r.FILE_GROUP_ID = #{fileGroupId},
+	            </if>
+   	            <if test="resumeContent != null">
+	                r.RESUME_CONTENT = #{resumeContent},
+	            </if>
+	            r.UPDATED_AT = SYSDATE
+       		</set>
+
+	    WHEN NOT MATCHED THEN
+	        INSERT (RESUME_ID,MEM_ID,RESUME_TITLE,RESUME_CONTENT,RESUME_IS_TEMP,CREATED_AT,UPDATED_AT,FILE_GROUP_ID)
+	        VALUES (#{resumeId},#{memId},#{resumeTitle},#{resumeContent},#{resumeIsTemp},sysdate,sysdate,#{fileGroupId} )
+	</update>
+
+	<select id="selectResumeByResumeId" parameterType="kr.or.ddit.cdp.rsm.rsm.service.ResumeVO" resultType="kr.or.ddit.cdp.rsm.rsm.service.ResumeVO">
+		SELECT RESUME_ID,MEM_ID,RESUME_TITLE,RESUME_CONTENT,RESUME_IS_TEMP,CREATED_AT,UPDATED_AT,FILE_GROUP_ID
+		FROM RESUME
+		WHERE RESUME_ID = #{resumeId}
+	</select>
+
+	<select id="selectResumeBymemId" parameterType="kr.or.ddit.cdp.rsm.rsm.service.ResumeVO" resultType="kr.or.ddit.cdp.rsm.rsm.service.ResumeVO">
+		SELECT * FROM (
+			SELECT ROWNUM AS RNUM, B.*
+			FROM (
+				SELECT
+					RESUME_ID,
+					RESUME_TITLE,
+					RESUME_IS_TEMP,
+					UPDATED_AT
+				FROM
+					RESUME
+				WHERE
+					MEM_ID = #{memId}
+					<if test="keyword != null and keyword != ''">
+						AND RESUME_TITLE LIKE '%' || #{keyword} || '%'
+					</if>
+					<if test="status != null and status != ''">
+						AND RESUME_IS_TEMP = #{status}
+					</if>
+				<choose>
+					<when test="sortOrder == 'updatedAtDesc' ">
+					ORDER BY UPDATED_AT DESC, RESUME_ID DESC
+					</when>
+					<when test="sortOrder == 'updatedAtAsc' ">
+					ORDER BY UPDATED_AT ASC, RESUME_ID DESC
+					</when>
+					<otherwise>
+					ORDER BY UPDATED_AT DESC, RESUME_ID DESC
+					</otherwise>
+				</choose>
+				) B
+			WHERE ROWNUM <![CDATA[<]]>= #{endNo}
+		)
+		WHERE RNUM<![CDATA[>]]> #{startNo}
+	</select>
+
+	<delete id="deleteResumeById" parameterType="kr.or.ddit.cdp.rsm.rsm.service.ResumeVO">
+		DELETE RESUME
+		WHERE RESUME_ID = #{resumeId}
+	</delete>
+
+	<select id="selectResumeTotalBymemId" parameterType="kr.or.ddit.cdp.rsm.rsm.service.ResumeVO" resultType="int">
+		SELECT COUNT(*)
+		FROM RESUME
+		WHERE MEM_ID = #{memId}
+		<if test="keyword != null and keyword != ''">
+			AND RESUME_TITLE LIKE '%' || #{keyword} || '%'
+		</if>
+		<if test="status != null and status != ''">
+			AND RESUME_IS_TEMP = #{status}
+		</if>
+	</select>
+</mapper>

@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.pse.cr.crl.service.impl.CareerEncyclopediaMapper">
+
+	<select id="selectJobLclCode" resultType="map" >
+		SELECT
+		    CC_ID
+		    , CC_NAME
+		FROM
+		    COM_CODE
+		WHERE
+		    CL_CODE = 'G15'
+	</select>
+
+	<select id="selectCareerList" parameterType="kr.or.ddit.worldcup.service.JobsVO" resultType="kr.or.ddit.worldcup.service.JobsVO">
+	    SELECT
+	        JOB_CODE
+	        , JOB_NAME
+	        , JOB_MAIN_DUTY
+	        , JOB_SATIS
+	        , JOB_TARGET_ID
+	        <if test="memId != null and memId !=''">
+	        , IS_BOOKMARK
+	        </if>
+	        , CASE PROSPECT_SCORE
+	            WHEN 5 THEN '증가'
+	            WHEN 4 THEN '다소 증가'
+	            WHEN 3 THEN '유지'
+	            WHEN 2 THEN '다소 감소'
+	            WHEN 1 THEN '감소'
+	        END AS PROSPECT
+	        , CASE
+	            WHEN AVG_SALARY <![CDATA[<]]> 10000 THEN
+	            	TO_CHAR(ROUND(AVG_SALARY / 1000)) || '천만원'
+	            WHEN AVG_SALARY <![CDATA[>=]]> 10000 THEN
+	                TRUNC(AVG_SALARY / 10000) || '억' ||
+	                CASE
+	                	WHEN MOD(AVG_SALARY, 10000) <![CDATA[>]]> 0 THEN
+	                		' ' || TO_CHAR(ROUND(MOD(AVG_SALARY, 10000) / 1000)) || '천만원'
+	                	ELSE
+	                		'' END
+	            ELSE
+	            	TO_CHAR(AVG_SALARY) || '만원'
+	        END AS AVERAGE_SAL
+	    FROM
+	        (
+	            SELECT
+	                B.*
+	                , ROWNUM AS RNUM
+	            FROM
+		            (
+		                SELECT
+		                    JOB_CODE
+		                    , JOB_NAME
+		                    , JOB_MAIN_DUTY
+		                    , ROUND(JOB_SATIS) AS JOB_SATIS
+		                    , PROSPECT_SCORE
+		                    , AVG_SALARY
+		                    , JOB_TARGET_ID
+		                    <if test="memId != null and memId !=''">
+		                    , IS_BOOKMARK
+		                    </if>
+		                FROM
+		                (
+		                    SELECT
+		                        JOB_CODE
+		                        , JOB_NAME
+		                        , JOB_MAIN_DUTY
+		                        , JOB_SATIS
+		                        , JOB_WAY
+		                        , JOB_LCL
+		                        , JOB_SAL
+		                        , JOB_TARGET_ID
+		                        <if test="memId != null and memId !=''">
+		                        , (
+			                        SELECT
+			                        	BM_TARGET_ID
+			                        FROM
+			                        	BOOKMARK
+			                        WHERE
+			                        	BM_CATEGORY_ID = 'G03004'
+			                        	AND MEM_ID = #{memId}
+			                        	AND BM_TARGET_ID = JOB_TARGET_ID) AS IS_BOOKMARK
+		                        </if>
+						        , ROUND(
+						            (OUTLOOK_INCREASE * 5 + OUTLOOK_SLIGHT_INCREASE * 4 + OUTLOOK_STABLE * 3 + OUTLOOK_SLIGHT_DECREASE * 2 + OUTLOOK_DECREASE * 1)
+						            / NVL((OUTLOOK_INCREASE + OUTLOOK_SLIGHT_INCREASE + OUTLOOK_STABLE + OUTLOOK_SLIGHT_DECREASE + OUTLOOK_DECREASE), 1)
+						        ) AS PROSPECT_SCORE
+		                        , TO_NUMBER(
+		                            TRIM(SUBSTR(JOB_SAL, INSTR(JOB_SAL, '평균(50%)') + 7, INSTR(JOB_SAL, '만원', INSTR(JOB_SAL, '평균(50%)')) - (INSTR(JOB_SAL, '평균(50%)') + 7)))
+		                        ) AS AVG_SALARY
+		                    FROM JOBS
+		                ) A
+		                WHERE 1=1
+		                <if test = "keyword != null and keyword != ''">
+							<choose>
+								<when test="status == 'title'">
+									AND JOB_NAME LIKE '%' || UPPER(#{keyword}) || '%'
+								</when>
+								<when test="status == 'content'">
+									AND (
+										JOB_MAIN_DUTY LIKE '%' || UPPER(#{keyword}) || '%'
+										OR JOB_WAY LIKE '%' || UPPER(#{keyword}) || '%'
+									)
+								</when>
+								<otherwise>
+									AND (
+										JOB_NAME LIKE '%' || UPPER(#{keyword}) || '%'
+										OR JOB_MAIN_DUTY LIKE '%' || UPPER(#{keyword}) || '%'
+										OR JOB_WAY LIKE '%' || UPPER(#{keyword}) || '%'
+									)
+								</otherwise>
+							</choose>
+						</if>
+		                <if test="jobSals != null and !jobSals.isEmpty()">
+		                    AND (
+		                        <foreach collection="jobSals" item="salItem" separator=" OR ">
+		                            <choose>
+		                                <when test="salItem == 'sal1'"> (A.AVG_SALARY <![CDATA[<]]> 3000) </when>
+		                                <when test="salItem == 'sal2'"> (A.AVG_SALARY BETWEEN 3000 AND 4999) </when>
+		                                <when test="salItem == 'sal3'"> (A.AVG_SALARY BETWEEN 5000 AND 9999) </when>
+		                                <when test="salItem == 'sal4'"> (A.AVG_SALARY <![CDATA[>]]> 10000) </when>
+		                            </choose>
+		                        </foreach>
+		                    )
+		                </if>
+		                <if test="jobLcls != null and !jobLcls.isEmpty()">
+		                    AND A.JOB_LCL IN
+		                    <foreach collection="jobLcls" item="lclItem" open="(" close=")" separator=",">
+		                        #{lclItem}
+		                    </foreach>
+		                </if>
+		                ORDER BY
+		                 <if test="memId != null and memId !=''">
+		                    IS_BOOKMARK,
+		                 </if>
+
+		                 <choose>
+		                 	<when test="sortOrder == 'salDesc'">
+		                 		A.AVG_SALARY DESC, JOB_NAME ASC
+		                 	</when>
+		                 	<when test="sortOrder == 'prospectDesc'">
+		                 		PROSPECT_SCORE DESC, JOB_NAME DESC
+		                 	</when>
+		                 	<when test="sortOrder == 'staisDesc'">
+		                 		JOB_SATIS DESC, JOB_NAME ASC
+		                 	</when>
+		                 	<otherwise>
+		                    	JOB_SATIS DESC, JOB_NAME ASC
+		                 	</otherwise>
+		                 </choose>
+		            ) B
+	            WHERE ROWNUM <![CDATA[<=]]> #{endRow}
+	        )
+	    WHERE RNUM <![CDATA[>=]]> #{startRow}
+	</select>
+
+	<select id="selectCareerTotal" parameterType="kr.or.ddit.worldcup.service.JobsVO" resultType="int">
+	    SELECT
+	        COUNT(*)
+	    FROM
+	        (
+	            SELECT
+	                JOB_CODE
+	                , JOB_NAME
+	                , JOB_MAIN_DUTY
+	                , JOB_SATIS
+	                , JOB_WAY
+	                , JOB_LCL
+	                , JOB_SAL
+	                , ROUND(
+	                    (OUTLOOK_INCREASE * 5 + OUTLOOK_SLIGHT_INCREASE * 4 + OUTLOOK_STABLE * 3 + OUTLOOK_SLIGHT_DECREASE * 2 + OUTLOOK_DECREASE * 1)
+	                    / NVL((OUTLOOK_INCREASE + OUTLOOK_SLIGHT_INCREASE + OUTLOOK_STABLE + OUTLOOK_DECREASE + OUTLOOK_DECREASE), 1)
+	                ) AS PROSPECT_SCORE
+	                , TO_NUMBER(
+	                    TRIM(SUBSTR(JOB_SAL, INSTR(JOB_SAL, '평균(50%)') + 7, INSTR(JOB_SAL, '만원', INSTR(JOB_SAL, '평균(50%)')) - (INSTR(JOB_SAL, '평균(50%)') + 7)))
+	                ) AS AVG_SALARY
+	            FROM JOBS
+	        ) A
+	    WHERE 1=1
+		<choose>
+			<when test="status == 'title'">
+                AND JOB_NAME LIKE '%' || UPPER(#{keyword}) || '%'
+            </when>
+            <when test="status == 'content'">
+                AND (
+                    JOB_MAIN_DUTY LIKE '%' || UPPER(#{keyword}) || '%'
+                    OR JOB_WAY LIKE '%' || UPPER(#{keyword}) || '%'
+                )
+            </when>
+			<otherwise>
+                AND (
+                    JOB_NAME LIKE '%' || UPPER(#{keyword}) || '%'
+                    OR JOB_MAIN_DUTY LIKE '%' || UPPER(#{keyword}) || '%'
+                    OR JOB_WAY LIKE '%' || UPPER(#{keyword}) || '%'
+                )
+            </otherwise>
+		</choose>
+        <if test="jobSals != null and !jobSals.isEmpty()">
+            AND (
+                <foreach collection="jobSals" item="salItem" separator=" OR ">
+                    <choose>
+                        <when test="salItem == 'sal1'"> (A.AVG_SALARY <![CDATA[<]]> 3000) </when>
+                        <when test="salItem == 'sal2'"> (A.AVG_SALARY BETWEEN 3000 AND 4999) </when>
+                        <when test="salItem == 'sal3'"> (A.AVG_SALARY BETWEEN 5000 AND 9999) </when>
+                        <when test="salItem == 'sal4'"> (A.AVG_SALARY <![CDATA[>]]> 10000) </when>
+                    </choose>
+                </foreach>
+            )
+        </if>
+        <if test="jobLcls != null and !jobLcls.isEmpty()">
+            AND A.JOB_LCL IN
+            <foreach collection="jobLcls" item="lclItem" open="(" close=")" separator=",">
+                #{lclItem}
+            </foreach>
+        </if>
+	</select>
+
+    <resultMap id="careerDetailMap" type="kr.or.ddit.worldcup.service.JobsVO">
+        <id property="jobCode" column="JOB_CODE"/>
+
+		<result property="jobName" column="JOB_NAME"/>
+		<result property="jobLcl" column="JOB_LCL"/>
+		<result property="jobMcl" column="JOB_MCL"/>
+		<result property="jobSal" column="JOB_SAL"/>
+		<result property="jobSatis" column="JOB_SATIS"/>
+		<result property="jobWay" column="JOB_WAY"/>
+		<result property="jobRelatedMajor" column="JOB_RELATED_MAJOR"/>
+		<result property="jobRelatedCert" column="JOB_RELATED_CERT"/>
+		<result property="jobMainDuty" column="JOB_MAIN_DUTY"/>
+		<result property="jobCreatedAt" column="JOB_CREATED_AT"/>
+		<result property="fileGroupNo" column="FILE_GROUP_NO"/>
+		<result property="edubgMgraduUndr" column="EDUBG_MGRADU_UNDR"/>
+		<result property="edubgHgradu" column="EDUBG_HGRADU"/>
+		<result property="edubgCgraduUndr" column="EDUBG_CGRADU_UNDR"/>
+		<result property="edubgUgradu" column="EDUBG_UGRADU"/>
+		<result property="edubgGgradu" column="EDUBG_GGRADU"/>
+		<result property="edubgDgradu" column="EDUBG_DGRADU"/>
+		<result property="outlookIncrease" column="OUTLOOK_INCREASE"/>
+		<result property="outlookSlightIncrease" column="OUTLOOK_SLIGHT_INCREASE"/>
+		<result property="outlookStable" column="OUTLOOK_STABLE"/>
+		<result property="outlookSlightDecrease" column="OUTLOOK_SLIGHT_DECREASE"/>
+		<result property="outlookDecrease" column="OUTLOOK_DECREASE"/>
+		<result property="jobTargetId" column="JOB_TARGET_ID"/>
+		<result property="isBookmark" column="IS_BOOKMARK"/>
+
+        <collection property="jobsRelVOList" ofType="kr.or.ddit.pse.cr.crl.service.JobsRelVO">
+            <id property="jrCode" column="JR_CODE"/>
+            <result property="jobName" column="RELATED_JOB_NAME"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectCareerDetail" resultMap="careerDetailMap" parameterType="kr.or.ddit.worldcup.service.JobsVO">
+        SELECT
+              A.JOB_CODE
+            , A.JOB_NAME
+            , (SELECT CC_NAME FROM COM_CODE WHERE CC_ID = A.JOB_LCL) AS JOB_LCL
+            , (SELECT CC_NAME FROM COM_CODE WHERE CC_ID = A.JOB_MCL) AS JOB_MCL
+            , A.JOB_SAL
+            , A.JOB_SATIS
+            , A.JOB_WAY
+            , A.JOB_RELATED_MAJOR
+            , A.JOB_RELATED_CERT
+            , A.JOB_MAIN_DUTY
+            , A.JOB_CREATED_AT
+            , A.FILE_GROUP_NO
+            , A.EDUBG_MGRADU_UNDR
+            , A.EDUBG_HGRADU
+            , A.EDUBG_CGRADU_UNDR
+            , A.EDUBG_UGRADU
+            , A.EDUBG_GGRADU
+            , A.EDUBG_DGRADU
+            , A.OUTLOOK_INCREASE
+            , A.OUTLOOK_SLIGHT_INCREASE
+            , A.OUTLOOK_STABLE
+            , A.OUTLOOK_SLIGHT_DECREASE
+            , A.OUTLOOK_DECREASE
+            , A.JOB_TARGET_ID
+            , B.JR_CODE
+			<if test="memId != null and memId != ''">
+			, (
+				SELECT
+					BM_TARGET_ID
+				FROM
+					BOOKMARK
+				WHERE
+					BM_CATEGORY_ID = 'G03004'
+				AND MEM_ID = #{memId}
+				AND BM_TARGET_ID = A.JOB_TARGET_ID) AS IS_BOOKMARK
+			</if>
+            , (
+                SELECT JOB_NAME FROM JOBS WHERE JOB_CODE = B.JR_CODE
+              ) AS RELATED_JOB_NAME
+        FROM
+            JOBS A
+            LEFT JOIN JOBS_REL B ON A.JOB_CODE = B.JOB_CODE
+        WHERE
+            A.JOB_CODE = #{jobCode}
+    </select>
+
+    <insert id="insertCareer" parameterType="kr.or.ddit.worldcup.service.JobsVO">
+    	MERGE
+		INTO
+			JOBS A
+				USING DUAL
+			ON (A.JOB_CODE = #{jobCode})
+			WHEN MATCHED THEN
+		UPDATE
+		SET
+		    JOB_NAME                  = #{jobName}
+		    , JOB_LCL                 = #{jobLcl}
+		    , JOB_MCL                 = #{jobMcl}
+		    , JOB_SAL                 = #{jobSal}
+		    , JOB_SATIS               = #{jobSatis}
+		    , JOB_WAY                 = #{jobWay}
+		    , JOB_RELATED_MAJOR       = #{jobRelatedMajor}
+		    , JOB_RELATED_CERT        = #{jobRelatedCert}
+		    , JOB_MAIN_DUTY           = #{jobMainDuty}
+		    , FILE_GROUP_NO           = #{fileGroupNo}
+		    , EDUBG_MGRADU_UNDR       = #{edubgMgraduUndr}
+		    , EDUBG_HGRADU            = #{edubgHgradu}
+		    , EDUBG_CGRADU_UNDR       = #{edubgCgraduUndr}
+		    , EDUBG_UGRADU            = #{edubgUgradu}
+		    , EDUBG_GGRADU            = #{edubgGgradu}
+		    , EDUBG_DGRADU            = #{edubgDgradu}
+		    , OUTLOOK_INCREASE        = #{outlookIncrease}
+		    , OUTLOOK_SLIGHT_INCREASE = #{outlookSlightIncrease}
+		    , OUTLOOK_STABLE          = #{outlookStable}
+		    , OUTLOOK_SLIGHT_DECREASE = #{outlookSlightDecrease}
+		    , OUTLOOK_DECREASE        = #{outlookDecrease}
+			WHEN NOT MATCHED THEN
+		INSERT
+			(
+				JOB_CODE
+				, JOB_NAME
+				, JOB_LCL
+				, JOB_MCL
+				, JOB_SAL
+				, JOB_SATIS
+				, JOB_WAY
+				, JOB_RELATED_MAJOR
+				, JOB_RELATED_CERT
+				, JOB_MAIN_DUTY
+				, JOB_CREATED_AT
+				, FILE_GROUP_NO
+				, EDUBG_MGRADU_UNDR
+				, EDUBG_HGRADU
+				, EDUBG_CGRADU_UNDR
+				, EDUBG_UGRADU
+				, EDUBG_GGRADU
+				, EDUBG_DGRADU
+				, OUTLOOK_INCREASE
+				, OUTLOOK_SLIGHT_INCREASE
+				, OUTLOOK_STABLE
+				, OUTLOOK_SLIGHT_DECREASE
+				, OUTLOOK_DECREASE
+				, JOB_TARGET_ID
+			)
+		VALUES
+			(
+				#{jobCode}
+			  , #{jobName}
+			  , #{jobLcl}
+			  , #{jobMcl}
+			  , #{jobSal}
+			  , #{jobSatis}
+			  , #{jobWay}
+			  , #{jobRelatedMajor}
+			  , #{jobRelatedCert}
+			  , #{jobMainDuty}
+			  , SYSDATE
+			  , #{fileGroupNo}
+			  , #{edubgMgraduUndr}
+			  , #{edubgHgradu}
+			  , #{edubgCgraduUndr}
+			  , #{edubgUgradu}
+			  , #{edubgGgradu}
+			  , #{edubgDgradu}
+			  , #{outlookIncrease}
+			  , #{outlookSlightIncrease}
+			  , #{outlookStable}
+			  , #{outlookSlightDecrease}
+			  , #{outlookDecrease}
+			  , (SELECT NVL(MAX(JOB_CODE), 0)+1 FROM JOBS)
+			 )
+    </insert>
+</mapper>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.csc.inq.service.impl.InqMapper">
+
+	<!-- Inq 등록 -->
+	<insert id="insertInqData" parameterType="kr.or.ddit.csc.inq.service.InqVO">
+		INSERT INTO 
+			CONTACT(CONTACT_ID,MEM_ID,CONTACT_TITLE,CONTACT_CONTENT,CONTACT_AT,CONTACT_IS_PUBLIC)
+		VALUES
+			((SELECT NVL(COUNT(CONTACT_ID)+1,0)FROM CONTACT),#{memId},#{contactTitle},#{contactContent},SYSDATE,#{contactIsPublic})
+	</insert>
+	<!--  목록조회 -->
+	<select id="getInqList" resultType="kr.or.ddit.csc.inq.service.InqVO" parameterType="map">
+		SELECT * FROM (
+		SELECT ROWNUM AS RNUM, B.*
+		FROM (
+		SELECT
+		C.CONTACT_ID,
+		C.MEM_ID,
+		REPLACE(M.MEM_NAME, SUBSTR(M.MEM_NAME, 2, 1), '*') AS memName,
+		C.CONTACT_TITLE,
+		C.CONTACT_CONTENT,
+		C.CONTACT_AT,
+		C.CONTACT_IS_PUBLIC,
+		C.CONTACT_REPLY,
+		C.CONTACT_REPLY_AT
+		FROM CONTACT C
+		JOIN MEMBER M ON C.MEM_ID = M.MEM_ID
+		<where>
+			C.MEM_ID = #{memId}
+			<if test="keyword != null and keyword != ''">
+				AND C.CONTACT_TITLE LIKE '%' || #{keyword} || '%'
+			</if>
+		</where>
+		ORDER BY C.CONTACT_ID DESC
+		) B
+		WHERE ROWNUM &lt;= #{endNo}
+		)
+		WHERE RNUM &gt;= #{startNo}
+	</select>
+	
+	<select id="getAllInq"  parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM CONTACT
+		<where>
+			<if test="keyword != null and keyword != ''">
+				AND CONTACT_TITLE LIKE '%' || #{keyword} || '%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="getAllInqByMemId"  parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM CONTACT
+		<where>
+			MEM_ID = #{memId}
+			<if test="keyword != null and keyword != ''">
+				AND CONTACT_TITLE LIKE '%' || #{keyword} || '%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="getAdminInqList" resultType="kr.or.ddit.csc.inq.service.InqVO">
+		SELECT * FROM (
+	   	SELECT B.*, ROWNUM RNUM
+	        FROM (
+	            SELECT CONTACT_ID, MEM_ID, CONTACT_TITLE, CONTACT_CONTENT, CONTACT_AT, CONTACT_IS_PUBLIC, CONTACT_REPLY, CONTACT_REPLY_AT
+	            FROM CONTACT
+	            <where>
+	                CONTACT_ID IS NOT NULL
+	                <if test="keyword != null and keyword != ''">
+	                    AND CONTACT_TITLE LIKE '%' || #{keyword} || '%'
+	                </if>
+	                <if test="status != null and status!= '선택하세요.'">
+	                    AND TO_CHAR(CONTACT_AT, 'YYYY') = #{status}
+	                </if>
+	            </where>
+	            ORDER BY CONTACT_ID
+	        ) B
+	        WHERE ROWNUM &lt;= #{endNo}
+	    )
+	    WHERE RNUM &gt;= #{startNo}
+	</select>
+	
+	<select id="getAdminInqDetail" resultType="kr.or.ddit.csc.inq.service.InqVO" parameterType="int">
+		SELECT CONTACT_ID, MEM_ID, CONTACT_TITLE, CONTACT_CONTENT, CONTACT_AT, CONTACT_IS_PUBLIC, CONTACT_REPLY, CONTACT_REPLY_AT
+		FROM CONTACT 
+		WHERE CONTACT_ID = #{inqId}
+	</select>
+	
+	<update id="insertInq" parameterType="kr.or.ddit.csc.inq.service.InqVO">
+		UPDATE CONTACT 
+		SET CONTACT_REPLY =#{contactReply}
+		WHERE CONTACT_ID = #{contactId}
+	</update>
+	
+	<select id="getMemId" parameterType="int" resultType="int">
+		SELECT MEM_ID
+		FROM CONTACT
+		WHERE CONTACT_ID = #{contactId}
+	</select>
+	
+</mapper>

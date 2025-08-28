@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mpg.mif.inq.service.impl.MyInquiryMapper">
+
+	<resultMap id="memberDetailResultMap" type="kr.or.ddit.main.service.MemberVO">
+		<id property="memId" column="MEM_ID" />
+		<result property="fileProfile" column="FILE_PROFILE" />
+		<result property="memName" column="MEM_NAME" />
+		<result property="memNickname" column="MEM_NICKNAME" />
+		<result property="memEmail" column="MEM_EMAIL" />
+		<result property="memGen" column="MEM_GEN" />
+		<result property="memPhoneNumber" column="MEM_PHONE_NUMBER" />
+		<result property="memBirth" column="MEM_BIRTH" />
+		<result property="memPoint" column="MEM_POINT" />
+		<result property="subName" column="SUB_NAME" />
+		<result property="subDetail" column="SUB_DETAIL" />
+		<result property="remainingDays" column="REMAINING_DAYS" />
+		<result property="msId" column="MS_ID" />
+		<result property="resumeRemain" column="RESUME_REMAIN" />
+		<result property="coverRemain" column="COVER_REMAIN" />
+		<result property="consultRemain" column="CONSULT_REMAIN" />
+		<result property="mockRemain" column="MOCK_REMAIN" />
+		<result property="serviceTotal" column="SERVICE_TOTAL" />
+		<result property="veriCreatedAt" column="VERI_CREATED_AT" />
+		<result property="veriStatus" column="VERI_STATUS" />
+		<result property="veriReason" column="VERI_REASON" />
+		<collection property="interests" javaType="list" ofType="kr.or.ddit.com.ComCodeVO" select="selectInterestsByMemId" column="MEM_ID" />
+	</resultMap>
+
+	<select id="selectInterestsByMemId" parameterType="int" resultType="kr.or.ddit.com.ComCodeVO"> 
+		SELECT
+			C.CC_ID
+			, C.CC_NAME
+			, C.CC_ETC
+		FROM
+			INTEREST_CN B
+		JOIN COM_CODE C ON
+			B.IC_CODE = C.CC_ID
+		WHERE
+		    B.MEM_ID = #{memId}
+        AND
+            C.CC_ID != 'K01001'
+		ORDER BY
+			B.IC_CODE
+	</select>
+
+	<select id="selectMyInquiryView" parameterType="int" resultMap="memberDetailResultMap">
+		SELECT
+		    A.MEM_ID
+		  , A.MEM_NAME
+		  , A.MEM_NICKNAME
+		  , A.MEM_EMAIL
+		  , A.MEM_GEN
+		  , A.MEM_PHONE_NUMBER
+		  , A.MEM_BIRTH
+		  , A.MEM_POINT
+		  , S.SUB_NAME
+		  , CASE S.SUB_NAME
+		        WHEN 'BASIC' THEN SUBSTR(S.SUB_BENEFIT, 1, INSTR(S.SUB_BENEFIT, ',') - 1) || '.'
+		        WHEN 'PLUS' THEN SUBSTR(S.SUB_BENEFIT, 1, INSTR(S.SUB_BENEFIT, ',') - 1) || '.'
+		        WHEN 'PRO' THEN SUBSTR(S.SUB_BENEFIT, 1, INSTR(S.SUB_BENEFIT, ',') - 1) || '.'
+		        ELSE '구독 중인 상품이 없습니다.'
+		    END AS SUB_DETAIL
+		  , TRUNC(MS.SUB_END_DT) - TRUNC(SYSDATE) AS REMAINING_DAYS
+		  , V.VERI_CREATED_AT
+		  , V.VERI_STATUS
+		  , V.VERI_REASON
+		  , MS.MS_ID
+		  , P.PAY_RESUME_CNT AS RESUME_REMAIN
+		  , P.PAY_COVER_CNT AS COVER_REMAIN
+		  , P.PAY_CONSULT_CNT AS CONSULT_REMAIN
+		  , P.PAY_MOCK_CNT AS MOCK_REMAIN
+		  , CASE S.SUB_NAME
+		      WHEN 'BASIC' THEN 3
+		      WHEN 'PLUS' THEN 6
+		      WHEN 'PRO' THEN 8
+		      ELSE 0
+		    END AS SERVICE_TOTAL
+		FROM MEMBER A
+		LEFT JOIN (
+		  SELECT MS.*
+		  FROM MEMBER_SUBSCRIPTION MS
+		  JOIN (
+		    SELECT MEM_ID, MAX(MS_ID) AS MAX_MS_ID
+		    FROM MEMBER_SUBSCRIPTION
+		    WHERE RECUR_PAY_CNT > 0 AND SUB_END_DT >= TRUNC(SYSDATE)
+		    GROUP BY MEM_ID
+		  ) TMP ON MS.MEM_ID = TMP.MEM_ID AND MS.MS_ID = TMP.MAX_MS_ID
+		  WHERE MS.RECUR_PAY_CNT > 0 AND MS.SUB_END_DT >= TRUNC(SYSDATE)
+		) MS ON A.MEM_ID = MS.MEM_ID
+		LEFT JOIN SUBSCRIBE S ON MS.SUB_ID = S.SUB_ID
+		LEFT JOIN (
+		    SELECT *
+		    FROM (
+		        SELECT P.*,
+		               ROW_NUMBER() OVER (PARTITION BY P.MS_ID ORDER BY P.PAY_DATE DESC, P.PAY_ID DESC) AS RN
+		        FROM PAYMENT P
+		    )
+		    WHERE RN = 1
+		) P ON P.MS_ID = MS.MS_ID
+		LEFT JOIN VERIFICATION V
+		  ON A.MEM_ID = V.MEM_ID
+		  AND V.VERI_CATEGORY = 'G38001'
+		WHERE A.MEM_ID = #{memId}
+	</select>
+	
+	<select id="checkPassword" resultType="kr.or.ddit.main.service.MemberVO" parameterType="int">
+		SELECT
+			MEM_PASSWORD
+		FROM
+			MEMBER
+		WHERE
+			MEM_ID = #{memId}
+	</select>
+	
+	<update id="updateMyInquiryView" parameterType="kr.or.ddit.main.service.MemberVO">
+		UPDATE
+			MEMBER
+		SET
+			MEM_NAME = #{memName}
+			, MEM_NICKNAME = #{memNickname}
+		WHERE
+			MEM_ID = #{memId}
+	</update>
+	
+	<update id="updateFileGroup" parameterType="kr.or.ddit.main.service.MemberVO">
+		UPDATE
+			MEMBER
+		SET
+			FILE_PROFILE = #{fileProfile}
+		WHERE
+			MEM_ID = #{memId}
+	</update>
+	
+	<select id="selectInteretsKeywordList" resultType="kr.or.ddit.com.ComCodeVO">
+		SELECT
+		    CC_ID
+		    , CC_NAME
+		    , CC_ETC
+		FROM
+		    COM_CODE
+		WHERE
+		    CL_CODE = 'K01'
+		AND
+		    USE_YN = 'Y'
+		AND
+			CC_ID != 'K01001'
+		ORDER BY
+		    CC_ETC
+	</select>
+	
+	<delete id="deleteInterestList" parameterType="int">
+		DELETE FROM
+			INTEREST_CN
+		WHERE
+			MEM_ID = #{memId}
+	</delete>
+	
+	<insert id="insertEmptyInterest" parameterType="int">
+		INSERT
+			INTO
+			INTEREST_CN (
+				IC_ID
+				, MEM_ID
+				, IC_CODE
+			)
+		VALUES (
+			(
+				SELECT
+					NVL(MAX(IC_ID), 0) + 1
+				FROM
+					INTEREST_CN
+			)
+			, #{memId}
+			, 'K01001'
+		)
+	</insert>
+	
+	<insert id="insertInterestList" parameterType="map">
+		INSERT
+			INTO
+			INTEREST_CN (
+				IC_ID
+				, MEM_ID
+				, IC_CODE
+			)
+		VALUES (
+			(
+				SELECT
+					NVL(MAX(IC_ID), 0) + 1
+				FROM
+					INTEREST_CN
+			)
+			, #{memId}
+			, #{keyword}
+		)
+	</insert>
+	
+	<insert id="insertVerification" parameterType="kr.or.ddit.mpg.mif.inq.service.VerificationVO">
+		INSERT INTO VERIFICATION (
+		    VERI_ID
+		    , MEM_ID
+		    , VERI_CREATED_AT
+		    , FILE_GROUP_ID
+		    , SV_STATUS
+		) VALUES (
+			  (SELECT NVL(MAX(VERI_ID), 0) + 1 FROM VERIFICATION)
+			, #{memId}
+			, SYSDATE
+			, #{fileGroupId}
+			, 'S05001'
+			, #{veriCategory}
+		)
+	</insert>
+	
+	<select id="getProfileFile" parameterType="int" resultType="kr.or.ddit.main.service.MemberVO">
+		SELECT
+		    FILE_BADGE
+		    , FILE_PROFILE
+		    , FILE_SUB
+		FROM
+		    MEMBER
+		WHERE
+		    MEM_ID = #{memId}
+	</select>
+	
+	<update id="updateMemberPhone" parameterType="kr.or.ddit.main.service.MemberVO">
+		UPDATE MEMBER
+		SET
+		    MEM_PHONE_NUMBER = #{memPhoneNumber}
+		WHERE
+		    MEM_ID = #{memId}
+	</update>
+</mapper>

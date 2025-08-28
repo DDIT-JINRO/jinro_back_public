@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.rdm.service.impl.RoadmapMapper">
+
+	<!-- 특정 사용자의 로드맵있는지에 대한 여부 조회 -->
+	<select id="selectMemberRoadmap" resultType="kr.or.ddit.rdm.service.RoadmapVO" parameterType="int">
+		SELECT
+			MEM_ID
+		FROM
+			ROADMAP
+		WHERE
+			MEM_ID = #{memId}
+	</select>
+
+	<!-- 로드맵이 없는 사용자의 첫 로드맵 생성 -->
+	<insert id="insertMemberRoadmap" parameterType="int">
+		INSERT
+			INTO
+			ROADMAP(
+				ROAD_ID
+				, MEM_ID
+				, RS_ID
+				, ROAD_COMPLETE
+				, CREATED_AT
+				, DUE_DATE
+			)
+		VALUES(ROADMAP_SEQ.NEXTVAL, #{memId}, 1, 'N', SYSDATE, SYSDATE)
+	</insert>
+	
+	<!-- 특정 사용자의 로드맵의 현재 캐릭터의 위치 조회 -->
+	<select id="selectCurrentCharPosition" resultType="int" parameterType="int">
+		SELECT
+		    RS_ID
+		FROM(
+	        SELECT
+	            A.RS_ID
+	        FROM
+	            ROADMAP A
+	        INNER JOIN
+	            ROADMAP_STEP B ON (A.RS_ID = B.RS_ID)
+	        WHERE
+	            A.MEM_ID = #{memId}
+	        ORDER BY
+	            A.ROAD_ID DESC,
+	            B.RS_STEP DESC
+		)
+		WHERE
+		    ROWNUM = 1
+	</select>
+	
+	<!-- 특정 사용자의 진행 중인 미션 리스트 조회 -->
+	<select id="selectProgressMissionList" resultType="kr.or.ddit.rdm.service.RoadmapVO" parameterType="int">
+		SELECT
+			RS_ID
+			, DUE_DATE
+		FROM
+			ROADMAP
+		WHERE
+			ROAD_COMPLETE = 'N'
+			AND MEM_ID = #{memId}
+		ORDER BY
+			RS_ID DESC
+	</select>
+	
+	<!-- 특정 사용자의 완료된 미션 리스트 조회 -->
+	<select id="selectCompletedMissionList" resultType="kr.or.ddit.rdm.service.RoadmapVO" parameterType="int">
+		SELECT
+		   RS_ID
+		   , CREATED_AT
+		   , ROAD_COMPLETE
+		   , COMPLETE_AT
+		FROM
+		   ROADMAP
+		WHERE
+		   ROAD_COMPLETE = 'Y'
+		   AND MEM_ID = #{memId}
+		ORDER BY
+		   RS_ID DESC
+	</select>
+	
+	<!-- 로드맵 노드별 미션 리스트 -->
+	<resultMap type="kr.or.ddit.rdm.service.RoadmapStepVO" id="roadmapStepMap">
+		<result property="rsId" column="RS_ID"/>
+		<result property="stepName" column="STEP_NAME"/>
+	</resultMap>
+	
+	<select id="selectMissionList" resultMap="roadmapStepMap">
+		SELECT
+			A.RS_ID
+			, B.CC_ETC AS STEP_NAME
+		FROM
+			ROADMAP_STEP A
+		INNER JOIN COM_CODE B ON
+			(A.RS_TYPE = B.CC_ID)
+	</select>
+	
+	<!-- 파라미터 단계에 해당하는 테이블명 조회 -->
+	<select id="selectTableName" parameterType="int" resultType="String">
+		SELECT
+			CC_NAME
+		FROM
+			COM_CODE
+		WHERE
+			CC_ID = (
+				SELECT
+					RS_TYPE
+				FROM
+					ROADMAP_STEP
+				WHERE
+					RS_ID = #{rsId}
+			)
+	</select>
+	
+	<!-- 미션 완료 확인 여부 조회 -->
+	<select id="isCompleteExists" parameterType="map" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			${tableName}
+		WHERE
+			MEM_ID = #{memId}
+		<if test="tableName == 'BOOKMARK'">
+		AND
+			BM_CATEGORY_ID = 'G03004'
+		</if>
+		<if test="tableName == 'SELF_INTRO'">
+		AND
+			SI_STATUS = '완료'
+		</if>
+	</select>
+	
+	<!-- 미션 완료 시 완료 여부 업데이트 -->
+	<update id="updateCompleteMission" parameterType="map">
+		UPDATE
+		   ROADMAP
+		SET 
+		   ROAD_COMPLETE = 'Y',
+		   COMPLETE_AT = SYSDATE
+		WHERE
+		   MEM_ID = #{memId}
+		AND
+		   RS_ID = #{rsId}
+	</update>
+	
+	<!-- 로드맵 완료시 특정 회원의 포인트를 추가 -->
+	<update id="updateUserPoint" parameterType="map">
+		UPDATE
+		   MEMBER
+		SET
+		   MEM_POINT = MEM_POINT + #{point}
+		WHERE
+		   MEM_ID = #{memId}
+	</update>
+	
+	<!-- 특정 사용자의 미션 등록 메서드 -->
+	<insert id="insertMission" parameterType="kr.or.ddit.rdm.service.RoadmapVO">
+		INSERT
+			INTO
+			ROADMAP (
+				ROAD_ID
+				, MEM_ID
+				, RS_ID
+				, ROAD_COMPLETE
+				, CREATED_AT
+				, DUE_DATE
+			)
+		SELECT
+			ROADMAP_SEQ.NEXTVAL
+			, #{memId}
+			, #{rsId}
+			, 'N'
+			, SYSDATE
+			, #{dueDate}
+		FROM
+			DUAL
+		WHERE
+			NOT EXISTS (
+				SELECT
+					1
+				FROM
+					ROADMAP
+				WHERE
+					MEM_ID = #{memId}
+					AND RS_ID = #{rsId}
+			)
+	</insert>
+	
+	<update id="updateDueDate" parameterType="kr.or.ddit.rdm.service.RoadmapVO">
+		UPDATE
+			ROADMAP
+		SET
+			DUE_DATE = #{dueDate}
+		WHERE
+			MEM_ID = #{memId}
+		AND
+			RS_ID = #{rsId}	
+	</update>
+	
+	<insert id="insertCompleteRoadmap" parameterType="int">
+		INSERT
+			INTO
+			ROADMAP(
+				ROAD_ID
+				, MEM_ID
+				, RS_ID
+				, ROAD_COMPLETE
+				, COMPLETE_AT
+				, CREATED_AT
+				, DUE_DATE
+			)
+		VALUES(ROADMAP_SEQ.NEXTVAL, #{memId}, 11, 'Y', SYSDATE, SYSDATE, SYSDATE)
+	</insert>
+	
+	<select id="selectResultData" parameterType="int" resultType="kr.or.ddit.rdm.service.RoadmapResultRequestVO">
+		SELECT
+			(
+				SELECT
+					MEM_NAME
+				FROM
+					MEMBER
+				WHERE
+					MEM_ID = #{memId}
+			) AS MEM_NAME
+		  , (
+		        SELECT
+		            TRUNC((SYSDATE - MEM_BIRTH) / 365) + 1
+		        FROM
+		            MEMBER
+		        WHERE
+		            MEM_ID = #{memId}
+		    ) AS MEM_AGE
+		  , (
+		        SELECT
+		            LISTAGG(CC_NAME, ', ') WITHIN GROUP(
+		            ORDER BY
+		                IC_ID DESC
+		            )
+		        FROM
+		            (
+		                SELECT
+		                    C.CC_NAME
+		                  , I.IC_ID
+		                FROM
+		                         COM_CODE C
+		                    JOIN INTEREST_CN I ON C.CC_ID = I.IC_CODE
+		                WHERE
+		                    I.MEM_ID = #{memId}
+		                ORDER BY
+		                    I.IC_ID DESC
+		            )
+		        WHERE
+		            ROWNUM <![CDATA[<=]]> 3
+		    ) AS INTEREST_CN
+		  , (
+		        SELECT
+		            CC_NAME
+		        FROM
+		            COM_CODE
+		        WHERE
+		            CC_ID IN (
+		                SELECT
+		                    C.SIQ_JOB
+		                FROM
+		                    SELF_INTRO         A
+		                    LEFT JOIN SELF_INTRO_CONTENT B ON A.SI_ID = B.SI_ID
+		                    LEFT JOIN SELF_INTRO_Q       C ON B.SIQ_ID = C.SIQ_ID
+		                WHERE
+		                        A.MEM_ID = 1
+		                    AND A.SI_STATUS = '완료'
+		                    AND C.SIQ_JOB IS NOT NULL
+		                    AND A.SI_UPDATED_AT = (
+		                        SELECT
+		                            MAX(SI_UPDATED_AT)
+		                        FROM
+		                            SELF_INTRO
+		                        WHERE
+		                            MEM_ID = #{memId}
+		                    )
+		            )
+		    ) AS SIQ_JOB
+		  , (
+		        SELECT
+		            J.JOB_NAME
+		        FROM
+		                 JOBS J
+		            JOIN WORLDCUP W ON J.JOB_CODE = W.WD_RESULT
+		        WHERE
+		                W.MEM_ID = 1
+		            AND W.WD_ID = (
+		                SELECT
+		                    MAX(WD_ID)
+		                FROM
+		                    WORLDCUP
+		                WHERE
+		                    MEM_ID = #{memId}
+		            )
+		    ) AS WD_RESULT
+		  , (
+		        SELECT
+		            LISTAGG(B.JOB_NAME, ', ') WITHIN GROUP(
+		            ORDER BY
+		                B.JOB_NAME
+		            )
+		        FROM
+		                 JOBS B
+		            JOIN BOOKMARK A ON B.JOB_TARGET_ID = A.BM_TARGET_ID
+		        WHERE
+		                A.MEM_ID = #{memId}
+		            AND A.BM_CATEGORY_ID = 'G03004'
+		    ) AS BOOKMARK_JOB
+		  , (
+		        SELECT
+		            CASE
+		                WHEN AT_TEST_NO IN ( 20, 21 ) THEN
+		                    '직업적성검사'
+		                WHEN AT_TEST_NO IN ( 24, 25 ) THEN
+		                    '직업가치관검사'
+		                WHEN AT_TEST_NO IN ( 30, 31 ) THEN
+		                    '직업흥미검사(K)'
+		            END
+		        FROM
+		            APTITUDE_TEST
+		        WHERE
+		                MEM_ID = #{memId}
+		            AND AT_ID = (
+		                SELECT
+		                    MAX(AT_ID)
+		                FROM
+		                    APTITUDE_TEST
+		            )
+		    ) AS APTITUDE_TEST_NAME
+		  , (
+		        SELECT
+		            AT_RESULT_TEXT
+		        FROM
+		            (
+		                SELECT
+		                    AT_RESULT_TEXT
+		                FROM
+		                    APTITUDE_TEST
+		                WHERE
+		                    MEM_ID = #{memId}
+		                ORDER BY
+		                    AT_ID DESC
+		            )
+		        WHERE
+		            ROWNUM = 1
+		    ) AS APTITUDE_RESULT
+		    , (
+		        SELECT
+		            LISTAGG(RK_NAME, ', ') WITHIN GROUP(
+		            ORDER BY
+		                RK_ID DESC
+		            )
+		        FROM
+		            (
+		                SELECT
+		                    RK_NAME
+		                  , RK_ID
+		                FROM
+		                    RECOMMEND_KEYWORD
+		                WHERE
+		                    MEM_ID = 1
+		                ORDER BY
+		                    RK_ID DESC
+		            )
+		        WHERE
+		            ROWNUM <![CDATA[<=]]> 3
+		    ) AS RECOMMEND_KEYWORD
+		FROM
+		    DUAL
+	</select>
+</mapper>

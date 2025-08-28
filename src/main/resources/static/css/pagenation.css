@@ -1,0 +1,65 @@
+@charset "UTF-8";
+
+
+.pagination {
+    display: flex;
+    list-style: none;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem 0;
+}
+
+.pagination a {
+    padding: 0.4rem 0.75rem;
+    border-radius: 5px;
+    text-decoration: none;
+    color: black;
+    font-weight: 500;
+}
+
+.pagination a:hover {
+    background-color: #f0f0f0;
+}
+
+.pagination .active {
+    background-color: #2C2C2C;
+    color: white;
+    pointer-events: none;
+}
+
+.pagination .disabled {
+    color: #757575;
+    pointer-events: none;
+}
+.paginationPenalty {
+    display: flex;
+    list-style: none;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem 0;
+}
+
+.paginationPenalty a {
+    padding: 0.4rem 0.75rem;
+    border-radius: 5px;
+    text-decoration: none;
+    color: black;
+    font-weight: 500;
+}
+
+.paginationPenalty a:hover {
+    background-color: #f0f0f0;
+}
+
+.paginationPenalty .active {
+    background-color: #2C2C2C;
+    color: white;
+    pointer-events: none;
+}
+
+.paginationPenalty .disabled {
+    color: #757575;
+    pointer-events: none;
+}

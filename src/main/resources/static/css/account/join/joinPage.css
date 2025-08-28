@@ -1,0 +1,640 @@
+@charset "UTF-8";
+
+/* 기본 스타일 유지 */
+.name-message {
+  font-size: 12px;
+  font-weight: 500;
+  margin: 0;
+  padding: 0;
+  text-align: right; 
+}
+
+.name-message.success {
+  color: green;
+}
+
+.name-message.error {
+  color: red;
+}
+
+.password-message {
+  font-size: 12px;
+  font-weight: 500;
+  margin: 0;
+  padding: 0;
+  text-align: right; 
+}
+
+.password-message.success {
+  color: green;
+}
+
+.password-message.error {
+  color: red;
+}
+
+.email-message {
+  font-size: 12px;
+  font-weight: 500;
+  margin: 0;
+  padding: 0;
+  text-align: right; 
+}
+
+.email-message.success {
+  color: green;
+}
+
+.email-message.error {
+  color: red;
+}
+
+.emailTag {
+	padding: 0;
+	margin: 0;
+}
+
+.nickname-message {
+  font-size: 12px;
+  font-weight: 500;
+  margin: 0;
+  padding: 0;
+  text-align: right; 
+}
+
+.nickname-message.success {
+  color: green;
+}
+
+.nickname-message.error {
+  color: red;
+}
+
+.nicknameTag {
+	padding: 0;
+	margin: 0;
+}
+
+#timer {
+  font-size: 14px;
+  font-weight: 600;
+  color: #7b88f9;
+  margin-top: 15px;
+  text-align: center;
+  letter-spacing: 0.3px;
+  user-select: none;
+}
+
+#authCodeInput {
+  width: 60%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+#authCodeInput:focus {
+  border-color: #7b88f9;
+  box-shadow: 0 0 5px #7b88f9;
+}
+
+#verifyCodeBtn {
+  padding: 5px 10px;
+  margin-left: 10px;
+  font-size: 14px;
+  background-color: #7b88f9;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#verifyCodeBtn:hover {
+  background-color: #5f6ee0;
+}
+
+#authCodeBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+#sendEmailBtn {
+	background-color: #7b88f9;
+	color: white;
+	border: none;
+	padding: 5px 20px;
+	font-size: 16px;
+	border-radius: 10px;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+}
+
+#userEmailInfo {
+	font-size: 16px;
+	font-weight: 600;
+	color: #333;
+	margin-bottom: 20px;
+	letter-spacing: 0.5px;
+}
+
+#userEmailInfo::before {
+	content: "이메일";
+	margin-right: 12px;
+ 	font-weight: 600;
+ 	color: #333;
+}
+
+/* 모달 스타일 유지하며 반응형 개선 */
+.modal {
+	display: none;
+	position: fixed;
+	z-index: 999;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.6);
+	padding: 20px;
+	box-sizing: border-box;
+}
+
+.modal-content {
+	background-color: white;
+	margin: 15% auto;
+	padding: 30px;
+	width: 100%;
+	max-width: 400px;
+	text-align: center;
+	border-radius: 16px;
+	animation: fadeIn 0.3s ease;
+	box-sizing: border-box;
+}
+
+#emailModal .modal-content {
+	position: relative;
+	background-color: #fff;
+	width: 100%;
+	max-width: 400px;
+	padding: 30px 40px 30px 30px;
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+	text-align: center;
+	transform: translateY(-20px);
+	animation: slideIn 0.4s ease-out forwards;
+	border-radius: 16px;
+}
+
+#emailModal .close {
+	position: absolute;
+	top: 15px;
+	right: 15px;
+	font-size: 24px;
+	font-weight: bold;
+	color: #333;
+	cursor: pointer;
+	user-select: none;
+	transition: color 0.3s ease;
+}
+
+#emailModal .close:hover {
+	color: #7b88f9;
+}
+
+@keyframes fadeIn {
+	from { 
+		opacity: 0;
+		transform: translateY(-20px);
+	}	
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeInBg {
+  from {
+    background-color: rgba(0, 0, 0, 0);
+  }
+  to {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+.hidden {
+	display: none;
+}
+
+/* 상단 컨테이너 */
+.dpfx2 {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 30px;
+	padding: 0 20px;
+}
+
+.dpfx {
+	display: flex;
+	justify-content: center;
+	padding: 0 20px;
+}
+
+/* 컨테이너 반응형 개선 - 기존 스타일 유지 */
+.signup-container2 {
+	background-color: #fff;
+	border-radius: 16px;
+	padding: 25px 40px;
+	width: 100%;
+	max-width: 680px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+	height: auto;
+	box-sizing: border-box;
+}
+
+.signup-container {
+	background-color: #fff;
+	border-radius: 16px;
+	padding: 40px;
+	width: 100%;
+	max-width: 680px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+	box-sizing: border-box;
+}
+
+.signup-container h2 {
+	font-size: 18px;
+	margin-bottom: 24px;
+}
+
+/* 라벨 스타일 유지 */
+.signup-container label {
+	width: 50%;
+	display: block;
+	margin: 6px 0 6px;
+	font-weight: 500;
+}
+
+/* 입력 필드 크기 클래스 유지 */
+.inputWt {
+	width: 50%;
+}
+
+.inputWt2 {
+	width: 72%;
+}
+
+.signup-container input[type="text"], 
+.signup-container input[type="email"],
+.signup-container input[type="password"], 
+.signup-container input[type="tel"],
+.signup-container input[type="date"] {
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	font-size: 14px;
+	box-sizing: border-box;
+}
+
+/* 입력 행 레이아웃 유지 */
+.input-row {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	justify-content: center;
+	padding: 10px 0;
+}
+
+.input-row2 {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	padding: 10px 0;
+}
+
+.pTagInfo {
+	margin: 0px;
+	font-size: 13px;
+	color: gray;
+}
+
+.required {
+  color: red;
+  margin-left: 2px; /* 라벨과의 간격 조절 */
+  font-weight: bold; /* 별표를 더 강조하기 위해 굵게 표시 */
+  
+}
+
+.flex {
+	display: flex;
+}
+
+.input-row button {
+	width: 20%;
+	padding: 10px 1px;
+	font-size: 14px;
+	background-color: #7b88f9;
+	color: white;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+}
+
+.input-row button:hover {
+	background-color: #5f6ee0;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+	transition: all 0.2s ease;
+}
+
+.minimal {
+	color: #7b88f9;
+}
+
+.input-gen {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	padding-bottom: 20px;
+}
+
+.gender-row {
+	display: flex;
+	gap: 20px;
+	align-items: center;
+	padding-right: 180px;
+}
+
+.gender-wt {
+	width: 40px;
+	font-weight: 500;
+}
+
+.checkboxes {
+	margin-top: 60px;
+}
+
+.checkboxes label {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 8px;
+}
+
+.checkboxes span {
+	font-size: 12px;
+	color: #777;
+}
+
+.agreeBorder {
+  border: 1px solid #7b88f9;
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #7b88f9;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.agreeBorder:hover {
+  border-color: #4a5de4;
+  background-color: #eef0ff;
+}
+
+.reqAgree {
+	display: flex;
+	align-items: center;
+}
+
+.solAgree {
+	display: flex;
+	align-items: center;
+}
+
+.eventAgree {
+	display: flex;
+	align-items: center;
+}
+
+.tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.btn-signup {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background-color: #ccc;
+  color: white;
+  margin-top: 24px;
+  transition: all 0.2s ease;
+}
+
+.btn-signup:disabled {
+  background-color: #c0c4cc;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.btn-signup:disabled:hover {
+  background-color: #a0a7f5;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-signup:enabled {
+	background-color: #7b88f9;
+	color: white;
+	border-radius: 10px;
+	padding: 12px;
+}
+
+.btn-signup:enabled:hover {
+	background-color: #5f6ee0;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.tooltip-text {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  font-size: 12px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  visibility: hidden;
+  opacity: 0;
+  z-index: 10;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  bottom: 100%;
+  margin-bottom: 5px;
+}
+
+.tooltip-wrapper:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+.top-text {
+	display: flex;
+	justify-content: space-between;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.top-text a {
+	color: #7b88f9;
+	text-decoration: none;
+}
+
+/* 태블릿 반응형 (768px 이하) */
+@media (max-width: 768px) {
+	.signup-container, .signup-container2 {
+		padding: 30px 25px;
+		margin: 0 10px;
+	}
+	
+	.signup-container label {
+		width: 100%;
+	}
+	
+	.inputWt {
+		width: 65%;
+	}
+	
+	.inputWt2 {
+		width: 100%;
+	}
+	
+	.input-row {
+		flex-wrap: wrap;
+	}
+	
+	.input-row button {
+		width: 30%;
+		min-width: 100px;
+	}
+	
+	.gender-row {
+		padding-right: 50px;
+	}
+	
+	.checkboxes {
+		margin-top: 40px;
+	}
+}
+
+/* 모바일 반응형 (480px 이하) */
+@media (max-width: 480px) {
+	.dpfx2, .dpfx {
+		padding: 0 15px;
+	}
+	
+	.signup-container, .signup-container2 {
+		padding: 25px 20px;
+		margin: 0 5px;
+	}
+	
+	.signup-container label {
+		width: 100%;
+		margin-bottom: 8px;
+		font-size: 13px;
+	}
+	
+	.inputWt, .inputWt2 {
+		width: 100%;
+	}
+	
+	.input-row, .input-row2 {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 10px;
+	}
+	
+	.input-row2 {
+		padding: 0;
+		gap: 0;
+	}
+	
+	.input-row button {
+		width: 100%;
+		padding: 8px;
+		font-size: 14px;
+	}
+	
+	.gender-row {
+		padding-right: 0;
+		justify-content: flex-start;
+	}
+	
+	.btn-signup {
+		padding: 14px;
+		font-size: 18px;
+	}
+	
+	.top-text {
+		flex-direction: column;
+		text-align: center;
+		gap: 10px;
+	}
+	
+	.modal {
+		padding: 15px;
+	}
+	
+	.modal-content, #emailModal .modal-content {
+		margin: 10% auto;
+		padding: 25px 20px;
+	}
+	
+	#authCodeBox {
+		flex-direction: column;
+		gap: 10px;
+	}
+	
+	#authCodeInput {
+		width: 100%;
+	}
+	
+	#verifyCodeBtn {
+		width: 100%;
+		margin-left: 0;
+		padding: 12px;
+	}
+	
+	.agreeBorder {
+		margin-top: 5px;
+		align-self: flex-start;
+	}
+	
+	.reqAgree, .solAgree, .eventAgree {
+		flex-direction: column;
+		align-items: flex-start;
+		margin-bottom: 15px;
+	}
+}

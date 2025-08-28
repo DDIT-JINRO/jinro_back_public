@@ -1,0 +1,283 @@
+@charset "UTF-8";
+
+.template-panel.list-panel {
+	display: flex;
+	flex-direction: column;
+}
+
+.template-panel-top {
+	display: flex;
+	flex-direction: column; /* 자식 요소들을 세로로 정렬 */
+}
+
+.cns-logoutBtn {
+	position: absolute;
+	display: flex;
+    justify-content: center;
+    top: 22px;
+    right: 20px;
+    background-color: #07223D;
+    width: 100px;
+    height: 15px;
+    padding: 10px 5px;
+    text-align: center;
+    align-items: center;
+    line-height: 1;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+}
+
+.cns-logoutBtn:hover {
+    background-color: #031526;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ------------------ FullCalendar 영역 스타일 수정 ------------------ */
+.fc-day-today {
+	background-color: blue; /* 기본 노란색 배경 제거 */
+	border: none; /* 기본 테두리 제거 */
+}
+
+/* 사용자 정의 스타일: 선택된 날짜에 대한 파란색 하이라이트 */
+.fc-day.selected {
+	background-color: rgb(149, 223, 108); 
+	border: 2px solid rgb(128, 255, 128); 
+}
+
+/* 오늘 날짜가 선택되었을 경우의 스타일 */
+.fc-day-today.selected {
+	background-color: #F39C12  !important; 
+	border: 2px solid rgb(128, 255, 128) ; 
+}
+/* FullCalendar 컨테이너 스타일 */
+#calendar {
+	height: 90%;
+	width: 100%; /* 화면 너비의 100%를 차지하도록 설정 */
+	max-width: none; /* 최대 너비 제한 해제 */
+	margin: 0px auto;
+	margin-bottom: 20px;
+	padding: 0; /* 내부 패딩을 0으로 설정 */
+}
+
+.fc .fc-toolbar.fc-header-toolbar {
+	margin: 0;
+}
+
+.fc .fc-toolbar-title {
+	font-size: 1em;
+	margin: 0;
+}
+
+/* 캘린더 버튼 크기 줄이기 */
+.fc .fc-button {
+	padding: 0; /* 버튼 내부 패딩을 줄입니다. */
+}
+/* scheduleManagement.css 파일에 추가 */
+.fc-day-other {
+    /* 날짜와 요일 모두 숨기기 */
+    visibility: hidden;
+}
+.template-panel #calendar .fc-event-title {
+    font-size: 1.2rem; /* 원하는 크기로 변경 */
+    font-weight: bold; /* 폰트 굵게 */
+    color: black; /* 원하는 색상으로 변경 */
+}
+.fc .fc-bg-event {
+    opacity: 0.4;
+}
+/* ──────────────────────────────────────────────────────────
+   리스트 테이블
+──────────────────────────────────────────────────────────*/
+.template-panel tbody tr {
+	transition: background 0.2s;
+}
+
+.template-panel tbody tr:nth-child(odd) {
+	background: #fff;
+}
+
+.template-panel tbody tr:nth-child(even) {
+	background: #fcfcfc;
+}
+
+.template-panel tbody tr:hover {
+	background: #f0f8ff;
+}
+
+/* ──────────────────────────────────────────────────────────
+   기본정보 테이블 (오른쪽 패널)
+──────────────────────────────────────────────────────────*/
+.template-panel[style*="flex: 1.5"]>form {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	box-sizing: border-box;
+}
+
+.panel-footer.button-group {
+	margin-top: auto;
+	display: flex;
+	justify-content: flex-end;
+	border-top: 1px solid #e0e0e0;
+	padding-top: 16px;
+}
+
+/* ──────────────────────────────────────────────────────────
+   상세/작성 폼
+──────────────────────────────────────────────────────────*/
+.template-panel form>div {
+	margin-bottom: 16px;
+	display: flex;
+	align-items: center;
+}
+
+.template-panel form label {
+	width: 100px;
+	font-size: 14px;
+	color: #333;
+}
+
+.template-panel form input[type="text"], .template-panel form textarea {
+	flex: 1;
+	padding: 6px 10px;
+	font-size: 14px;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	box-sizing: border-box;
+}
+
+.template-panel form textarea {
+	height: 180px;
+}
+
+/* ───────────────────────────────────────────────────
+   버튼 그룹 (삭제/초기화/저장)
+──────────────────────────────────────────────────────────*/
+.template-panel .btn-delete, .template-panel .btn-reset, .template-panel .btn-confirm,
+	.template-panel .btn-save, .btn-cancel {
+	padding: 8px 16px;
+	font-size: 14px;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	min-width: 85px;
+}
+
+.btn.btn-start-counsel {
+	padding: 8px 16px;
+	font-size: 14px;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	min-width: 85px;
+	background: rgb(125, 148, 253);
+	color: #fff;
+}
+
+.template-panel .btn-delete, .template-panel .btn-reset {
+	background: #C00003;
+	color: #fff;
+	margin-right: 8px;
+}
+
+.template-panel .btn-delete:hover, .template-panel .btn-reset:hover {
+	background: #A00002;
+}
+
+.template-panel .btn-confirm {
+	background: #07223D;
+	color: #fff;
+	margin-left: 2%;
+}
+
+.template-panel .btn-save {
+	background: #07223D;
+	color: #fff;
+	margin-left: auto;
+}
+
+.template-panel .btn-confirm:hover, .template-panel .btn-save:hover {
+	background: #07223D;
+}
+
+.btn-cancel {
+	background: #A00002;
+	color: #fff;
+	margin-left: auto;
+}
+
+/* 상세내용 */
+
+/* 상담 정보 요약 부분 스타일 */
+.counsel-info-summary {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	padding: 10px;
+	border-bottom: 1px solid #ccc;
+	flex-wrap: wrap; /* 창 크기가 작아지면 자동으로 줄 바꿈 */
+}
+
+.counsel-info-summary .info-item {
+	margin: 5px 10px;
+}
+
+.counsel-info-summary .info-label {
+	font-weight: bold;
+	color: black;
+}
+
+.counsel-detail-content {
+	display: flex;
+	padding: 10px;
+	gap: 20px;
+	box-sizing: border-box;
+}
+
+.counsel-motivation, .personal-info {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	max-height: fit-content;
+}
+
+.section-title {
+	font-size: 1.1rem;
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
+.counsel-textarea {
+	resize: none;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	height: 240px;
+}
+
+.personal-info .info-item {
+	margin-bottom: 8px;
+}
+
+.info-label {
+	font-weight: bold;
+    font-size: large;
+}
+
+.button-group {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+th, td {
+    padding: 10px 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+

@@ -1,0 +1,134 @@
+@charset "UTF-8";
+
+/* =================================================== */
+/* 상담 내역 리스트 (필터 및 페이지네이션 스타일 제외) */
+/* =================================================== */
+
+/* --- 상담 내역 리스트 --- */
+.counsel-list {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	margin-top: 24px;
+}
+
+.counsel-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 20px;
+	padding: 24px;
+	border: 1px solid #e5e7eb;
+	border-radius: 12px;
+	background-color: #fff;
+	transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.counsel-item:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.item-content:first-child {
+	flex-grow: 1;
+}
+
+.item-content {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.item-header {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.category-tag {
+	background-color: #f3f4f6;
+	color: #4b5563;
+	padding: 4px 12px;
+	border-radius: 12px;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.item-title {
+	margin: 0;
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: #111827;
+}
+
+.item-snippet {
+	margin: 0;
+	font-size: 0.95rem;
+	color: #4b5563;
+	line-height: 1.6;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 1;
+	-webkit-box-orient: vertical;
+}
+
+.item-meta {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+	font-size: 0.85rem;
+	color: #6b7280;
+}
+
+.item-meta .divider {
+	color: #d1d5db;
+}
+
+/* 버튼 */
+.btn {
+	padding: 8px 16px;
+	border-radius: 8px;
+	font-weight: 600;
+	font-size: 14px;
+	transition: all 0.2s ease;
+	text-decoration: none;
+	border: 1px solid transparent;
+	text-align: center;
+	white-space: nowrap;
+}
+
+.btn-primary {
+	background-color: #7881f5;
+	color: white;
+}
+
+.btn-primary:hover {
+	background-color: #6366f1;
+}
+
+.btn-danger {
+	background-color: #f3f4f6;
+	color: #6b7280;
+} /* 취소/대기중 버튼은 회색 계열로 */
+.no-content-message {
+	padding: 80px 20px;
+	text-align: center;
+	color: #6b7280;
+	font-size: 1.1rem;
+	border: 1px dashed #e5e7eb;
+	border-radius: 8px;
+}
+
+/* 반응형 */
+@media ( max-width : 768px) {
+	.counsel-item {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	.item-content {
+		width: 100% !important;
+	}
+}

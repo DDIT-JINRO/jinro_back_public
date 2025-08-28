@@ -1,0 +1,7 @@
+/**
+ * faq : Frequently Asked Questions (자주찾는질문)
+ * 자주찾는 질문과 관련된 패키지
+ * 
+ * kr\or\ddit\csc\faq\web\FAQController.java
+ * : 관리자는 사용자를 위한 FAQ를 관리하는 클래스
+ */

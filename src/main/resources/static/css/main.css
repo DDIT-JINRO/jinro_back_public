@@ -1,0 +1,1159 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   메인 배너
+   ========================================================================== */
+.main-banner {
+    width: 100%;
+    height: 750px;
+    background-color: #CCDCFE;
+    transition: background-color 0.5s ease;
+    animation: slideDownFade 1s ease-out forwards;
+    animation-delay: 0.2s;
+    opacity: 0;
+    overflow: hidden;
+}
+.mainContainer{
+	animation: slideDownFade 1s ease-out forwards;
+    animation-delay: 0.2s;
+    opacity: 0;
+    overflow: hidden;
+}
+.main-banner__inner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	max-width: 1200px;
+	height: 100%;
+	margin: auto;
+	padding: 0 20px;
+}
+
+.main-banner__text-content {
+	flex-basis: 50%;
+}
+
+.main-banner__logo {
+	margin-bottom: 20px;
+	max-width: 200px;
+	height: auto;
+}
+
+.main-banner__title {
+	font-size: 50px;
+	font-weight: bold;
+	margin-bottom: 10px;
+	line-height: 1.2;
+}
+
+.main-banner__subtitle {
+	font-size: 18px;
+	color: black;
+	line-height: 1.6;
+	margin-bottom: 40px;
+	font-weight: bold;
+}
+
+.main-banner__button {
+	background-color: black;
+	color: white;
+	border: none;
+	padding: 12px 24px;
+	border-radius: 30px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+	width: 170px;
+	height: 50px;
+	font-size: 16px;
+}
+
+.main-banner__button:hover {
+	background-color: #333;
+}
+
+.BtnData {
+	background-color: black;
+	color: white;
+	border: none;
+	padding: 12px 24px;
+	border-radius: 30px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+	margin-left: 10px;
+	width: 190px;
+	height: 50px;
+	font-size: 16px;
+	display: inline-block;
+	box-sizing: border-box;
+	text-decoration: none;
+	text-align: center;
+}
+
+.main-banner__visuals {
+	flex-basis: 50%;
+	position: relative;
+	height: 100%;
+}
+
+.main-banner__float-icon {
+	position: absolute;
+	animation: floatUpDown 3s ease-in-out infinite;
+}
+
+.main-banner__float-icon--char {
+	width: 90%;
+	top: 10%;
+	left: 15%;
+	animation-delay: 0.3s;
+	z-index: 2;
+}
+
+.main-banner__float-icon--char2 {
+	width: 80%;
+    bottom: 10%;
+    left: 25%;
+    animation-delay: 0.3s;
+    z-index: 2;
+}
+.main-banner__float-icon--char3{
+	width: 75%;
+    bottom: 10%;
+    left: 25%;
+    animation-delay: 0.3s;
+    z-index: 2;
+}
+.main-banner__float-icon--1 {
+	width: 90px;
+	top: 15%;
+	left: 10%;
+	animation-delay: 0s;
+}
+
+.main-banner__float-icon--2 {
+	width: 90px;
+	top: 18%;
+	left: 90%;
+	animation-delay: 1.6s;
+}
+
+.main-banner__float-icon--3 {
+	width: 150px;
+	top: 85%;
+	left: 80%;
+	animation-delay: 0.9s;
+}
+
+.main-banner__float-icon--4 {
+	width: 150px;
+	top: 70%;
+	left: 15%;
+	animation-delay: 0.6s;
+	z-index: 2;
+}
+
+.main-banner__float-icon--5 {
+	width: 160px;
+	top: 35%;
+	animation-delay: 1.3s;
+}
+
+.main-banner__float-icon--6 {
+	width: 160px;
+	top: 25%;
+	left: 95%;
+	animation-delay: 0.6s;
+}
+
+.main-banner__float-icon--7 {
+	width: 90px;
+	top: 60%;
+	left: 95%;
+	animation-delay: 0.9s;
+}
+
+@keyframes slideDownFade {
+	0% { opacity: 0; transform: translateY(-50px); }
+	100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatUpDown {
+	0% { transform: translateY(0px); }
+	50% { transform: translateY(-15px); }
+	100% { transform: translateY(0px); }
+}
+
+/* ==========================================================================
+   자동 슬라이더 배너
+   ========================================================================== */
+.feature-slider {
+	padding: 80px 0;
+	text-align: center;
+}
+
+.feature-slider__header {
+	margin-bottom: 50px;
+	padding: 0 20px;
+}
+
+.feature-slider__title {
+	font-weight: 800;
+	font-size: 32px;
+	margin-bottom: 16px;
+}
+
+.feature-slider__subtitle {
+	font-weight: 500;
+	font-size: 20px;
+	line-height: 1.5;
+}
+
+.feature-slider__subtitle strong {
+	font-weight: 800;
+}
+
+.feature-slider__container {
+	max-width: 1200px;
+	margin: 0 auto;
+	overflow: hidden;
+	position: relative;
+}
+
+.feature-slider__slides {
+	width: max-content;
+    padding: 10px 0;
+	display: flex;
+	gap: 60px;
+	animation: smoothSlideAnimation 30s linear infinite;
+}
+
+.feature-slider__slides:hover {
+	animation-play-state: paused;
+}
+
+.feature-slider__anchor{
+	height: 345px;
+	width: 300px;
+
+}
+
+.feature-slider__image {
+	height: 100%;
+	width: 100%;
+	object-fit: cover;
+	border-radius: 10px;
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+	flex-shrink: 0;
+}
+
+.feature-slider__image:hover {
+	transform: scale(1.05);
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes smoothSlideAnimation {
+	0% { transform: translateX(0); }
+	100% { transform: translateX(calc(-50% - 40px)); }
+}
+
+/* ==========================================================================
+   이상형 월드컵, 진로 심리 검사 섹션
+   ========================================================================== */
+.promo-section {
+	padding: 80px 20px;
+	background-color: black;
+}
+
+.promo-section__inner {
+	max-width: 1200px;
+	margin: 0 auto;
+	display: flex;
+	justify-content: center;
+	gap: 50px;
+}
+
+.promo-card {
+	width: 550px;
+	max-width: 100%;
+}
+
+.promo-card__title {
+	text-align: center;
+	color: white;
+	font-size: 1.8rem;
+	font-weight: 700;
+	margin-bottom: 20px;
+}
+
+.promo-card__body {
+	position: relative;
+	background: white;
+	padding: 40px;
+	border-radius: 12px;
+	height: 300px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+	overflow: visible;
+}
+
+.promo-card__body:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+.promo-card__visuals {
+	position: absolute;
+	top: 0; left: 0; width: 100%; height: 100%;
+	pointer-events: none;
+}
+
+.promo-card__character {
+	position: absolute;
+}
+
+.promo-card__character--1 {
+	bottom: -10px;
+	left: -121px;
+	width: 150px;
+	transform: scaleX(-1);
+}
+
+.promo-card__character--2 {
+	bottom: 30px;
+	right: 20px;
+	width: 180px;
+}
+
+.promo-card__character--3 {
+	right: -57px;
+	width: 80px;
+}
+
+.promo-card__character--4 {
+	bottom: 30px;
+	right: 20px;
+	width: 200px;
+}
+
+.promo-card__text-content {
+	position: relative;
+	z-index: 1;
+}
+
+.promo-card__text-content p {
+	font-size: 18px;
+	line-height: 1.6;
+	margin-bottom: 10px;
+	font-weight: 700;
+}
+
+.promo-card__button {
+	margin-top: 20px;
+	padding: 12px 24px;
+	border: 2px solid black;
+	background: white;
+	border-radius: 30px;
+	font-size: 16px;
+	cursor: pointer;
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+	font-weight: 700;
+}
+
+.promo-card__button:hover {
+	transform: scale(1.03);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ==========================================================================
+   유튜브 섹션
+   ========================================================================== */
+.content-showcase {
+	padding: 80px 20px;
+	background-color: #f9f9f9;
+}
+
+.content-showcase__header {
+	text-align: center;
+}
+
+.content-showcase__title {
+	font-size: 32px;
+	color: black;
+	font-weight: 700;
+}
+
+.typing-js {
+	min-height: 46px;
+	white-space: nowrap;
+	overflow: hidden;
+	border-right: 2px solid black;
+	display: inline-block;
+}
+
+.content-showcase__list {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: 24px;
+	margin: 0 auto;
+}
+
+.content-card {
+	width: 300px;
+	padding: 12px 24px 24px;
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+	text-align: center;
+}
+
+.content-card:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+.content-card__video {
+	width: 100%;
+	height: 160px;
+	border-radius: 10px;
+	border: none;
+}
+
+/* ==========================================================================
+	AI기능 섹션
+   ========================================================================== */
+#ai-shortcuts{
+  background: #f7f9fc;
+  padding: 28px 0 28px;        /* "위아래 크기 너무 크지 않게" */
+}
+
+.ai-shortcuts__container{
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.ai-shortcuts__head{
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.ai-shortcuts__eyebrow{
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: #6c7cff;	/* 컬러수정고려*/
+  margin: 0 0 6px;
+}
+
+.ai-shortcuts__title{
+  font-size: 22px;
+  line-height: 1.25;
+  margin: 0 0 4px;
+  color: #1f2d3d;
+}
+
+.ai-shortcuts__desc{
+  margin: 0;
+  color: #667085;
+  font-size: 14px;
+}
+
+/* 4-컬럼 그리드(가로 나열), 작은 화면에서만 자동 줄바꿈 */
+.ai-shortcuts__grid{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* 카드 */
+.ai-card{
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 108px;               /* 컴팩트 높이 */
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #e9eef3;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  text-decoration: none;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  overflow: hidden;
+}
+
+.ai-card:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+  border-color: rgba(108,124,255,.35);
+}
+
+.ai-card:focus-visible{
+  outline: 2px solid #6c7cff;
+  outline-offset: 2px;
+}
+
+/* 아이콘 이미지 (정사각, 투명 배경 권장) */
+.ai-card__icon{
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  flex: 0 0 44px;
+}
+
+/* 텍스트 */
+.ai-card__body{
+  min-width: 0;
+}
+
+.ai-card__title{
+  margin: 0 0 4px;
+  font-size: 16px;
+  line-height: 1.25;
+  color: #1f2d3d;
+  font-weight: 800;
+}
+
+.ai-card__text{
+  margin: 0;
+  font-size: 13px;
+  color: #667085;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* ==========================================================================
+   Trending Strip
+   ========================================================================== */
+.trending-strip{
+  width: 1160px;
+  margin: 10px auto;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  font-family: 'Noto Sans KR', sans-serif;
+  position: relative;
+  z-index: 5;
+}
+
+.trend-widget{
+  position: relative;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.06);
+  transition: transform .2s ease, box-shadow .2s ease;
+  overflow: visible;
+  min-height: 60px;
+}
+
+.trend-widget:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,.10);
+}
+
+.trend-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:6px;
+  color: #626262;
+}
+
+.trend-title{
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing:.2px;
+  z-index: 3000;
+}
+
+.trend-viewport{
+  position: relative;
+  height: 28px;
+  overflow: hidden;
+}
+
+.trend-roller{
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+
+.trend-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  height:28px;
+  line-height:28px;
+  white-space:nowrap;
+  transform: translateY(0);
+  transition: transform .35s ease;
+  font-size: 13px;
+}
+
+.trend-rank{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width: 20px;
+  height:20px;
+  border-radius:4px;
+  background:#626262;
+  color:#fff;
+  font-weight:700;
+  font-size: 12px;
+}
+
+.trend-text{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  color: #626262;
+}
+
+.trend-panel{
+  position:absolute;
+  inset: 0;
+  background:#fff;
+  padding: 46px 16px 14px 14px;
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:8px;
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.14);
+  min-height: max-content;
+  z-index: 2000;
+}
+
+.trend-panel.hidden{
+	display:none;
+}
+
+.trend-panel .panel-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 6px;
+  border-radius:8px;
+  transition: background .15s ease;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.trend-widget a{
+	text-decoration: none;
+	color: #626262;
+}
+
+.trend-widget a:visited{
+	text-decoration: none;
+	color: #626262;
+}
+
+.trend-panel .panel-item:hover{
+	background:#f7f8ff;
+}
+
+.trend-panel .panel-rank {
+	width: 24px;
+	height: 24px;
+	border-radius: 6px;
+	background: #7881f5;
+	color: #fff;
+	font-weight: 800;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 12px;
+	min-width: 24px;
+}
+
+/* ==========================================================================
+   슬라이더 컨트롤
+   ========================================================================== */
+.slides {
+    display: flex;
+    height: 100%;
+    transition: transform 0.8s ease-in-out;
+}
+
+.slide {
+    flex: 0 0 100%;
+    max-width: 100%;
+	transition: transform 0.5s ease-in-out;
+}
+
+.slider-container {
+    overflow: hidden; /* 슬라이더 컨테이너에서 overflow 숨김 */
+    position: relative;
+}
+
+.slider-controls {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.prev-btn,
+.next-btn {
+    background-color: rgba(255, 255, 255, 0.0);
+    border: none;
+    cursor: pointer;
+    font-size: 70px;
+    z-index: 1000;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%)
+}
+
+.prev-btn {
+    left: 100px;
+}
+
+.next-btn {
+    right: 100px;
+}
+
+.dots-container {
+    display: flex;
+    gap: 8px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.dot.active {
+    background-color: #fff;
+}
+
+/* ==========================================================================
+   태블릿 반응형 스타일 (1024px 이하)
+   ========================================================================== */
+@media (max-width: 1024px) {
+	/* 메인 배너 */
+	.main-banner {
+		height: 600px;
+	}
+
+	.main-banner__inner {
+		padding: 0 40px;
+	}
+
+	.main-banner__title {
+		font-size: 42px;
+	}
+
+	.main-banner__subtitle {
+		font-size: 16px;
+		margin-bottom: 30px;
+	}
+
+	.main-banner__button {
+		width: 150px;
+		height: 45px;
+		font-size: 14px;
+	}
+
+	.main-banner__float-icon--char {
+		top: 15%;
+		width: 85%;
+	}
+
+	.main-banner__float-icon--1 {
+		width: 72px;
+	}
+
+	.main-banner__float-icon--2 {
+		width: 72px;
+		left: auto;
+		right: 0%;
+	}
+
+	.main-banner__float-icon--3 {
+		display: none;
+	}
+
+	.main-banner__float-icon--4 {
+		width: 96px;
+	}
+
+	.main-banner__float-icon--5 {
+		width: 96px;
+		top: 40%;
+	}
+
+	.main-banner__float-icon--6 {
+		display: none;
+	}
+
+	.main-banner__float-icon--7 {
+		width: 72px;
+		left: auto;
+		right: 5%;
+		top: 65%;
+	}
+
+	/* 자동 슬라이더 배너 */
+	.feature-slider {
+		padding: 60px 0;
+	}
+
+	.feature-slider__title {
+		font-size: 28px;
+	}
+
+	.feature-slider__subtitle {
+		font-size: 18px;
+	}
+
+	.feature-slider__slides {
+		gap: 40px;
+		animation: smoothSlideAnimationTablet 18s linear infinite;
+	}
+
+	.feature-slider__slides:hover {
+		animation-play-state: paused; /* 태블릿에서도 마우스 오버 시 애니메이션 중지 */
+	}
+
+	.feature-slider__image {
+		height: 280px;
+	}
+
+	@keyframes smoothSlideAnimationTablet {
+		0% { transform: translateX(0); }
+		100% {
+			transform: translateX(calc(-1438px - 40px * 6));
+		}
+	}
+
+	/* 직업 이상형 월드컵, 진로 심리 검사 섹션 */
+	.promo-section {
+		padding: 60px 30px;
+	}
+
+	.promo-section__inner {
+		gap: 30px;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+
+	.promo-card {
+		width: 100%;
+		max-width: 500px;
+	}
+
+	.promo-card__title {
+		font-size: 1.6rem;
+		margin-bottom: 18px;
+	}
+
+	.promo-card__body {
+		height: 280px;
+		padding: 35px;
+	}
+
+	.promo-card__text-content p {
+		font-size: 17px;
+		line-height: 1.5;
+	}
+
+	.promo-card__button {
+		font-size: 15px;
+		padding: 11px 22px;
+	}
+
+	.promo-card__character--1 {
+		left: -105px;
+		width: 130px;
+	}
+	.promo-card__character--2 {
+		right: 10px;
+		width: 160px;
+	}
+	.promo-card__character--3 {
+		right: -50px;
+		width: 70px;
+	}
+	.promo-card__character--4 {
+		right: 10px;
+		width: 180px;
+	}
+
+	/* 유튜브 섹션 */
+	.content-showcase {
+		padding: 60px 20px;
+	}
+
+	.content-showcase__title {
+		font-size: 28px;
+	}
+
+	.content-card {
+		width: calc(50% - 12px);
+		max-width: 350px;
+	}
+
+	.ai-shortcuts__grid {
+	grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+/* ==========================================================================
+   모바일 반응형 스타일 (768px 이하)
+   ========================================================================== */
+@media (max-width: 768px) {
+	/* 메인 배너 */
+	.main-banner {
+        height: fit-content;
+        padding: 60px 0;
+	}
+
+	.main-banner__inner {
+		flex-direction: column;
+		text-align: center;
+		padding: 0 20px;
+		gap: 30px;
+	}
+
+	.main-banner__text-content {
+		flex-basis: auto;
+		width: 100%;
+	}
+
+	.main-banner__visuals {
+		display: none;
+	}
+
+	.main-banner__logo {
+		max-width: 150px;
+		margin-bottom: 15px;
+	}
+
+	.main-banner__title {
+		font-size: 32px;
+		margin-bottom: 15px;
+	}
+
+	.main-banner__subtitle {
+		font-size: 16px;
+		margin-bottom: 30px;
+	}
+
+	.main-banner__button {
+		width: 160px;
+		height: 50px;
+		font-size: 16px;
+	}
+
+	/* 자동 슬라이더 배너 */
+	.feature-slider {
+		padding: 50px 0;
+	}
+
+	.feature-slider__header {
+		margin-bottom: 30px;
+		padding: 0 20px;
+	}
+
+	.feature-slider__title {
+		font-size: 24px;
+		margin-bottom: 12px;
+	}
+
+	.feature-slider__subtitle {
+		font-size: 16px;
+	}
+
+	.feature-slider__container {
+		overflow-x: auto;
+		overflow-y: hidden;
+		padding: 0 20px;
+		-webkit-overflow-scrolling: touch;
+		scroll-behavior: smooth;
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+	}
+
+	.feature-slider__container::-webkit-scrollbar {
+		display: none;
+	}
+
+	.feature-slider__slides {
+		animation: smoothSlideAnimationMobile 15s linear infinite;
+		gap: 20px;
+		padding-right: 20px;
+		white-space: nowrap;
+		width: max-content;
+	}
+
+	.feature-slider__slides:hover {
+		animation-play-state: paused; /* 모바일에서도 마우스 오버 시 애니메이션 중지 */
+	}
+
+	.feature-slider__image {
+		object-fit: cover;
+		display: block;
+		border-radius: 10px;
+		box-shadow: 0 2px 10px rgba(0,0,0,0.8);
+		width: 100%;
+		height: 100%;
+		object-position: top;
+		transform: translateZ(0);
+		transition: transform .45s ease, filter .45s ease;
+		will-change: transform, filter;
+		vertical-align: top;
+	}
+
+	.feature-slider__slides a {
+		display: inline-block;
+		white-space: normal;
+	}
+
+	@keyframes smoothSlideAnimationMobile {
+		0% { transform: translateX(0); }
+		100% {
+			transform: translateX(calc(-1130px - 20px * 6));
+		}
+	}
+
+	/* 직업 이상형 월드컵, 진로 심리 검사 섹션 */
+	.promo-section {
+		padding: 50px 20px;
+	}
+
+	.promo-section__inner {
+		gap: 40px;
+	}
+
+	.promo-card {
+		width: 100%;
+		max-width: none;
+	}
+
+	.promo-card__title {
+		font-size: 1.5rem;
+		margin-bottom: 20px;
+	}
+
+	.promo-card__body {
+		height: auto;
+		padding: 30px;
+		text-align: center;
+	}
+
+	.promo-card__visuals {
+		display: none;
+	}
+
+	.promo-card__text-content {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		height: fit-content;
+	}
+
+	.promo-card__text-content p {
+		font-size: 16px;
+		margin-bottom: 12px;
+		text-align: center;
+	}
+
+	.promo-card__button {
+		margin-top: 25px;
+		padding: 12px 24px;
+		font-size: 15px;
+		width: auto;
+		min-width: 180px;
+	}
+
+	/* 유튜브 섹션 */
+	.content-showcase {
+		padding: 50px 15px;
+	}
+
+	.content-showcase__header {
+		margin-bottom: 30px;
+	}
+
+	.content-showcase__title {
+		font-size: 15px;
+	}
+
+	.content-showcase__list {
+		gap: 20px;
+	}
+
+	.typing-js {
+	    min-height: 21px;
+	}
+
+	.content-card {
+		width: 100%;
+		max-width: none;
+		padding: 20px;
+	}
+
+	.content-card__video {
+		height: 200px;
+	}
+
+	.ai-shortcuts__grid {
+		grid-template-columns: 1fr;
+	}
+
+	.ai-card {
+		height: 96px;
+		padding: 14px 16px;
+	}
+
+	.ai-card__icon {
+		width: 40px;
+		height: 40px;
+	}
+}
+
+/* 유튜브 관련 */
+.goToTest {
+    margin-right: 200px;
+    top: 50%;            
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;  
+    align-items: flex-end;   
+ 	display: none;
+}
+.goToTest button {
+    padding: 8px 16px;
+    cursor: pointer;
+	background-color: #eeeeee;
+    color: #333333;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: 700;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 2px solid black;
+    
+}
+
+.goToTest p{
+	font-size: 14px;
+	color: #778899;
+	
+}
+

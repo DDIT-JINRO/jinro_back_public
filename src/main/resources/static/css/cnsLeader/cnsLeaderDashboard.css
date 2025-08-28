@@ -1,0 +1,181 @@
+@charset "UTF-8";
+
+body {
+	margin: 0;
+	font-family: 'Noto Sans KR', sans-serif;
+}
+
+.main-content {
+	margin-left: 260px;
+	padding: 5 20px;
+}
+
+.cnsLd-logoutBtn {
+	position: absolute;
+	display: flex;
+    justify-content: center;
+    top: 22px;
+    right: 20px;
+    background-color: #07223D;
+    width: 100px;
+    height: 15px;
+    padding: 10px 5px;
+    text-align: center;
+    align-items: center;
+    line-height: 1;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+}
+
+.cnsLd-logoutBtn:hover {
+    background-color: #031526;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ──────────────────────────────────────────────────────────
+   컨테이너 & 패널 공통
+──────────────────────────────────────────────────────────*/
+.template-container {
+	display: flex;
+	gap: 24px;
+	height: 90vh;
+	box-sizing: border-box;
+}
+
+.template-panel {
+	background: #fff;
+	border: 1px solid #e0e0e0;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	min-width: 0;
+}
+
+.template-panel[style*="flex: 1.2"] {
+	flex: 1.2;
+}
+
+.template-panel[style*="flex: 1.5"] {
+	flex: 1.5;
+}
+
+.template-panel.list-panel {
+	display: flex;
+	flex-direction: column;
+}
+
+
+.table-wrapper {
+	border: 1px solid #ddd; /* 테이블 외곽선 */
+	border-radius: 4px;
+	overflow: auto; /* 테이블 내용이 wrapper 밖으로 넘치면 숨김 */
+}
+/* ──────────────────────────────────────────────────────────
+   테이블
+──────────────────────────────────────────────────────────*/
+table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 14px;
+	background-color: #fff;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	border-radius: 8px;
+	overflow: hidden;
+}
+th, td {
+	padding: 12px 16px;
+	text-align: center;
+	border-bottom: 1px solid #eee;
+}
+th {
+	background-color: #F4F6F8;
+	color: #333;
+	font-weight: 600;
+}
+td {
+	color: #555;
+	font-size: 12px;
+	cursor: pointer;
+}
+tr:hover {
+	background-color: #F1F1F1;
+}
+table td:first-child {
+	color: #848EFB;
+	font-weight: bold;
+}
+table th:first-child {
+	border-top-left-radius: 8px;
+}
+table th:last-child {
+	border-top-right-radius: 8px;
+}
+
+
+/* 필터 */
+.filter-box {
+ display: flex; /* Arrange elements in a row */
+ align-items: center; /* Vertically align items in the center */
+ padding: 10px; /* Add some padding around the box */
+ border-radius: 5px; /* Optional: Rounded corners */
+ border: 1px solid #ccc; /* Optional: Border for the box */
+ background-color: #F9F9F9; /* Optional: Background color */
+}
+.filter-box select {
+ padding: 8px;
+ border: 1px solid #ddd;
+ border-radius: 3px;
+ margin-right: 10px; /* Space between select and input */
+ font-size: 14px;
+}
+.filter-box input {
+ padding: 8px;
+ border: 1px solid #ddd;
+ border-radius: 3px;
+ margin-right: 10px; /* Space between input and button */
+ font-size: 14px;
+ flex-grow: 1; /* Allow input to take up remaining space */
+}
+.filter-box button.btn-save {
+ padding: 8px 15px;
+ border: none;
+ border-radius: 3px;
+ background-color: #6759FF; /* Example: Purple color like in the image */
+ color: white;
+ font-size: 14px;
+ cursor: pointer;
+}
+.filter-box button.btn-save:hover {
+ background-color: #5243CD; /* Darker shade on hover */
+}
+
+/* ──────────────────────────────────────────────────────────
+   패널 헤더
+──────────────────────────────────────────────────────────*/
+.panel-header {
+	background: #07223D;
+	color: #fff;
+	font-size: 18px;
+	font-weight: 600;
+	padding: 12px 16px;
+	border-radius: 8px 8px 0 0;
+	margin: -20px -20px 16px;
+	box-sizing: border-box;
+}
+
+/* ──────────────────────────────────────────────────────────
+   필터
+──────────────────────────────────────────────────────────*/
+.filter-box {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	justify-content: flex-end;
+}

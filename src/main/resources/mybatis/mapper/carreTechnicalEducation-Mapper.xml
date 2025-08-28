@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.empt.cte.service.impl.CareerTechnicalEducationMapper">
+
+	<select id="getTotal" parameterType="kr.or.ddit.empt.cte.service.CareerTechnicalEducationVO" resultType="int">
+		SELECT COUNT(JT_ID)
+		FROM JOB_TRAINING
+		<where>
+			JT_ID IS NOT NULL
+			<if test="keyword != null and keyword != ''">
+				AND (
+				JT_SCHOOL LIKE '%' || #{keyword} || '%'
+				OR JT_NAME LIKE '%' || #{keyword} || '%'
+				)
+			</if>
+			<if test="region != null and region != ''">
+				AND JT_ADDRESS LIKE '%' || #{region} || '%'
+			</if>
+		</where>
+		<choose>
+			<when
+				test="status == '마감느린순'">
+				ORDER BY JT_START_DATE DESC
+			</when>
+			<when test="status == '마감빠른순'">
+				ORDER BY JT_START_DATE ASC
+			</when>
+			<otherwise>
+				ORDER BY JT_ID DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="getList" parameterType="kr.or.ddit.empt.cte.service.CareerTechnicalEducationVO" resultType="kr.or.ddit.empt.cte.service.CareerTechnicalEducationVO">
+		SELECT * FROM (
+			SELECT ROWNUM AS RNUM
+				 , B.*
+			FROM (
+				SELECT JT.*
+					 , CASE WHEN JT.JT_START_DATE - SYSDATE &lt;= 0 THEN 99999999
+				       		ELSE JT.JT_START_DATE - SYSDATE
+				  	   END AS SORT_END
+				FROM JOB_TRAINING JT
+				<where>
+					JT_ID IS NOT NULL
+					<if test="keyword != null and keyword != ''">
+						AND (
+						JT_SCHOOL LIKE '%' || #{keyword} || '%'
+						OR JT_NAME LIKE '%' || #{keyword} || '%'
+						)
+					</if>
+					<if test="region != null and region != ''">
+						AND JT_ADDRESS LIKE '%' || #{region} || '%'
+					</if>
+				</where>
+				<choose>
+					<when test="sortOrder == 'ratingDesc'">
+						ORDER BY JT_SCORE DESC
+					</when>
+					<when test="sortOrder == 'endDateDesc'">
+						ORDER BY SORT_END ASC, JT_ID DESC
+					</when>
+					<when test="sortOrder == 'endDateAsc'">
+						ORDER BY JT_START_DATE DESC
+					</when>
+					<when test="sortOrder == 'recruitCntDesc'">
+						ORDER BY JT_QUOTA DESC
+					</when>
+					<when test="sortOrder == 'recruitCntAsc'">
+						ORDER BY JT_QUOTA ASC
+					</when>
+					<otherwise>
+						ORDER BY JT_ID DESC
+					</otherwise>
+				</choose>
+				, JT.JT_ID
+			) B
+			WHERE ROWNUM &lt;= #{endNo}
+		)
+		WHERE RNUM  &gt; #{startNo}
+	</select>
+</mapper>

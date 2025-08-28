@@ -1,0 +1,95 @@
+@charset "UTF8";
+
+/* ==========================================================================
+   페이지 레이아웃: Content List 6열 구조 재정의
+   ========================================================================== */
+.content-list__total-count {
+	font-size: 0.9rem;
+	color: #6b7280;
+	margin-bottom: 15px;
+	text-align: right;
+}
+
+.content-list__header, .content-list__item {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+}
+
+.content-list__col {
+	display: flex;
+	align-items: center;
+	justify-content: left;
+}
+
+.content-list__col--univ-name {
+	flex: 1.8;
+	justify-content: flex-start;
+}
+	
+.content-list__col--region {
+	flex: 0.8;
+}
+
+.content-list__col--type {
+	flex: 0.6;
+}
+
+.content-list__col--gubun {
+	flex: 0.5;
+	justify-content: center;
+}
+
+.content-list__col--dept-count {
+	flex: 0.5;
+	justify-content: flex-end;
+}
+
+.content-list__col--bookmark {
+	flex: 0 0 80px;
+	justify-content: center;
+}
+
+/* ==========================================================================
+   반응형 스타일
+   ========================================================================== */
+@media ( max-width : 768px) {
+	.content-list__header {
+		display: none;
+	}
+	.content-list__item {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+	}
+	.content-list__col {
+		width: 100%;
+		justify-content: flex-start;
+		padding: 5px 0;
+		border-bottom: 1px dashed #eee;
+	}
+	.content-list__item .content-list__col:last-child {
+		border-bottom: none;
+	}
+
+	.content-list__col::before {
+		content: attr(data-label);
+		font-weight: 600;
+		color: #6b7280;
+		width: 80px;
+		flex-shrink: 0;
+	}
+
+	.content-list__col--univ-name::before, .content-list__col--bookmark::before
+		{
+		display: none;
+	}
+	.content-list__col--univ-name {
+		border-bottom: none;
+		padding-bottom: 0;
+	}
+	.content-list__col--bookmark {
+		align-self: center;
+		padding-top: 10px;
+	}
+}

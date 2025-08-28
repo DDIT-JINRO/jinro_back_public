@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mpg.mat.csh.service.impl.CounselingHistoryMapper">
+
+	<select id="selectCounselStatusList" resultType="map" > 
+		SELECT
+			CC_ID
+			, CC_NAME
+		FROM
+			COM_CODE
+		WHERE
+			CL_CODE = 'S04'
+		ORDER BY
+			CC_ID
+	</select>
+	
+	<select id="selectCounselCategoryList" resultType="map" > 
+		SELECT
+			CC_ID
+			, CC_NAME
+		FROM
+			COM_CODE
+		WHERE
+			CL_CODE = 'G07'
+		ORDER BY
+			CC_ID
+	</select>
+	
+	<select id="selectCounselMethodList" resultType="map" > 
+		SELECT
+			CC_ID
+			, CC_NAME
+		FROM
+			COM_CODE
+		WHERE
+			CL_CODE = 'G08'
+		ORDER BY
+			CC_ID
+	</select>
+	
+	<select id="selectCounselingList" resultType="kr.or.ddit.cnslt.resve.crsv.service.CounselingVO" parameterType="kr.or.ddit.cnslt.resve.crsv.service.CounselingVO">
+		SELECT
+			MEM_NAME
+			, COUNSEL_ID
+			, COUNSEL_NAME
+			, COUNSEL_CATEGORY
+			, COUNSEL_METHOD
+			, COUNSEL_TITLE
+			, COUNSEL_DESCRIPTION
+			, COUNSEL_STATUS
+			, COUNSEL_REQ_DATETIME
+			, COUNSEL_URL_USER
+			, COUNSEL_REVIEWD
+			, COUNSEL_CREATED_AT
+			, COUNSEL_UPDATED_AT
+		FROM (
+		    SELECT
+		        ROWNUM as RNUM
+		        , D.*
+		    FROM
+		        (
+		            SELECT
+		                A.COUNSEL_ID
+		              , M1.MEM_NAME AS MEM_NAME
+		              , M2.MEM_NAME AS COUNSEL_NAME
+		              , A.COUNSEL_CATEGORY
+		              , A.COUNSEL_METHOD
+		              , A.COUNSEL_TITLE
+		              , A.COUNSEL_DESCRIPTION
+		              , A.COUNSEL_STATUS
+		              , A.COUNSEL_REQ_DATETIME
+		              , A.COUNSEL_URL_COU
+		              , A.COUNSEL_URL_USER
+		              , A.COUNSEL_REVIEWD
+		              , A.COUNSEL_CREATED_AT
+		              , A.COUNSEL_UPDATED_AT
+		            FROM
+		                COUNSELING A
+		                LEFT JOIN MEMBER M1 ON A.MEM_ID = M1.MEM_ID
+		                LEFT JOIN MEMBER M2 ON A.COUNSEL = M2.MEM_ID
+		            WHERE
+		                A.MEM_ID = #{memId}
+		            <if test="keyword != null and keyword != ''">
+		            	<choose>
+		            		<when test="status == 'title'">
+		            			AND A.COUNSEL_TITLE LIKE '%' || #{keyword} || '%'
+		            		</when>
+		            		<when test="status == 'content'">
+		            			AND A.COUNSEL_DESCRIPTION LIKE '%' || #{keyword} || '%'
+		            		</when>
+		            		<when test="status == 'counsel'">
+		            			AND M2.COUNSEL_NAME LIKE '%' || #{keyword} || '%'
+		            		</when>
+		            		<otherwise>
+		            			AND (
+		            				A.COUNSEL_TITLE LIKE '%' || #{keyword} || '%'
+			            			OR A.COUNSEL_DESCRIPTION LIKE '%' || #{keyword} || '%'
+			            			OR A.COUNSEL LIKE '%' || #{keyword} || '%'
+		            			)
+		            		</otherwise>
+		            	</choose>
+		            </if>
+		            <if test="counselMethod != null and counselMethod != ''">
+		            	AND A.COUNSEL_METHOD = #{counselMethod}
+		            </if>
+		            <if test="counselCategory != null and counselCategory != ''">
+		            	AND A.COUNSEL_CATEGORY = #{counselCategory}
+		            </if>
+		            <if test="counselStatus != null and counselStatus != ''">
+		            	AND A.COUNSEL_STATUS = #{counselStatus}
+		            </if>
+		            ORDER BY
+					<choose>
+				        <when test="sortOrder == 'createdAtAsc'">
+				            A.COUNSEL_CREATED_AT ASC
+				        </when>
+				        <when test="sortOrder == 'reqDateAsc'">
+				            A.COUNSEL_REQ_DATETIME ASC, A.COUNSEL_CREATED_AT DESC
+				        </when>
+				        <when test="sortOrder == 'reqDateDesc'">
+				            A.COUNSEL_REQ_DATETIME DESC, A.COUNSEL_CREATED_AT DESC
+				        </when>
+				        <otherwise>
+				            A.COUNSEL_CREATED_AT DESC
+				        </otherwise>
+				    </choose>
+		        ) D
+		    WHERE
+		        ROWNUM <![CDATA[<=]]> #{endRow}
+		)
+		WHERE
+		    RNUM <![CDATA[>=]]> #{startRow}
+	</select>
+	
+	<select id="selectCounselingTotal" parameterType="kr.or.ddit.cnslt.resve.crsv.service.CounselingVO" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			COUNSELING A
+			LEFT JOIN MEMBER M1 ON A.MEM_ID = M1.MEM_ID
+			LEFT JOIN MEMBER M2 ON A.COUNSEL = M2.MEM_ID
+		WHERE
+			A.MEM_ID = #{memId}
+			<if test="keyword != null and keyword != ''">
+				<choose>
+					<when test="status == 'title'">
+						AND A.COUNSEL_TITLE LIKE '%' || #{keyword} || '%'
+					</when>
+					<when test="status == 'content'">
+						AND A.COUNSEL_DESCRIPTION LIKE '%' || #{keyword} || '%'
+					</when>
+					<when test="status == 'counsel'">
+						AND M2.COUNSEL_NAME LIKE '%' || #{keyword} || '%'
+					</when>
+					<otherwise>
+						AND (
+							A.COUNSEL_TITLE LIKE '%' || #{keyword} || '%'
+			 			OR A.COUNSEL_DESCRIPTION LIKE '%' || #{keyword} || '%'
+			 			OR A.COUNSEL LIKE '%' || #{keyword} || '%'
+						)
+					</otherwise>
+				</choose>
+			</if>
+			<if test="counselMethod != null and counselMethod != ''">
+				AND A.COUNSEL_METHOD = #{counselMethod}
+			</if>
+			<if test="counselCategory != null and counselCategory != ''">
+				AND A.COUNSEL_CATEGORY = #{counselCategory}
+			</if>
+			<if test="counselStatus != null and counselStatus != ''">
+				AND A.COUNSEL_STATUS = #{counselStatus}
+			</if>
+	</select>
+</mapper>

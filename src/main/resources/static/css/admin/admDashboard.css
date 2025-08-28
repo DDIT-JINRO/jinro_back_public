@@ -1,0 +1,842 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   alert
+   ========================================================================== */
+/* 모달 배경 */
+.custom-confirm {
+    display: none;
+    position: fixed;
+    top: 20px;               /* 맨 위에서 살짝 띄움 */
+    left: 50%;               /* 가로 중앙 */
+    transform: translateX(-50%);
+    width: 440px;            /* 창 너비 */
+    z-index: 9999;
+    padding: 12px 20px;
+    animation: slideDown 0.3s ease;
+}
+
+.custom-confirm h4 {
+	margin: 2px 0 8px;
+	font-size: 18px;
+	font-weight: 700;
+	text-align: center;
+}
+
+/* 모달 박스 */
+.custom-confirm__content {
+	background: #fff;
+	padding: 20px 20px;
+	border-radius: 10px;
+	text-align: center;
+	width: 440px;
+	box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+.custom-confirm__buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    justify-content: flex-end;
+}
+
+.custom-confirm__buttons button {
+	padding: 8px 16px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.confirmOk {
+	appearance: none;
+	border: none;
+	border-radius: 12px;
+	padding: 11px 18px;
+	font-weight: 700;
+	cursor: pointer;
+	background: #6a82fb;
+	color: #fff;
+	transition: all 0.15s ease;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+#confirmCancel {
+	background: #f3f5f7;
+	color: #202427
+}
+
+.confirmOk, #confirmCancel :hover{
+	opacity: 0.92;
+	transform: translateY(-1px);
+	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.pData{
+	margin: 10px 0;
+    background: #f8fafb;
+    border: 1px dashed #e4e9ee;
+    border-radius: 12px;
+    padding: 10px 12px;
+    color: #47515b;
+}
+
+/* ==========================================================================
+   alert
+   ========================================================================== */
+/* 메인 dashboard */
+body {
+	margin: 0px;
+	background-color: #EDF2F9;
+}
+
+.topTitle {
+	color: gray;
+	font-size: 18px;
+	margin: 0;
+	line-height: 75px;
+}
+
+.topBtnGroup .topBtn.active {
+    background-color: #727cf5; /* 활성 배경색 */
+    color: white;             /* 활성 글자색 */
+}
+
+.topBtnGroup .topBtn {
+    background-color: #ffffff; /* 비활성 배경색 */
+    color: black;             /* 비활성 글자색 */
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s; /* 부드러운 색상 전환 효과 */
+}
+
+.breadcrumb-item::before {
+	font-family: 'Font Awesome 5 Free';
+	/* 폰트 어썸 폰트 지정 */
+	font-weight: 900;
+	/* 폰트 굵기 지정 (필수) */
+	content: '\f054';
+	/* 꺽쇠(>) 아이콘의 유니코드 */
+	padding: 0 8px;
+	color: #999;
+	line-height: 77px;
+}
+
+.admin-logoutBtn {
+	position: absolute;
+	display: flex;
+	justify-content: center;
+	top: 22px;
+	right: 20px;
+	width: 100px;
+	height: 15px;
+	padding: 10px 5px;
+	text-align: center;
+	align-items: center;
+	line-height: 1;
+	font-size: 14px;
+	font-weight: bold;
+	border-radius: 4px;
+	color: white;
+	background-color: #727cf5;
+	cursor: pointer;
+}
+
+.admin-logoutBtn:hover {
+	background-color: #666ed5;
+	color: #fff;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.main-content {
+	margin-left: 260px;
+	padding: 5px 20px;
+}
+
+.template-panel {
+	background: #fff;
+	padding: 24px;
+	border-radius: 12px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	min-width: 0;
+	transition: all 0.3s ease;
+	transform: translateY(0);
+}
+
+.panel-header {
+	background: #07223D;
+	color: #fff;
+	font-size: 15px;
+	font-weight: 600;
+	padding: 12px 16px;
+	border-radius: 8px 8px 0 0;
+	margin: -20px -20px 16px;
+	box-sizing: border-box;
+}
+
+@keyframes slideInFromTop {from { transform:translateY(-20px);
+	opacity: 0;
+}
+
+to {
+	transform: translateY(0);
+	opacity: 1;
+}
+
+}
+.template-panel {
+	animation: slideInFromTop 0.5s ease-out;
+}
+
+.space-between {
+	justify-content: space-between;
+}
+
+/* 스크롤바 전체 스타일 */
+::-webkit-scrollbar {
+	width: 8px; /* 세로 스크롤바의 폭 */
+	height: 8px; /* 가로 스크롤바의 높이 */
+}
+
+/* 스크롤바 배경 트랙 */
+::-webkit-scrollbar-track {
+	background: #F0F0F0;
+	border-radius: 10px;
+}
+
+/* 스크롤바 엄지 (움직이는 부분) */
+::-webkit-scrollbar-thumb {
+	background: #D3D3D3;
+	border-radius: 10px;
+}
+
+/********************공통 부분 *********************/
+.overflow-wrap {
+	overflow-wrap: break-word;
+}
+
+.middleTitle {
+	color: gray;
+	font-size: 14px;
+	margin: 0;
+	font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+}
+
+.middleTitleBtn {
+	min-width: 45.77px;
+	height: 30px;
+	font-size: 12px;
+	font-weight: bold;
+	border: none;
+	border-radius: 2px;
+	cursor: pointer;
+	transition: background-color 0.3s ease, color 0.3s ease;
+	padding: 7px 10px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: fit-content;
+	line-height: 1;
+	color: white;
+	background-color: #727cf5;
+}
+
+.filter-box {
+	display: flex;
+	/* Arrange elements in a row */
+	align-items: center;
+	/* Vertically align items in the center */
+	padding: 10px;
+	/* Add some padding around the box */
+	border-radius: 5px;
+	/* Optional: Rounded corners */
+	border: 1px solid #ccc;
+	/* Optional: Border for the box */
+	background-color: #f9f9f9;
+	/* Optional: Background color */
+}
+
+.filter-box select {
+	padding: 8px;
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	margin-right: 10px;
+	/* Space between select and input */
+	font-size: 14px;
+}
+
+.filter-box input {
+	padding: 8px;
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	margin-right: 10px;
+	/* Space between input and button */
+	font-size: 14px;
+	flex-grow: 1;
+	/* Allow input to take up remaining space */
+}
+
+.filter-box button.btn-save {
+	padding: 8px 15px;
+	border: none;
+	border-radius: 3px;
+	background-color: #6759ff;
+	/* Example: Purple color like in the image */
+	color: white;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+.filter-box button.btn-save:hover {
+	background-color: #5243cd;
+	/* Darker shade on hover */
+}
+
+/**************** 공통 부분 끝 *******************/
+
+/**************** dashboard-1 시작 *******************/
+.dashboard-1 {
+	display: flex;
+	gap: 20px;
+}
+
+.dashboard-1-1 {
+	margin-bottom: 20px;
+}
+
+.dashboard-1-1-1 {
+	width: 390px;
+	height: 150px;
+	padding: 24px;
+	margin-bottom: 20px;
+}
+
+.image1-1-1-1 {
+	width: 40px;
+	position: absolute;
+	right: 1.5rem;
+}
+
+.userCnt-1-1-1 {
+	font-size: 35px;
+	font-weight: 700;
+	color: gray;
+	margin-bottom: .60rem !important;
+}
+
+.increase-1-1-1 {
+	display: flex;
+	font-size: 15px;
+	font-weight: 600;
+	color: rgba(10, 207, 151, 1);
+}
+
+.increase-1-1-1-red {
+	display: flex;
+	font-size: 15px;
+	font-weight: 600;
+	color: rgba(250, 92, 124, 1);
+}
+
+.increase-1-1-1-p {
+	margin-left: 10px;
+	color: #8a969c;
+	font-weight: 400;
+}
+
+.dashboard-1-2 {
+	width: 1195px;
+	height: 490px;
+}
+
+/**************** dashboard-1 끝 *******************/
+
+/**************** dashboard-2 시작 *******************/
+.middleTitlePp  {
+	display: flex;
+	justify-content: space-between;
+	color: gray;
+	font-size: 14px;
+	margin: 0;
+	font-weight: 600;
+}
+
+.dashboard-2 {
+	width: 1085px;
+}
+
+.dash2Flex {
+	gap: 20px;
+	display: flex;
+	margin-bottom: 20px;
+}
+
+.dashboard-2-1 {
+	margin-top: 20px;
+	overflow-x: auto;
+	display: flex;
+	align-content: center;
+	justify-content: center;
+	padding: 24px;
+	background-color: #FBFCFD;
+	overflow-x: auto;
+	gap: 50px;
+}
+
+.dashboard-2-2 {
+	background-color: #DCDEFC;
+	width: 500px;
+}
+
+.dashboard-profileImg {
+	display: flex;
+	justify-content: center;
+	padding-top: 40px;
+}
+
+.dashboard-profileImg img {
+	width: 80px;
+}
+
+.chart-container {
+	height: 280px;
+	border-radius: 12px;
+}
+
+.stats-container {
+	display: flex;
+	/* 항목들을 가로로 나란히 정렬 */
+	gap: 60px;
+	/* 항목 사이의 간격 */
+	padding: 20px;
+	background-color: #fff;
+	border-radius: 12px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+	width: fit-content;
+	/* 내용물에 맞게 너비 조절 */
+}
+
+/* 각 통계 항목 (Current Week, Previous Week) */
+.stat-item {
+	display: flex;
+	flex-direction: column;
+	/* 제목과 값을 세로로 정렬 */
+	margin-right: 40px;
+}
+
+.stat-title {
+	color: #8898aa;
+	font-size: 14px;
+	margin-bottom: 8px;
+}
+
+.stat-value-wrapper {
+	display: flex;
+	align-items: center;
+}
+
+.stat-dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	margin-right: 12px;
+}
+
+.dot-current {
+	background-color: gray;
+}
+
+.dot-previous {
+	background-color: #FF4560;
+}
+
+/* 금액 텍스트 스타일 */
+.stat-value {
+	font-size: 28px;
+	font-weight: 600;
+	color: #3e4c59;
+}
+
+/**************** dashboard-2 끝 *******************/
+
+/**************** dashboard-3 시작 *******************/
+.dashboard-3 {
+	display: flex;
+	gap: 20px;
+	margin-bottom: 20px;
+}
+
+.dashboard-3-1 {
+	width: 520px;
+	height: 400px;
+}
+
+/************************************************* 공용 css ******************************************************************************/
+.flex {
+	display: flex;
+}
+
+.gap {
+	gap: 20px;
+}
+
+.gap5 {
+	gap: 5px;
+}
+
+.gap10 {
+	gap: 10px;
+}
+
+.endflex {
+	justify-content: flex-end;
+}
+
+.public-countCard {
+	width: 390px;
+	height: 150px;
+}
+
+.public-span-increase {
+	color: rgba(10, 207, 151, 1);
+	margin-right: 5px;
+}
+
+.public-span-decrease {
+	color: rgba(250, 92, 124, 1);
+	margin-right: 5px;
+}
+
+.public-span-equal {
+	color: #808080;
+	margin-right: 5px;
+}
+
+.public-card-title {
+	color: gray;
+	font-size: 14px;
+	margin: 0;
+	font-weight: 600;
+}
+
+.public-card-icon {
+	width: 40px;
+	position: absolute;
+	right: 1.5rem;
+}
+
+.public-card-count {
+	font-size: 35px;
+	font-weight: 700;
+	color: gray;
+	margin-bottom: .60rem !important;
+}
+
+.public-span-space {
+	display: flex;
+	font-size: 15px;
+	font-weight: 600;
+}
+
+.public-span-since {
+	margin-left: 10px;
+	color: #8a969c;
+	font-weight: 400;
+}
+
+.public-toggle-button {
+	min-width: 45.77px;
+	height: 30px;
+	font-size: 12px;
+	font-weight: bold;
+	color: #555555;
+	background-color: #EDF2F9;
+	border: none;
+	border-radius: 2px;
+	cursor: pointer;
+	transition: background-color 0.3s ease, color 0.3s ease;
+	padding: 7px 10px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: fit-content;
+	line-height: 1;
+}
+
+.public-toggle-select {
+	height: 30px;
+	font-size: 12px;
+	font-weight: bold;
+	color: #555555;
+	background-color: #EDF2F9;
+	border: none;
+	border-radius: 2px;
+	cursor: pointer;
+	transition: background-color 0.3s ease, color 0.3s ease;
+	padding: 5px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: fit-content;
+}
+
+.public-toggle-select>option {
+	font-size: 12px;
+}
+
+.public-toggle-button.active {
+	color: #ffffff; /* 하얀색 폰트 */
+	background-color: #727cf5; /* 보라색 배경 */
+}
+
+.public-toggle-button:hover {
+	background-color: #E8ECF0;
+}
+
+.public-listSearch {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	border-radius: 2px;
+	overflow: hidden;
+	font-family: Arial, sans-serif;
+	align-items: center;
+}
+
+/* 드롭다운 (이름, 이메일) */
+.public-listSearch select {
+	height: 30px;
+	background-color: #DCDEFC;
+	border: none;
+	padding: 8px 12px;
+	font-size: 12px;
+	font-weight: bold;
+	outline: none;
+	cursor: pointer;
+	border-radius: 3px 0 0 3px;
+}
+
+.public-listSearch select option {
+	background-color: white;
+}
+
+/* 검색창 */
+.public-listSearch input {
+	width: 150px;
+	padding: 8px 12px;
+	border: none;
+	font-size: 12px;
+	font-weight: bold;
+	outline: none;
+	background-color: #f8fafc; /* 연한 흰/회색 */
+}
+
+/* 버튼 */
+.public-listSearch .btn-save {
+	height: 30px;
+	background-color: #727CF5; /* 진한 보라 */
+	color: white;
+	border: none;
+	padding: 5px 16px;
+	font-size: 12px;
+	font-weight: bold;
+	cursor: pointer;
+	transition: background 0.2s;
+}
+
+.public-listSearch .btn-save:hover {
+	background-color: #5548e0; /* hover 진한 보라 */
+}
+
+.public-card-red-count {
+	font-size: 42px;
+	font-weight: 700;
+	color: #FA5C7C;
+	margin-top: auto;
+	margin-left: auto;
+}
+
+.public-card-green-count {
+	font-size: 42px;
+	font-weight: 700;
+	color: #0ACF97;
+	margin-top: auto;
+	margin-left: auto;
+}
+
+.arrow {
+	margin-left: 10px; /* 숫자와의 여백 */
+	font-weight: bold;
+}
+
+/* 상승 화살표 색상 */
+.arrow.increase {
+	color: rgba(10, 207, 151, 1);
+}
+
+/* 하락 화살표 색상 */
+.arrow.decrease {
+	color: #FA5C7C;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	font-family: Arial, sans-serif;
+	border-left: none;
+	border-right: none;
+}
+
+th {
+	font-size: 14px;
+	font-weight: 700;
+}
+
+td {
+	font-size: 12px;
+	font-weight: 500;
+}
+
+th, td {
+	border: 1px solid #ddd;
+	padding: 12px;
+	text-align: center;
+	border-left: none;
+	border-right: none;
+}
+
+tbody tr:hover {
+	background-color: #F8F8F8;
+}
+
+.card-footer {
+	display: flex;
+	margin-top: auto;
+	justify-content: center;
+}
+/****************************** 공용 색상 css ****************************/
+.color-white {
+	color: white;
+}
+
+.color-purple {
+	color: #727CF5;
+}
+
+.color-red {
+	color: #FA5C7C;
+}
+
+.color-green {
+	color: #0ACF97;
+}
+
+.color-yello {
+	color: #FFC35A;
+}
+
+.back-color-red {
+	background-color: #FA5C7C;
+}
+
+.back-color-green {
+	background-color: #0ACF97;
+}
+
+.back-color-purple {
+	background-color: #727CF5;
+}
+
+.back-color-red {
+	background-color: #FA5C7C;
+}
+
+/* 공통 스타일 (크기와 모양) */
+.dot-status {
+	display: inline-block;
+	width: 11px;
+	height: 11px;
+	border-radius: 50%;
+	margin-right: 5px;
+}
+
+/* 각 상태별 색상 */
+.dot-status-green {
+	background: #06eaa9;
+	box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.dot-status-gray {
+	background: #808080;
+	box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.dot-status-orange {
+	background: #ffdc53;
+	box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.dot-status-red {
+	background: #F65A7A;
+	box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.dkwnrrhtlvek {
+	align-items: center;
+}
+
+.topBtnGroup {
+	margin-left: 20px;
+}
+
+.btn-primary {
+	background-color: #7c7cf5;
+	color: #fff;
+	border: none;
+	padding: 8px 16px;
+	border-radius: 2px;
+	font-size: 12px;
+	font-weight: bold;
+	cursor: pointer;
+	transition: background-color 0.3s ease, transform 0.2s ease, box-shadow
+		0.3s ease;
+}
+
+.topBtn {
+	width: 100px;
+	padding: 10px 5px;
+	text-align: center;
+	align-items: center;
+	line-height: 1;
+	font-size: 14px;
+	font-weight: bold;
+	border-radius: 4px;
+	color: white;
+	background-color: #727cf5;
+}
+
+.topBtn:hover {
+    background-color: #666ed5;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#localTimeDisplay {
+	color: #808080;
+	font-weight: 600;
+}
+
+/***************************** 콘텐츠 이용 통계 도넛 ***************************************/
+.chart-container-doughnut {
+	margin-top: auto;
+	position: relative;
+	height: 350px; /* 도넛 차트 높이 조절 */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}

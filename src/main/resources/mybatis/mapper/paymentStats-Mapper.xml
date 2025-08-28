@@ -1,0 +1,869 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.admin.las.service.impl.PaymentStatsMapper">
+	
+	<!-- 
+	// 당일 기준 총 구독자 수
+	public int selectTotalSubscriberCount();
+	 -->
+	<select id="selectTotalSubscriberCount">
+        SELECT
+	        COUNT(DISTINCT MEM_ID)
+	    FROM
+	        MEMBER_SUBSCRIPTION
+	    WHERE
+	        TRUNC(SUB_END_DT) >= TRUNC(SYSDATE)
+    </select>
+ 
+ 	<!-- 
+ 	// 당일 새로운 구독자 수
+	public int selectNewSubscriberCountToday();
+	 -->
+	<select id="selectNewSubscriberCountToday">
+        SELECT
+        	COUNT(*)
+	    FROM PAYMENT P
+	    JOIN MEMBER_SUBSCRIPTION MS ON P.MS_ID = MS.MS_ID
+	    WHERE 
+	        TRUNC(P.PAY_DATE) = TRUNC(SYSDATE)
+	        AND P.PAY_DATE = (
+	            SELECT MIN(P2.PAY_DATE)
+	            FROM PAYMENT P2
+	            JOIN MEMBER_SUBSCRIPTION MS2 ON P2.MS_ID = MS2.MS_ID
+	            WHERE MS2.MEM_ID = MS.MEM_ID
+	        )
+    </select>
+	 
+	<!-- 
+	 // 구독 결제 매출 
+	public List<Map<String, Object>> selectRevenueStats(Map<String, Object> params);
+	 --> 
+	<select id="selectRevenueStats" parameterType="map" resultType="map">
+        <choose>
+            <when test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                <!-- 기간이 지정된 경우: 날짜 범위 생성 후 LEFT JOIN -->
+                WITH DATE_RANGE AS (
+                    SELECT 
+                        <choose>
+                            <when test="period == 'monthly'">
+                                ADD_MONTHS(TRUNC(TO_DATE(#{startDate}, 'YYYY-MM-DD'), 'MM'), LEVEL - 1) AS dt
+                            </when>
+				            <when test="period == 'quarterly' or period == null or period == ''">
+				                ADD_MONTHS(TRUNC(TO_DATE(#{startDate}, 'YYYY-MM-DD'), 'Q'), (LEVEL - 1) * 3) AS dt
+				            </when>
+                            <otherwise>
+                                TO_DATE(#{startDate}, 'YYYY-MM-DD') + LEVEL - 1 AS dt
+                            </otherwise>
+                        </choose>
+                    FROM DUAL
+                    CONNECT BY 
+                        <choose>
+                            <when test="period == 'monthly'">
+                                ADD_MONTHS(TRUNC(TO_DATE(#{startDate}, 'YYYY-MM-DD'), 'MM'), LEVEL - 1) <![CDATA[ <= ]]> TRUNC(TO_DATE(#{endDate}, 'YYYY-MM-DD'), 'MM')
+                            </when>
+				            <when test="period == 'quarterly' or period == null or period == ''">
+				                ADD_MONTHS(TRUNC(TO_DATE(#{startDate}, 'YYYY-MM-DD'), 'Q'), (LEVEL - 1) * 3) <![CDATA[ <= ]]> TRUNC(TO_DATE(#{endDate}, 'YYYY-MM-DD'), 'Q')
+				            </when>
+                            <otherwise>
+                                LEVEL <![CDATA[ <= ]]> TO_DATE(#{endDate}, 'YYYY-MM-DD') - TO_DATE(#{startDate}, 'YYYY-MM-DD') + 1
+                            </otherwise>
+                        </choose>
+                ),
+                CURRENT_DATA AS (
+                    SELECT
+                        <choose>
+                            <when test="period == 'monthly'">TRUNC(p.PAY_DATE, 'MM')</when>
+						    <when test="period == 'quarterly' or period == null or period == ''">TRUNC(p.PAY_DATE, 'Q')</when>
+                            <otherwise>TRUNC(p.PAY_DATE)</otherwise>
+                        </choose> AS dt,
+                        SUM(p.PAY_AMOUNT) AS revenue
+                    FROM PAYMENT p
+                    JOIN MEMBER_SUBSCRIPTION ms ON p.MS_ID = ms.MS_ID
+                    JOIN MEMBER m ON ms.MEM_ID = m.MEM_ID
+                    WHERE p.PAY_AMOUNT > 0
+                      AND p.PAY_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                      AND p.PAY_DATE <![CDATA[ < ]]> TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+                      <if test="gender != null and gender == 'male'">AND m.MEM_GEN = 'G11001'</if>
+                      <if test="gender != null and gender == 'female'">AND m.MEM_GEN = 'G11002'</if>
+                      <if test="ageGroup != null and ageGroup != '' and ageGroup == 'teen'">
+                        AND m.MEM_BIRTH IS NOT NULL
+                        AND TRUNC(MONTHS_BETWEEN(p.PAY_DATE, m.MEM_BIRTH) / 12) <![CDATA[ <= ]]> 19
+                      </if>
+                      <if test="ageGroup != null and ageGroup != '' and ageGroup == 'youth'">
+                        AND m.MEM_BIRTH IS NOT NULL
+                        AND TRUNC(MONTHS_BETWEEN(p.PAY_DATE, m.MEM_BIRTH) / 12) <![CDATA[ >= ]]> 20
+                      </if>
+                    GROUP BY 
+                        <choose>
+                            <when test="period == 'monthly'">TRUNC(p.PAY_DATE, 'MM')</when>
+    						<when test="period == 'quarterly' or period == null or period == ''">TRUNC(p.PAY_DATE, 'Q')</when>
+                            <otherwise>TRUNC(p.PAY_DATE)</otherwise>
+                        </choose>
+                ),
+				  PREV_DATA AS (
+				    SELECT
+				      <choose>
+				        <when test="period == 'monthly'">TRUNC(p.PAY_DATE, 'MM')</when>
+				        <when test="period == 'quarterly' or period == null or period == ''">TRUNC(p.PAY_DATE, 'Q')</when>
+				        <otherwise>TRUNC(p.PAY_DATE)</otherwise>
+				      </choose> AS dt,
+				      SUM(p.PAY_AMOUNT) AS revenue
+				    FROM PAYMENT p
+				    JOIN MEMBER_SUBSCRIPTION ms ON p.MS_ID = ms.MS_ID
+				    JOIN MEMBER m ON ms.MEM_ID = m.MEM_ID
+				    WHERE p.PAY_AMOUNT > 0
+				      <!-- 비교 구간: 일별은 전월, 그 외(월/분기/selectDays)는 전년 -->
+				      <choose>
+				        <when test="period == 'monthly' or period == 'quarterly' or period == 'selectDays'">
+				          AND p.PAY_DATE >= ADD_MONTHS(TO_DATE(#{startDate}, 'YYYY-MM-DD'), -12)
+				          AND p.PAY_DATE <![CDATA[ < ]]> ADD_MONTHS(TO_DATE(#{endDate}, 'YYYY-MM-DD'), -12) + 1
+				        </when>
+				        <otherwise> <!-- daily -->
+				          AND p.PAY_DATE >= ADD_MONTHS(TO_DATE(#{startDate}, 'YYYY-MM-DD'), -1)
+				          AND p.PAY_DATE <![CDATA[ < ]]> ADD_MONTHS(TO_DATE(#{endDate}, 'YYYY-MM-DD'), -1) + 1
+				        </otherwise>
+				      </choose>
+				      <if test="gender != null and gender == 'male'">AND m.MEM_GEN = 'G11001'</if>
+				      <if test="gender != null and gender == 'female'">AND m.MEM_GEN = 'G11002'</if>
+				      <if test="ageGroup != null and ageGroup != '' and ageGroup == 'teen'">
+				        AND m.MEM_BIRTH IS NOT NULL
+				        AND TRUNC(MONTHS_BETWEEN(p.PAY_DATE, m.MEM_BIRTH) / 12) <![CDATA[ <= ]]> 19
+				      </if>
+				      <if test="ageGroup != null and ageGroup != '' and ageGroup == 'youth'">
+				        AND m.MEM_BIRTH IS NOT NULL
+				        AND TRUNC(MONTHS_BETWEEN(p.PAY_DATE, m.MEM_BIRTH) / 12) <![CDATA[ >= ]]> 20
+				      </if>
+				    GROUP BY
+				      <choose>
+				        <when test="period == 'monthly'">TRUNC(p.PAY_DATE, 'MM')</when>
+				        <when test="period == 'quarterly' or period == null or period == ''">TRUNC(p.PAY_DATE, 'Q')</when>
+				        <otherwise>TRUNC(p.PAY_DATE)</otherwise>
+				      </choose>
+				  )
+                SELECT
+                    <choose>
+                        <when test="period == 'monthly'">TO_CHAR(dr.dt, 'YYYY-MM')</when>
+    					<when test="period == 'quarterly' or period == null or period == ''">TO_CHAR(dr.dt, 'YYYY') || '-Q' || TO_CHAR(dr.dt, 'Q')</when>
+                        <otherwise>TO_CHAR(dr.dt, 'YYYY-MM-DD')</otherwise>
+                    </choose> AS "dt",
+                    NVL(cd.revenue, 0) AS "revenue",
+   					NVL(pd.revenue, 0) AS "revenuePrev"
+                FROM DATE_RANGE dr
+				LEFT JOIN CURRENT_DATA cd ON cd.dt = dr.dt
+				<!-- 비교 조인: 기간 유형에 맞춰 dt를 전월/전년으로 이동 -->
+				<choose>
+				  <when test="period == 'monthly' or period == 'quarterly' or period == 'selectDays' or period == null or period == ''">
+				    LEFT JOIN PREV_DATA pd ON pd.dt = ADD_MONTHS(dr.dt, -12)
+				  </when>
+				  <otherwise> <!-- daily -->
+				    LEFT JOIN PREV_DATA pd ON pd.dt = ADD_MONTHS(dr.dt, -1)
+				  </otherwise>
+				</choose>
+                ORDER BY dr.dt ASC
+            </when>
+            <otherwise>
+                <!-- 기간이 지정되지 않은 경우: 기본 쿼리 -->
+                 WITH DATE_RANGE AS (
+				    SELECT ADD_MONTHS(TRUNC(SYSDATE, 'YYYY'), (LEVEL - 1) * 3) AS dt
+				    FROM DUAL
+				    CONNECT BY ADD_MONTHS(TRUNC(SYSDATE, 'YYYY'), (LEVEL - 1) * 3)
+				             <![CDATA[ <= ]]> TRUNC(SYSDATE, 'YYYY') + 365
+				  ),
+				  CURRENT_DATA AS (
+				    SELECT
+				      TRUNC(p.PAY_DATE, 'Q') AS dt,
+				      SUM(p.PAY_AMOUNT) AS revenue
+				    FROM PAYMENT p
+				    JOIN MEMBER_SUBSCRIPTION ms ON p.MS_ID = ms.MS_ID
+				    JOIN MEMBER m ON ms.MEM_ID = m.MEM_ID
+				    WHERE p.PAY_AMOUNT > 0
+				      <if test="gender != null and gender == 'male'">AND m.MEM_GEN = 'G11001'</if>
+				      <if test="gender != null and gender == 'female'">AND m.MEM_GEN = 'G11002'</if>
+				      <if test="ageGroup != null and ageGroup != '' and ageGroup == 'teen'">
+				        AND m.MEM_BIRTH IS NOT NULL
+				        AND TRUNC(MONTHS_BETWEEN(p.PAY_DATE, m.MEM_BIRTH) / 12) <![CDATA[ <= ]]> 19
+				      </if>
+				      <if test="ageGroup != null and ageGroup != '' and ageGroup == 'youth'">
+				        AND m.MEM_BIRTH IS NOT NULL
+				        AND TRUNC(MONTHS_BETWEEN(p.PAY_DATE, m.MEM_BIRTH) / 12) <![CDATA[ >= ]]> 20
+				      </if>
+				    GROUP BY TRUNC(p.PAY_DATE, 'Q')
+				  )
+				  SELECT
+				    TO_CHAR(dr.dt, 'YYYY') || '-Q' || TO_CHAR(dr.dt, 'Q') AS "dt",
+				    NVL(cd.revenue, 0) AS "revenue"
+				  FROM DATE_RANGE dr
+				  LEFT JOIN CURRENT_DATA cd ON cd.dt = dr.dt
+				  ORDER BY dr.dt ASC
+            </otherwise>
+        </choose>
+    </select>
+	
+	<!-- 
+	// 구독자 수 
+	public List<Map<String, Object>> selectSubscriberCountStats(Map<String, Object> params);
+	 -->
+	<select id="selectSubscriberCountStats" parameterType="map" resultType="map">
+	  <choose>
+	    <when test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+	      WITH DATE_RANGE AS (
+	        SELECT
+	          <choose>
+	            <when test="period == 'monthly'">
+	              ADD_MONTHS(TRUNC(TO_DATE(#{startDate}, 'YYYY-MM-DD'), 'MM'), LEVEL - 1) AS dt
+	            </when>
+	            <when test="period == 'quarterly'">
+	              ADD_MONTHS(TRUNC(TO_DATE(#{startDate}, 'YYYY-MM-DD'), 'Q'), (LEVEL - 1) * 3) AS dt
+	            </when>
+	            <otherwise>
+	              TO_DATE(#{startDate}, 'YYYY-MM-DD') + LEVEL - 1 AS dt
+	            </otherwise>
+	          </choose>
+	        FROM DUAL
+	        CONNECT BY
+	          <choose>
+	            <when test="period == 'monthly'">
+	              ADD_MONTHS(TRUNC(TO_DATE(#{startDate}, 'YYYY-MM-DD'), 'MM'), LEVEL - 1) <![CDATA[ <= ]]> TRUNC(TO_DATE(#{endDate}, 'YYYY-MM-DD'), 'MM')
+	            </when>
+	            <when test="period == 'quarterly'">
+	              ADD_MONTHS(TRUNC(TO_DATE(#{startDate}, 'YYYY-MM-DD'), 'Q'), (LEVEL - 1) * 3) <![CDATA[ <= ]]> TRUNC(TO_DATE(#{endDate}, 'YYYY-MM-DD'), 'Q')
+	            </when>
+	            <otherwise>
+	              LEVEL <![CDATA[ <= ]]> TO_DATE(#{endDate}, 'YYYY-MM-DD') - TO_DATE(#{startDate}, 'YYYY-MM-DD') + 1
+	            </otherwise>
+	          </choose>
+	      ),
+	      CURRENT_DATA AS (
+	        SELECT
+	          <choose>
+	            <when test="period == 'monthly'">TRUNC(P.PAY_DATE, 'MM')</when>
+	            <when test="period == 'quarterly'">TRUNC(P.PAY_DATE, 'Q')</when>
+	            <otherwise>TRUNC(P.PAY_DATE)</otherwise>
+	          </choose> AS dt,
+	          COUNT(*) AS count
+	        FROM MEMBER_SUBSCRIPTION MS
+	        JOIN PAYMENT P ON P.MS_ID = MS.MS_ID
+	        JOIN MEMBER M ON M.MEM_ID = MS.MEM_ID
+	        WHERE P.PAY_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+	          AND P.PAY_DATE <![CDATA[ < ]]> TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+	          <if test="gender != null and gender == 'male'">AND M.MEM_GEN = 'G11001'</if>
+	          <if test="gender != null and gender == 'female'">AND M.MEM_GEN = 'G11002'</if>
+	          <if test="ageGroup != null and ageGroup != '' and ageGroup == 'teen'">
+	            AND M.MEM_BIRTH IS NOT NULL
+	            AND TRUNC(MONTHS_BETWEEN(P.PAY_DATE, M.MEM_BIRTH) / 12) <![CDATA[ <= ]]> 19
+	          </if>
+	          <if test="ageGroup != null and ageGroup != '' and ageGroup == 'youth'">
+	            AND M.MEM_BIRTH IS NOT NULL
+	            AND TRUNC(MONTHS_BETWEEN(P.PAY_DATE, M.MEM_BIRTH) / 12) <![CDATA[ >= ]]> 20
+	          </if>
+	        GROUP BY
+	          <choose>
+	            <when test="period == 'monthly'">TRUNC(P.PAY_DATE, 'MM')</when>
+	            <when test="period == 'quarterly'">TRUNC(P.PAY_DATE, 'Q')</when>
+	            <otherwise>TRUNC(P.PAY_DATE)</otherwise>
+	          </choose>
+	      ),
+	      PREV_DATA AS (
+	        SELECT
+	          <choose>
+	            <when test="period == 'monthly'">TRUNC(P.PAY_DATE, 'MM')</when>
+	            <when test="period == 'quarterly'">TRUNC(P.PAY_DATE, 'Q')</when>
+	            <otherwise>TRUNC(P.PAY_DATE)</otherwise>
+	          </choose> AS dt,
+	          COUNT(*) AS count
+	        FROM MEMBER_SUBSCRIPTION MS
+	        JOIN PAYMENT P ON P.MS_ID = MS.MS_ID
+	        JOIN MEMBER M ON M.MEM_ID = MS.MEM_ID
+	        WHERE 1=1
+	          <!-- 비교 구간: 일별=전월, 월/분기/selectDays=전년 -->
+	          <choose>
+	            <when test="period == 'monthly' or period == 'quarterly' or period == 'selectDays'">
+	              AND P.PAY_DATE >= ADD_MONTHS(TO_DATE(#{startDate}, 'YYYY-MM-DD'), -12)
+	              AND P.PAY_DATE <![CDATA[ < ]]> ADD_MONTHS(TO_DATE(#{endDate}, 'YYYY-MM-DD'), -12) + 1
+	            </when>
+	            <otherwise>
+	              AND P.PAY_DATE >= ADD_MONTHS(TO_DATE(#{startDate}, 'YYYY-MM-DD'), -1)
+	              AND P.PAY_DATE <![CDATA[ < ]]> ADD_MONTHS(TO_DATE(#{endDate}, 'YYYY-MM-DD'), -1) + 1
+	            </otherwise>
+	          </choose>
+	          <if test="gender != null and gender == 'male'">AND M.MEM_GEN = 'G11001'</if>
+	          <if test="gender != null and gender == 'female'">AND M.MEM_GEN = 'G11002'</if>
+	          <if test="ageGroup != null and ageGroup != '' and ageGroup == 'teen'">
+	            AND M.MEM_BIRTH IS NOT NULL
+	            AND TRUNC(MONTHS_BETWEEN(P.PAY_DATE, M.MEM_BIRTH) / 12) <![CDATA[ <= ]]> 19
+	          </if>
+	          <if test="ageGroup != null and ageGroup != '' and ageGroup == 'youth'">
+	            AND M.MEM_BIRTH IS NOT NULL
+	            AND TRUNC(MONTHS_BETWEEN(P.PAY_DATE, M.MEM_BIRTH) / 12) <![CDATA[ >= ]]> 20
+	          </if>
+	        GROUP BY
+	          <choose>
+	            <when test="period == 'monthly'">TRUNC(P.PAY_DATE, 'MM')</when>
+	            <when test="period == 'quarterly'">TRUNC(P.PAY_DATE, 'Q')</when>
+	            <otherwise>TRUNC(P.PAY_DATE)</otherwise>
+	          </choose>
+	      )
+	      SELECT
+	        <choose>
+	          <when test="period == 'monthly'">TO_CHAR(dr.dt, 'YYYY-MM')</when>
+	          <when test="period == 'quarterly'">TO_CHAR(dr.dt, 'YYYY') || '-Q' || TO_CHAR(dr.dt, 'Q')</when>
+	          <otherwise>TO_CHAR(dr.dt, 'YYYY-MM-DD')</otherwise>
+	        </choose> AS "dt",
+	        NVL(cd.count, 0) AS "count",
+	        NVL(pd.count, 0) AS "countPrev"
+	      FROM DATE_RANGE dr
+	      LEFT JOIN CURRENT_DATA cd ON cd.dt = dr.dt
+	      <choose>
+	        <when test="period == 'monthly' or period == 'quarterly' or period == 'selectDays'">
+	          LEFT JOIN PREV_DATA pd ON pd.dt = ADD_MONTHS(dr.dt, -12)
+	        </when>
+	        <otherwise>
+	          LEFT JOIN PREV_DATA pd ON pd.dt = ADD_MONTHS(dr.dt, -1)
+	        </otherwise>
+	      </choose>
+	      ORDER BY dr.dt ASC
+	    </when>
+	    <otherwise>
+	      SELECT
+	        <choose>
+	          <when test="period == 'monthly'">TO_CHAR(p.PAY_DATE, 'YYYY-MM')</when> 
+	          <when test="period == 'quarterly' or period == null or period == ''">TO_CHAR(p.PAY_DATE, 'YYYY') || '-Q' || TO_CHAR(TRUNC(p.PAY_DATE, 'Q'), 'Q')</when> 
+	          <otherwise>TO_CHAR(p.PAY_DATE, 'YYYY-MM-DD')</otherwise>
+	        </choose> AS "dt",
+	        COUNT(*) AS "count"
+	      FROM MEMBER_SUBSCRIPTION MS
+	      JOIN PAYMENT P ON P.MS_ID = MS.MS_ID
+	      JOIN MEMBER M ON M.MEM_ID = MS.MEM_ID
+	      WHERE 1=1
+	        <if test="gender != null and gender == 'male'">AND M.MEM_GEN = 'G11001'</if>
+	        <if test="gender != null and gender == 'female'">AND M.MEM_GEN = 'G11002'</if>
+	        <if test="ageGroup != null and ageGroup != '' and ageGroup == 'teen'">
+	          AND M.MEM_BIRTH IS NOT NULL
+	          AND TRUNC(MONTHS_BETWEEN(P.PAY_DATE, M.MEM_BIRTH) / 12) <![CDATA[ <= ]]> 19
+	        </if>
+	        <if test="ageGroup != null and ageGroup != '' and ageGroup == 'youth'">
+	          AND M.MEM_BIRTH IS NOT NULL
+	          AND TRUNC(MONTHS_BETWEEN(P.PAY_DATE, M.MEM_BIRTH) / 12) <![CDATA[ >= ]]> 20
+	        </if>
+	      GROUP BY
+	        <choose>
+	          <when test="period == 'monthly'">TO_CHAR(p.PAY_DATE, 'YYYY-MM')</when> 
+	          <when test="period == 'quarterly' or period == null or period == ''">TO_CHAR(p.PAY_DATE, 'YYYY') || '-Q' || TO_CHAR(TRUNC(p.PAY_DATE, 'Q'), 'Q')</when> 
+	          <otherwise>TO_CHAR(p.PAY_DATE, 'YYYY-MM-DD')</otherwise>
+	        </choose>
+	      ORDER BY "dt" ASC
+	    </otherwise>
+	  </choose>
+	</select>
+	
+	 <!-- 
+	 // 상품별 인기 통계
+	public List<Map<String, Object>> selectProductPopularityStats(Map<String, Object> params);
+	  -->
+	<select id="selectProductPopularityStats" parameterType="map" resultType="map">
+        <choose>
+            <when test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                <!-- 기간이 지정된 경우: 날짜 범위 생성 후 LEFT JOIN -->
+                WITH DATE_RANGE AS (
+                    SELECT 
+                        <choose>
+                            <when test="period == 'monthly'">
+                                ADD_MONTHS(TRUNC(TO_DATE(#{startDate}, 'YYYY-MM-DD'), 'MM'), LEVEL - 1) AS dt
+                            </when>
+				            <when test="period == 'quarterly'">
+				                ADD_MONTHS(TRUNC(TO_DATE(#{startDate}, 'YYYY-MM-DD'), 'Q'), (LEVEL - 1) * 3) AS dt
+				            </when>
+                            <otherwise>
+                                TO_DATE(#{startDate}, 'YYYY-MM-DD') + LEVEL - 1 AS dt
+                            </otherwise>
+                        </choose>
+                    FROM DUAL
+                    CONNECT BY 
+                        <choose>
+                            <when test="period == 'monthly'">
+                                ADD_MONTHS(TRUNC(TO_DATE(#{startDate}, 'YYYY-MM-DD'), 'MM'), LEVEL - 1) <![CDATA[ <= ]]> TRUNC(TO_DATE(#{endDate}, 'YYYY-MM-DD'), 'MM')
+                            </when>
+				            <when test="period == 'quarterly'">
+				                ADD_MONTHS(TRUNC(TO_DATE(#{startDate}, 'YYYY-MM-DD'), 'Q'), (LEVEL - 1) * 3) <![CDATA[ <= ]]> TRUNC(TO_DATE(#{endDate}, 'YYYY-MM-DD'), 'Q')
+				            </when>
+                            <otherwise>
+                                LEVEL <![CDATA[ <= ]]> TO_DATE(#{endDate}, 'YYYY-MM-DD') - TO_DATE(#{startDate}, 'YYYY-MM-DD') + 1
+                            </otherwise>
+                        </choose>
+                ),
+                PRODUCT_DATA AS (
+                    SELECT
+                        <choose>
+                            <when test="period == 'monthly'">TRUNC(P.PAY_DATE, 'MM')</when>
+   						    <when test="period == 'quarterly'">TRUNC(P.PAY_DATE, 'Q')</when>
+                            <otherwise>TRUNC(P.PAY_DATE)</otherwise>
+                        </choose> AS dt,
+                        S.SUB_NAME AS subName,
+                        COUNT(*) AS count
+                    FROM MEMBER_SUBSCRIPTION MS
+                    JOIN PAYMENT P ON P.MS_ID = MS.MS_ID
+                    JOIN SUBSCRIBE S ON S.SUB_ID = MS.SUB_ID
+                    JOIN MEMBER M ON M.MEM_ID = MS.MEM_ID
+                    WHERE P.PAY_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                      AND P.PAY_DATE <![CDATA[ < ]]> TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+                      <if test="gender != null and gender == 'male'">AND M.MEM_GEN = 'G11001'</if>
+                      <if test="gender != null and gender == 'female'">AND M.MEM_GEN = 'G11002'</if>
+                      <if test="ageGroup != null and ageGroup != '' and ageGroup == 'teen'">
+                        AND M.MEM_BIRTH IS NOT NULL
+                        AND TRUNC(MONTHS_BETWEEN(P.PAY_DATE, M.MEM_BIRTH) / 12) <![CDATA[ <= ]]> 19
+                      </if>
+                      <if test="ageGroup != null and ageGroup != '' and ageGroup == 'youth'">
+                        AND M.MEM_BIRTH IS NOT NULL
+                        AND TRUNC(MONTHS_BETWEEN(P.PAY_DATE, M.MEM_BIRTH) / 12) <![CDATA[ >= ]]> 20
+                      </if>
+                    GROUP BY 
+                        <choose>
+                            <when test="period == 'monthly'">TRUNC(P.PAY_DATE, 'MM')</when>
+      						<when test="period == 'quarterly'">TRUNC(P.PAY_DATE, 'Q')</when>
+                            <otherwise>TRUNC(P.PAY_DATE)</otherwise>
+                        </choose>,
+                        S.SUB_NAME
+                ),
+                ALL_PRODUCTS AS (
+                    SELECT DISTINCT SUB_NAME FROM SUBSCRIBE
+                )
+                SELECT
+                    <choose>
+                        <when test="period == 'monthly'">TO_CHAR(dr.dt, 'YYYY-MM')</when>
+                        <when test="period == 'quarterly'">TO_CHAR(dr.dt, 'YYYY') || '-Q' || TO_CHAR(dr.dt, 'Q')</when>
+                        <otherwise>TO_CHAR(dr.dt, 'YYYY-MM-DD')</otherwise>
+                    </choose> AS "dt",
+                    ap.SUB_NAME AS "subName",
+                    NVL(pd.count, 0) AS "count"
+                FROM DATE_RANGE dr
+                CROSS JOIN ALL_PRODUCTS ap
+                LEFT JOIN PRODUCT_DATA pd ON dr.dt = pd.dt AND ap.SUB_NAME = pd.subName
+                ORDER BY dr.dt, ap.SUB_NAME
+            </when>
+            <otherwise>
+                <!-- 기간이 지정되지 않은 경우: 기본 쿼리 -->
+                SELECT
+                    <choose>
+                        <when test="period == 'monthly'">TO_CHAR(p.PAY_DATE, 'YYYY-MM')</when> 
+				        <when test="period == 'quarterly' or period == null or period == ''">TO_CHAR(p.PAY_DATE, 'YYYY') || '-Q' || TO_CHAR(TRUNC(p.PAY_DATE, 'Q'), 'Q')</when> 
+				        <otherwise>TO_CHAR(p.PAY_DATE, 'YYYY-MM-DD')</otherwise>
+                    </choose> AS "dt",
+                    S.SUB_NAME AS "subName",
+                    COUNT(*) AS "count"
+                FROM MEMBER_SUBSCRIPTION MS
+                JOIN PAYMENT P ON P.MS_ID = MS.MS_ID
+                JOIN SUBSCRIBE S ON S.SUB_ID = MS.SUB_ID
+                JOIN MEMBER M ON M.MEM_ID = MS.MEM_ID
+                WHERE 1=1
+                    <if test="gender != null and gender == 'male'">AND M.MEM_GEN = 'G11001'</if>
+                    <if test="gender != null and gender == 'female'">AND M.MEM_GEN = 'G11002'</if>
+                    <if test="ageGroup != null and ageGroup != '' and ageGroup == 'teen'">
+                      AND M.MEM_BIRTH IS NOT NULL
+                      AND TRUNC(MONTHS_BETWEEN(P.PAY_DATE, M.MEM_BIRTH) / 12) <![CDATA[ <= ]]> 19
+                    </if>
+                    <if test="ageGroup != null and ageGroup != '' and ageGroup == 'youth'">
+                      AND M.MEM_BIRTH IS NOT NULL
+                      AND TRUNC(MONTHS_BETWEEN(P.PAY_DATE, M.MEM_BIRTH) / 12) <![CDATA[ >= ]]> 20
+                    </if>
+                GROUP BY 
+                    <choose>
+                        <when test="period == 'monthly'">TO_CHAR(p.PAY_DATE, 'YYYY-MM')</when> 
+					    <when test="period == 'quarterly' or period == null or period == ''">TO_CHAR(p.PAY_DATE, 'YYYY') || '-Q' || TO_CHAR(TRUNC(p.PAY_DATE, 'Q'), 'Q')</when> 
+					    <otherwise>TO_CHAR(p.PAY_DATE, 'YYYY-MM-DD')</otherwise>
+                    </choose>,
+                    S.SUB_NAME
+                ORDER BY "dt", "subName"
+            </otherwise>
+        </choose>
+    </select>
+	
+	<!-- 
+	// AI 기능 이용 내역
+	public List<Map<String, Object>> selectAiServiceUsageStats(Map<String, Object> params);
+	 -->
+	<select id="selectAiServiceUsageStats" parameterType="map" resultType="map">
+	    <choose>
+            <when test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                <!-- 기간이 지정된 경우: 날짜 범위 생성 후 LEFT JOIN -->
+                WITH DATE_RANGE AS (
+                    SELECT 
+                        <choose>
+                            <when test="period == 'monthly'">
+                                ADD_MONTHS(TRUNC(TO_DATE(#{startDate}, 'YYYY-MM-DD'), 'MM'), LEVEL - 1) AS dt
+                            </when>
+							<when test="period == 'quarterly'">
+							  ADD_MONTHS(TRUNC(TO_DATE(#{startDate}, 'YYYY-MM-DD'), 'Q'), (LEVEL - 1) * 3) AS dt
+							</when>
+                            <otherwise>
+                                TO_DATE(#{startDate}, 'YYYY-MM-DD') + LEVEL - 1 AS dt
+                            </otherwise>
+                        </choose>
+                    FROM DUAL
+                    CONNECT BY 
+                        <choose>
+                            <when test="period == 'monthly'">
+                                ADD_MONTHS(TRUNC(TO_DATE(#{startDate}, 'YYYY-MM-DD'), 'MM'), LEVEL - 1) <![CDATA[ <= ]]> TRUNC(TO_DATE(#{endDate}, 'YYYY-MM-DD'), 'MM')
+                            </when>
+							<when test="period == 'quarterly'">
+								ADD_MONTHS(TRUNC(TO_DATE(#{startDate}, 'YYYY-MM-DD'), 'Q'), (LEVEL - 1) * 3) <![CDATA[ <= ]]> TRUNC(TO_DATE(#{endDate}, 'YYYY-MM-DD'), 'Q')
+							</when>
+                            <otherwise>
+                                LEVEL <![CDATA[ <= ]]> TO_DATE(#{endDate}, 'YYYY-MM-DD') - TO_DATE(#{startDate}, 'YYYY-MM-DD') + 1
+                            </otherwise>
+                        </choose>
+                ),
+                AI_SERVICE_DATA AS (
+                    SELECT
+                        <choose>
+                            <when test="period == 'monthly'">TRUNC(l.PL_CREATED_AT, 'MM')</when>
+                            <when test="period == 'quarterly'">TRUNC(l.PL_CREATED_AT, 'Q')</when>
+                            <otherwise>TRUNC(l.PL_CREATED_AT)</otherwise>
+                        </choose> AS dt,
+                        
+                        -- 'AI 피드백 - 이력서' 로그 카운트
+                        COUNT(CASE WHEN l.PL_TITLE = 'AI 피드백 - 이력서' THEN 1 END) AS resumeCnt,
+                        
+                        -- 'AI 피드백 - 자기소개서' 로그 카운트
+                        COUNT(CASE WHEN l.PL_TITLE = 'AI 피드백 - 자기소개서' THEN 1 END) AS coverCnt,
+                        
+                        -- '모의면접 - AI 모의 면접' 로그 카운트
+                        COUNT(CASE WHEN l.PL_TITLE = '모의면접 - AI 모의 면접' THEN 1 END) AS mockCnt,
+                        
+                        -- 'AI상담%'으로 시작하는 로그 카운트
+                        COUNT(CASE WHEN l.PL_TITLE LIKE 'AI상담%' THEN 1 END) AS counselingCnt
+                        
+                    FROM PAGE_LOG l
+                    JOIN MEMBER m ON l.MEM_ID = m.MEM_ID
+                    WHERE (l.PL_TITLE IN ('AI 피드백 - 이력서', 'AI 피드백 - 자기소개서', '모의면접 - AI 모의 면접') OR l.PL_TITLE LIKE 'AI상담%')
+                      AND l.PL_CREATED_AT >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                      AND l.PL_CREATED_AT <![CDATA[ < ]]> TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+                      <if test="gender != null and gender == 'male'">AND m.MEM_GEN = 'G11001'</if>
+                      <if test="gender != null and gender == 'female'">AND m.MEM_GEN = 'G11002'</if>
+                      <if test="ageGroup != null and ageGroup != '' and ageGroup == 'teen'">
+                        AND m.MEM_BIRTH IS NOT NULL
+                        AND TRUNC(MONTHS_BETWEEN(l.PL_CREATED_AT, m.MEM_BIRTH) / 12) <![CDATA[ <= ]]> 19
+                      </if>
+                      <if test="ageGroup != null and ageGroup != '' and ageGroup == 'youth'">
+                        AND m.MEM_BIRTH IS NOT NULL
+                        AND TRUNC(MONTHS_BETWEEN(l.PL_CREATED_AT, m.MEM_BIRTH) / 12) <![CDATA[ >= ]]> 20
+                      </if>
+                    GROUP BY 
+                        <choose>
+                            <when test="period == 'monthly'">TRUNC(l.PL_CREATED_AT, 'MM')</when>
+                            <when test="period == 'quarterly'">TRUNC(l.PL_CREATED_AT, 'Q')</when>
+                            <otherwise>TRUNC(l.PL_CREATED_AT)</otherwise>
+                        </choose>
+                )
+                SELECT
+                    <choose>
+                        <when test="period == 'monthly'">TO_CHAR(dr.dt, 'YYYY-MM')</when>
+                        <when test="period == 'quarterly'">TO_CHAR(dr.dt, 'YYYY') || '-Q' || TO_CHAR(dr.dt, 'Q')</when>
+                        <otherwise>TO_CHAR(dr.dt, 'YYYY-MM-DD')</otherwise>
+                    </choose> AS "dt",
+                    NVL(asd.resumeCnt, 0) AS "resumeCnt",
+                    NVL(asd.coverCnt, 0) AS "coverCnt",
+                    NVL(asd.mockCnt, 0) AS "mockCnt",
+                    NVL(asd.counselingCnt, 0) AS "counselingCnt"
+                FROM DATE_RANGE dr
+                LEFT JOIN AI_SERVICE_DATA asd ON dr.dt = asd.dt
+                ORDER BY dr.dt ASC
+            </when>
+            <otherwise>
+                <!-- 기간이 지정되지 않은 경우: 기본 쿼리 -->
+                SELECT
+                    <choose>
+                        <when test="period == 'monthly'">TO_CHAR(l.PL_CREATED_AT, 'YYYY-MM')</when>
+                        <when test="period == 'quarterly'">TO_CHAR(l.PL_CREATED_AT, 'YYYY') || '-Q' || TO_CHAR(TRUNC(l.PL_CREATED_AT, 'Q'), 'Q')</when>
+                        <otherwise>TO_CHAR(l.PL_CREATED_AT, 'YYYY-MM-DD')</otherwise>
+                    </choose> AS "dt",
+                    
+                    -- 'AI 피드백 - 이력서' 로그 카운트
+                    COUNT(CASE WHEN l.PL_TITLE = 'AI 피드백 - 이력서' THEN 1 END) AS "resumeCnt",
+                    
+                    -- 'AI 피드백 - 자기소개서' 로그 카운트
+                    COUNT(CASE WHEN l.PL_TITLE = 'AI 피드백 - 자기소개서' THEN 1 END) AS "coverCnt",
+                    
+                    -- '모의면접 - AI 모의 면접' 로그 카운트
+                    COUNT(CASE WHEN l.PL_TITLE = '모의면접 - AI 모의 면접' THEN 1 END) AS "mockCnt",
+                    
+                    -- 'AI상담%'으로 시작하는 로그 카운트
+                    COUNT(CASE WHEN l.PL_TITLE LIKE 'AI상담%' THEN 1 END) AS "counselingCnt"
+                    
+                FROM PAGE_LOG l
+                JOIN MEMBER m ON l.MEM_ID = m.MEM_ID
+                WHERE (l.PL_TITLE IN ('AI 피드백 - 이력서', 'AI 피드백 - 자기소개서', '모의면접 - AI 모의 면접') OR l.PL_TITLE LIKE 'AI상담%')
+                    <if test="gender != null and gender == 'male'">AND m.MEM_GEN = 'G11001'</if>
+                    <if test="gender != null and gender == 'female'">AND m.MEM_GEN = 'G11002'</if>
+                    <if test="ageGroup != null and ageGroup != '' and ageGroup == 'teen'">
+                      AND m.MEM_BIRTH IS NOT NULL
+                      AND TRUNC(MONTHS_BETWEEN(l.PL_CREATED_AT, m.MEM_BIRTH) / 12) <![CDATA[ <= ]]> 19
+                    </if>
+                    <if test="ageGroup != null and ageGroup != '' and ageGroup == 'youth'">
+                      AND m.MEM_BIRTH IS NOT NULL
+                      AND TRUNC(MONTHS_BETWEEN(l.PL_CREATED_AT, m.MEM_BIRTH) / 12) <![CDATA[ >= ]]> 20
+                    </if>
+                GROUP BY 
+                    <choose>
+                        <when test="period == 'monthly'">TO_CHAR(l.PL_CREATED_AT, 'YYYY-MM')</when>
+                        <when test="period == 'quarterly'">TO_CHAR(l.PL_CREATED_AT, 'YYYY') || '-Q' || TO_CHAR(TRUNC(l.PL_CREATED_AT, 'Q'), 'Q')</when>
+                        <otherwise>TO_CHAR(l.PL_CREATED_AT, 'YYYY-MM-DD')</otherwise>
+                    </choose>
+                ORDER BY "dt" ASC
+            </otherwise>
+        </choose>
+	</select>
+
+	<!-- 
+	// 일일 구독 결제 매출 - 대시보드용
+	public List<Map<String, Object>> selectDailyRevenueForDashboard();
+	 -->	
+	<select id="selectDailyRevenueForDashboard" resultType="map">
+		<![CDATA[
+	    WITH DATES AS (
+	      SELECT TRUNC(SYSDATE) - LEVEL + 1 AS "dt"
+	      FROM DUAL
+	      CONNECT BY LEVEL <= 7
+	    ),
+	    REVENUE AS (
+	        SELECT
+	            TRUNC(PAY_DATE) AS "dt",
+	            SUM(PAY_AMOUNT) AS "revenue"
+	        FROM PAYMENT
+	        WHERE PAY_DATE >= TRUNC(SYSDATE) - 6
+	          AND PAY_AMOUNT > 0
+	        GROUP BY TRUNC(PAY_DATE)
+	    )
+	    SELECT
+	        TO_CHAR(D."dt", 'YYYY-MM-DD') AS "dt",
+	        NVL(R."revenue", 0) AS "revenue"
+	    FROM DATES D
+	    LEFT JOIN REVENUE R ON D."dt" = R."dt"
+	    ORDER BY D."dt" ASC
+	    ]]>
+	</select>
+	
+	<!-- 
+	// 회원 가입 수 대비하여 구독 비율 - 대시보드용
+	public List<Map<String, Object>> selectNewUserRevenueRate();
+	 -->	
+	<select id="selectNewUserRevenueRate" parameterType="map" resultType="map">
+		<![CDATA[
+	    WITH NEW_MEMBERS AS (
+	        SELECT
+	            <choose>
+	                <when test="period == 'monthly'">TO_CHAR(CREATED_AT, 'YYYY-MM')</when>
+	                <otherwise>TO_CHAR(CREATED_AT, 'YYYY-MM-DD')</otherwise>
+	            </choose> AS "dt",
+	            COUNT(*) AS "newMemberCount"
+	        FROM MEMBER
+	        WHERE 1=1
+	            <if test="startDate != null and startDate != ''">AND CREATED_AT >= TO_DATE(#{startDate}, 'YYYY-MM-DD')</if>
+	            <if test="endDate != null and endDate != ''">AND CREATED_AT < TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1</if>
+	        GROUP BY 
+	            <choose>
+	                <when test="period == 'monthly'">TO_CHAR(CREATED_AT, 'YYYY-MM')</when>
+	                <otherwise>TO_CHAR(CREATED_AT, 'YYYY-MM-DD')</otherwise>
+	            </choose>
+	    ),
+	    NEW_SUBS AS (
+	        SELECT
+	            <choose>
+	                <when test="period == 'monthly'">TO_CHAR(P.PAY_DATE, 'YYYY-MM')</when>
+	                <otherwise>TO_CHAR(P.PAY_DATE, 'YYYY-MM-DD')</otherwise>
+	            </choose> AS "dt",
+	            COUNT(*) AS "newSubscriberCount"
+	        FROM PAYMENT P
+	        JOIN MEMBER_SUBSCRIPTION MS ON P.MS_ID = MS.MS_ID
+	        WHERE 
+	            P.PAY_DATE = (
+	                SELECT MIN(P2.PAY_DATE)
+	                FROM PAYMENT P2
+	                JOIN MEMBER_SUBSCRIPTION MS2 ON P2.MS_ID = MS2.MS_ID
+	                WHERE MS2.MEM_ID = MS.MEM_ID
+	            )
+	            <if test="startDate != null and startDate != ''">AND P.PAY_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')</if>
+	            <if test="endDate != null and endDate != ''">AND P.PAY_DATE < TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1</if>
+	        GROUP BY
+	            <choose>
+	                <when test="period == 'monthly'">TO_CHAR(P.PAY_DATE, 'YYYY-MM')</when>
+	                <otherwise>TO_CHAR(P.PAY_DATE, 'YYYY-MM-DD')</otherwise>
+	            </choose>
+	    )
+	    SELECT
+	        d."dt",
+	        d."newMemberCount",
+	        NVL(s."newSubscriberCount", 0) AS "newSubscriberCount",
+	        CASE
+	            WHEN d."newMemberCount" > 0 THEN ROUND(NVL(s."newSubscriberCount", 0) / d."newMemberCount")
+	            ELSE 0
+	        END AS "conversionRate" -- 신규 가입자 대비 신규 구독
+	    FROM NEW_MEMBERS d
+	    LEFT JOIN NEW_SUBS s ON d."dt" = s."dt"
+	    ORDER BY d."dt" ASC
+	    ]]>
+	</select>
+	
+	<!-- 
+	// 총 구독 결제 대비하여 신규 구독 결제 비율 - 대시보드용
+	public List<Map<String, Object>> selectNewRevenueRateStats();
+	 -->	
+	<select id="selectNewRevenueRateStats" parameterType="map" resultType="map">
+		<![CDATA[
+	    WITH TOTAL_REVENUE AS (
+	        SELECT
+	            <choose>
+	                <when test="period == 'monthly'">TO_CHAR(P.PAY_DATE, 'YYYY-MM')</when>
+	                <otherwise>TO_CHAR(P.PAY_DATE, 'YYYY-MM-DD')</otherwise>
+	            </choose> AS "dt",
+	            SUM(P.PAY_AMOUNT) AS "totalRevenue"
+	        FROM PAYMENT P
+	        WHERE 1=1
+	            <if test="startDate != null and startDate != ''">AND P.PAY_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')</if>
+	            <if test="endDate != null and endDate != ''">AND P.PAY_DATE < TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1</if>
+	        GROUP BY 
+	            <choose>
+	                <when test="period == 'monthly'">TO_CHAR(P.PAY_DATE, 'YYYY-MM')</when>
+	                <otherwise>TO_CHAR(P.PAY_DATE, 'YYYY-MM-DD')</otherwise>
+	            </choose>
+	    ),
+	    NEW_SUB_REVENUE AS (
+	        SELECT
+	            <choose>
+	                <when test="period == 'monthly'">TO_CHAR(P.PAY_DATE, 'YYYY-MM')</when>
+	                <otherwise>TO_CHAR(P.PAY_DATE, 'YYYY-MM-DD')</otherwise>
+	            </choose> AS "dt",
+	            SUM(P.PAY_AMOUNT) AS "newSubscriberRevenue"
+	        FROM PAYMENT P
+	        JOIN MEMBER_SUBSCRIPTION MS ON P.MS_ID = MS.MS_ID
+	        WHERE 
+	            P.PAY_DATE = (
+	                SELECT MIN(P2.PAY_DATE)
+	                FROM PAYMENT P2
+	                JOIN MEMBER_SUBSCRIPTION MS2 ON P2.MS_ID = MS2.MS_ID
+	                WHERE MS2.MEM_ID = MS.MEM_ID
+	            )
+	            <if test="startDate != null and startDate != ''">AND P.PAY_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')</if>
+	            <if test="endDate != null and endDate != ''">AND P.PAY_DATE < TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1</if>
+	        GROUP BY
+	            <choose>
+	                <when test="period == 'monthly'">TO_CHAR(P.PAY_DATE, 'YYYY-MM')</when>
+	                <otherwise>TO_CHAR(P.PAY_DATE, 'YYYY-MM-DD')</otherwise>
+	            </choose>
+	    )
+	    SELECT
+	        d."dt",
+	        NVL(d."totalRevenue", 0) AS "totalRevenue",
+	        NVL(s."newSubscriberRevenue", 0) AS "newSubscriberRevenue",
+	        CASE
+	            WHEN d."totalRevenue" > 0 THEN ROUND((NVL(s."newSubscriberRevenue", 0) / d."totalRevenue") * 100, 2)
+	            ELSE 0
+	        END AS "newRevenueRate" -- 신규 매출 비율 (%)
+	    FROM TOTAL_REVENUE d
+	    LEFT JOIN NEW_SUB_REVENUE s ON d."dt" = s."dt"
+	    ORDER BY d."dt" ASC
+	    ]]>
+	</select>
+	
+	<!-- 
+	대시보드 상단 숫자 통계 (평균매출 vs 예상매출)
+	public Map<String, Object> getRevenueSummaryForDashboard();
+	 -->
+	<select id="getRevenueSummaryForDashboard" resultType="map">
+		<![CDATA[
+	    SELECT
+	        -- 1. 이전달까지의 월평균 매출
+	        -- (올해 1월~지난달 총매출 / 지난달까지의 개월 수)
+	        (
+	            SELECT
+	                CASE
+	                    -- 현재가 1월이 아닐 때만 계산
+	                    WHEN EXTRACT(MONTH FROM SYSDATE) > 1 THEN 
+	                        ROUND(SUM(PAY_AMOUNT) / (EXTRACT(MONTH FROM SYSDATE) - 1))
+	                    ELSE 0
+	                END
+	            FROM PAYMENT
+	            WHERE PAY_DATE >= TRUNC(SYSDATE, 'YY') -- 올해 1월 1일
+	              AND PAY_DATE < TRUNC(SYSDATE, 'MM')   -- 이번 달 1일 전까지
+	        ) AS "avgPreviousRevenue",
+	        
+	        -- 2. 이번달 예상 매출
+	        -- (현재까지 매출 / 현재까지 일수) * 이번달 총 일수
+	        (
+	            SELECT
+	                CASE
+	                    WHEN EXTRACT(DAY FROM SYSDATE) > 0 THEN 
+	                        ROUND((NVL(SUM(PAY_AMOUNT), 0) / EXTRACT(DAY FROM SYSDATE)) * EXTRACT(DAY FROM LAST_DAY(SYSDATE)))
+	                    ELSE 0
+	                END
+	            FROM PAYMENT
+	            WHERE PAY_DATE >= TRUNC(SYSDATE, 'MM')
+	        ) AS "estimatedCurrentRevenue"
+	    FROM DUAL
+	    ]]>
+	</select>
+	
+	<!-- 
+	// 대시보드 하단 그래프 통계 (전체사용자 vs 구독자)
+	public List<Map<String, Object>> getMonthlyUserStatsForDashboard();
+	 -->
+	<select id="getMonthlyUserStatsForDashboard"  resultType="map">
+		<![CDATA[
+	   WITH MONTH_LIST AS (
+		  -- 올해 1월 말일부터 현재 월 말일까지의 월말 목록
+		  SELECT LAST_DAY(ADD_MONTHS(TRUNC(SYSDATE, 'YY'), LEVEL - 1)) AS month_end
+		  FROM DUAL
+		  CONNECT BY LAST_DAY(ADD_MONTHS(TRUNC(SYSDATE, 'YY'), LEVEL - 1)) <= LAST_DAY(SYSDATE)
+		)
+		SELECT
+		  TO_CHAR(m.month_end, 'MM') AS "month",
+		
+		  -- 해당 월말 시점까지의 누적 총 가입자 수(탈퇴자 제외)
+		  (SELECT COUNT(*)
+		     FROM MEMBER
+		    WHERE CREATED_AT <= m.month_end
+		      AND MEM_ID NOT IN (
+		            SELECT MEM_ID
+		              FROM MEM_DEL
+		             WHERE MD_DELETED_AT <= m.month_end
+		      )
+		  ) AS "totalUsers",
+		
+		  -- 해당 월의 구독자 수 = 전달에 결제한 사람 수 (기준: 월말)
+		  (SELECT COUNT(*)
+		     FROM PAYMENT
+		    WHERE PAY_DATE >= ADD_MONTHS(TRUNC(m.month_end, 'MM'), -1)  -- 전달 월초 포함
+		      AND PAY_DATE <  TRUNC(m.month_end, 'MM')                  -- 당월 월초 미만
+		  ) AS "subscribers"
+		
+		FROM MONTH_LIST m
+		ORDER BY "month"
+	    ]]>
+	</select>
+	
+	<!-- 지난달 총 구독자 수 조회 (Oracle 버전) -->
+	<select id="selectTotalSubscriberCountLastMonth" resultType="int">
+	    SELECT
+	        COUNT(DISTINCT MEM_ID)
+	    FROM
+	        MEMBER_SUBSCRIPTION
+	    WHERE
+	        TRUNC(SUB_END_DT) >= LAST_DAY(ADD_MONTHS(SYSDATE, -2)) + 1
+	        AND TRUNC(SUB_END_DT) <![CDATA[ <= ]]> LAST_DAY(ADD_MONTHS(SYSDATE, -1))
+	</select>
+	
+	<!-- 어제 새로운 구독자 수 조회 (Oracle 버전) -->
+	<select id="selectNewSubscriberCountYesterday" resultType="int">
+	    SELECT
+	        COUNT(*)
+	    FROM PAYMENT P
+	    JOIN MEMBER_SUBSCRIPTION MS ON P.MS_ID = MS.MS_ID
+	    WHERE 
+	        TRUNC(P.PAY_DATE) = TRUNC(SYSDATE) - 1
+	        AND P.PAY_DATE = (
+	            SELECT MIN(P2.PAY_DATE)
+	            FROM PAYMENT P2
+	            JOIN MEMBER_SUBSCRIPTION MS2 ON P2.MS_ID = MS2.MS_ID
+	            WHERE MS2.MEM_ID = MS.MEM_ID
+	        )
+	</select>
+</mapper>

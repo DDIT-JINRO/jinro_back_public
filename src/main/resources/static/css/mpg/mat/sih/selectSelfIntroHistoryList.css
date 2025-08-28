@@ -1,0 +1,192 @@
+.activity-container {
+    margin: 0 auto;    /* 중앙 정렬 */
+	background-color: #fff;
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.com-select-wrapper {
+	position: relative;
+	display: flex;
+	align-items: center;
+	background-color: #fff;
+	/* 우측 구분선 */
+	border-right: 2px solid #e5e7eb;
+}
+
+/* 검색창 select 박스 스타일 */
+.com-status-filter {
+	/* 기본 select 스타일 초기화 */
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	background-color: transparent;
+	border: none;
+	padding: 0 36px 0 16px; /* 오른쪽 패딩으로 화살표 공간 확보 */
+	font-size: 1rem;
+	color: #4b5563;
+	cursor: pointer;
+	height: 100%;
+}
+
+.com-status-filter:focus {
+	outline: none;
+}
+/* IE 브라우저용 화살표 숨기기 */
+.com-status-filter::-ms-expand {
+	display: none;
+}
+
+/* 커스텀 화살표 아이콘 */
+.com-select-arrow {
+	position: absolute;
+	right: 12px;
+	width: 20px;
+	height: 20px;
+	color: #6b7280;
+	pointer-events: none; /* 화살표가 select 클릭을 방해하지 않도록 */
+}
+
+/* 1. 기본 검색창 스타일 */
+.com-default-search {
+	display: flex;
+	border: 2px solid #e5e7eb;
+	border-radius: 8px;
+	overflow: hidden;
+	margin-bottom: 12px;
+	background-color: #fff;
+}
+
+.com-default-search input {
+	width: auto;
+	flex-grow: 1;
+	border: none;
+	padding: 12px 16px;
+	font-size: 1rem;
+}
+
+.com-default-search input:focus {
+	outline: none;
+}
+
+.com-default-search .com-search-btn {
+	background: none;
+	border: none;
+	padding: 0 16px;
+	cursor: pointer;
+	color: #6b7280;
+}
+
+.self-intro-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* 아이템 사이 간격 */
+}
+
+.self-intro-history-item {
+    padding: 24px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.self-intro-history-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.07);
+}
+
+.item-content {
+    display: flex; /* 가로 정렬 */
+    justify-content: space-between; /* 양쪽 끝으로 분리 */
+    align-items: center; /* 세로 중앙 정렬 */
+    width: 100%; /* 너비를 100%로 설정 */
+    gap: 16px; /* 좌우 콘텐츠 사이의 최소 간격 */
+}
+
+.item-header {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.category-tag {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.category-tag.writing {
+    background-color: #fde047; /* 더 선명하고 진한 노란색 배경 */
+    color: #713f12;      /* 가독성을 위한 짙은 갈색 글씨 */
+}
+
+.category-tag.complete {
+	background-color: #7881f5;
+	color: white;
+}
+
+.item-title {
+	margin: 0;
+	font-size: 1.1rem;
+	font-weight: 600;
+}
+
+.item-title a {
+	color: #111827;
+	text-decoration: none;
+}
+
+.item-title a:hover {
+	text-decoration: underline;
+}
+
+.item-meta {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.pagination a {
+	padding: 0.4rem;
+}
+
+.pagination li:last-child
+, .pagination li:first-child {
+	width: 100px;
+}
+
+.page-num {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 25px;
+	height: 25px;
+	border-radius: 6px;
+	text-decoration: none;
+	color: #374151;
+	font-weight: 500;
+}
+
+.page-num:hover {
+	background-color: #f3f4f6;
+}
+
+.page-num.active {
+	background-color: #7881f5;
+	color: #fff;
+	font-weight: 700;
+}
+
+/* 5. (선택) 콘텐츠가 없을 경우를 위한 스타일 */
+.no-content-message {
+    padding: 80px 20px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 1.1rem;
+    border: 1px dashed #e5e7eb;
+    border-radius: 8px;
+}

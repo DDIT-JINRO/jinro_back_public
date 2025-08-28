@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.cns.service.impl.CounselorMapper">
+
+	<resultMap type="kr.or.ddit.cns.service.CounselingVO" id="counselingMap">
+		<result property="memId" column="MEM_ID"/>
+		<result property="counsel" column="COUNSEL"/>
+		<result property="counselCategory" column="COUNSEL_CATEGORY"/>
+		<result property="counselMethod" column="COUNSEL_METHOD"/>
+		<result property="counselTitle" column="COUNSEL_TITLE"/>
+		<result property="counselDescription" column="COUNSEL_DESCRIPTION"/>
+		<result property="counselStatus" column="COUNSEL_STATUS"/>
+		<result property="counselReqDatetime" column="COUNSEL_REQ_DATETIME"/>
+		<result property="counselUrlCou" column="COUNSEL_URL_COU"/>
+		<result property="counselReviewd" column="COUNSEL_REVIEWD"/>
+		<result property="counselCreatedAt" column="COUNSEL_CREATED_AT"/>
+		<result property="counselUpdatedAt" column="COUNSEL_UPDATED_AT"/>
+		<result property="counselId" column="COUNSEL_ID"/>
+		<result property="counselUrlUser" column="COUNSEL_URL_USER"/>
+
+		<result property="counselName" column="COUNSEL_NAME"/>
+
+		<result property="memName" column="MEM_NAME"/>
+		<result property="memEmail" column="MEM_EMAIL"/>
+		<result property="memPhoneNumber" column="MEM_PHONE_NUMBER"/>
+		<result property="memBirth" column="MEM_BIRTH"/>
+		<result property="memGen" column="MEM_GEN"/>
+
+		<association property="counselingLog"  javaType="kr.or.ddit.cns.service.CounselingLogVO">
+			<id property="clIdx" column="CL_IDX"/>
+			<result property="counselId" column="COUNSEL_ID" />
+			<result property="clContent" column="CL_CONTENT" />
+			<result property="clDifficulty" column="CL_DIFFICULTY" />
+			<result property="clContinue" column="CL_CONTINUE" />
+			<result property="clConfirm" column="CL_CONFIRM" />
+			<result property="createdAt" column="CREATED_AT" />
+			<result property="updatedAt" column="UPDATED_AT" />
+			<result property="clEtc" column="CL_ETC" />
+			<result property="fileGroupId" column="FILE_GROUP_ID" />
+		</association>
+	</resultMap>
+
+
+	<select id="selectTotalCompletedCounselList" resultType="int" parameterType="kr.or.ddit.cns.service.CounselingVO">
+		    SELECT
+		        count(COUNSEL_ID)
+		    FROM
+		        (
+		            SELECT
+		                A.COUNSEL_ID
+		              , M1.MEM_NAME AS MEM_NAME
+		              , M1.MEM_EMAIL AS MEM_EMAIL
+		              , M1.MEM_PHONE_NUMBER AS MEM_PHONE_NUMBER
+		              , M1.MEM_BIRTH AS MEM_BIRTH
+		              , M2.MEM_NAME AS COUNSEL_NAME
+		              , A.COUNSEL_CATEGORY
+		              , A.COUNSEL_METHOD
+		              , A.COUNSEL_TITLE
+		              , A.COUNSEL_DESCRIPTION
+		              , A.COUNSEL_STATUS
+		              , A.COUNSEL_REQ_DATETIME
+		              , A.COUNSEL_REVIEWD
+		              , A.COUNSEL_CREATED_AT
+		              , A.COUNSEL_UPDATED_AT
+
+                      , CL.CL_IDX
+                      , CL.CL_CONTENT
+                      , CL.CL_DIFFICULTY
+                      , CL.CL_CONTINUE
+                      , CL.CL_CONFIRM
+                      , CL.CREATED_AT
+                      , CL.UPDATED_AT
+		            FROM
+		                COUNSELING A
+		                LEFT JOIN MEMBER M1 ON A.MEM_ID = M1.MEM_ID
+		                LEFT JOIN MEMBER M2 ON A.COUNSEL = M2.MEM_ID
+                        LEFT OUTER JOIN COUNSELING_LOG CL ON CL.COUNSEL_ID = A.COUNSEL_ID
+		            WHERE
+		                A.COUNSEL = #{counsel}
+		              AND
+		                A.COUNSEL_STATUS='S04004'
+		            <if test="keyword != null and keyword != ''">
+		            	<choose>
+		            		<when test="status == 'title'">
+		            			AND A.COUNSEL_TITLE LIKE '%' || #{keyword} || '%'
+		            		</when>
+		            		<when test="status == 'content'">
+		            			AND A.COUNSEL_DESCRIPTION LIKE '%' || #{keyword} || '%'
+		            		</when>
+		            		<when test="status == 'mem'">
+		            			AND M1.MEM_NAME LIKE '%' || #{keyword} || '%'
+		            		</when>
+		            		<otherwise>
+		            			AND (
+		            				A.COUNSEL_TITLE LIKE '%' || #{keyword} || '%'
+			            			OR A.COUNSEL_DESCRIPTION LIKE '%' || #{keyword} || '%'
+			            			OR M1.MEM_NAME LIKE '%' || #{keyword} || '%'
+		            			)
+		            		</otherwise>
+		            	</choose>
+		            </if>
+		            <if test="year != null and year != ''">
+		            	AND EXTRACT(YEAR FROM COUNSEL_REQ_DATETIME) = #{year}
+		            </if>
+		            ORDER BY
+		            	A.COUNSEL_REQ_DATETIME DESC
+		        ) D
+	</select>
+
+
+	<select id="selectCompletedCounselList" resultMap="counselingMap" parameterType="kr.or.ddit.cns.service.CounselingVO">
+		SELECT
+			MEM_NAME
+			, COUNSEL_ID
+			, MEM_NAME
+			, MEM_EMAIL
+			, MEM_PHONE_NUMBER
+			, MEM_BIRTH
+			, COUNSEL_NAME
+			, COUNSEL_CATEGORY
+			, COUNSEL_METHOD
+			, COUNSEL_TITLE
+			, COUNSEL_DESCRIPTION
+			, COUNSEL_STATUS
+			, COUNSEL_REQ_DATETIME
+			, COUNSEL_REVIEWD
+			, COUNSEL_CREATED_AT
+			, COUNSEL_UPDATED_AT
+
+			, CL_IDX
+            , CL_CONTENT
+            , CL_DIFFICULTY
+            , CL_CONTINUE
+            , CL_CONFIRM
+            , CREATED_AT
+            , UPDATED_AT
+            , FILE_GROUP_ID
+		FROM (
+		    SELECT
+		        ROWNUM AS RN
+		        , D.*
+		    FROM
+		        (
+		            SELECT
+		                A.COUNSEL_ID
+		              , M1.MEM_NAME AS MEM_NAME
+		              , M1.MEM_EMAIL AS MEM_EMAIL
+		              , M1.MEM_PHONE_NUMBER AS MEM_PHONE_NUMBER
+		              , M1.MEM_BIRTH AS MEM_BIRTH
+		              , M2.MEM_NAME AS COUNSEL_NAME
+		              , A.COUNSEL_CATEGORY
+		              , A.COUNSEL_METHOD
+		              , A.COUNSEL_TITLE
+		              , A.COUNSEL_DESCRIPTION
+		              , A.COUNSEL_STATUS
+		              , A.COUNSEL_REQ_DATETIME
+		              , A.COUNSEL_REVIEWD
+		              , A.COUNSEL_CREATED_AT
+		              , A.COUNSEL_UPDATED_AT
+
+                      , CL.CL_IDX
+                      , CL.CL_CONTENT
+                      , CL.CL_DIFFICULTY
+                      , CL.CL_CONTINUE
+                      , CL.CL_CONFIRM
+                      , CL.CREATED_AT
+                      , CL.UPDATED_AT
+                      , CL.FILE_GROUP_ID
+		            FROM
+		                COUNSELING A
+		                LEFT JOIN MEMBER M1 ON A.MEM_ID = M1.MEM_ID
+		                LEFT JOIN MEMBER M2 ON A.COUNSEL = M2.MEM_ID
+                        LEFT OUTER JOIN COUNSELING_LOG CL ON CL.COUNSEL_ID = A.COUNSEL_ID
+		            WHERE
+		                A.COUNSEL = #{counsel}
+		              AND
+		                A.COUNSEL_STATUS='S04004'
+		            <if test="keyword != null and keyword != ''">
+		            	<choose>
+		            		<when test="status == 'title'">
+		            			AND A.COUNSEL_TITLE LIKE '%' || #{keyword} || '%'
+		            		</when>
+		            		<when test="status == 'content'">
+		            			AND A.COUNSEL_DESCRIPTION LIKE '%' || #{keyword} || '%'
+		            		</when>
+		            		<when test="status == 'mem'">
+		            			AND M1.MEM_NAME LIKE '%' || #{keyword} || '%'
+		            		</when>
+		            		<otherwise>
+		            			AND (
+		            				A.COUNSEL_TITLE LIKE '%' || #{keyword} || '%'
+			            			OR A.COUNSEL_DESCRIPTION LIKE '%' || #{keyword} || '%'
+			            			OR M1.MEM_NAME LIKE '%' || #{keyword} || '%'
+		            			)
+		            		</otherwise>
+		            	</choose>
+		            </if>
+		            <if test="year != null and year != ''">
+		            	AND EXTRACT(YEAR FROM COUNSEL_REQ_DATETIME) = #{year}
+		            </if>
+		            ORDER BY
+		            	A.COUNSEL_REQ_DATETIME DESC
+		        ) D
+		)X
+		WHERE
+		  X.RN > #{startNo}
+		AND
+		  X.RN <![CDATA[<=]]> #{endNo}
+	</select>
+
+	<select id="selectCounselDetail" resultMap="counselingMap" parameterType="int">
+		SELECT
+			   A.COUNSEL_ID
+			 , M1.MEM_ID
+			 , M1.MEM_NAME
+			 , M1.MEM_EMAIL
+			 , M1.MEM_PHONE_NUMBER
+			 , M1.MEM_BIRTH
+			 , M1.MEM_GEN
+			 , M2.MEM_NAME AS COUNSEL_NAME
+			 , A.COUNSEL_CATEGORY
+			 , A.COUNSEL_METHOD
+			 , A.COUNSEL_TITLE
+			 , A.COUNSEL_DESCRIPTION
+			 , A.COUNSEL_STATUS
+			 , A.COUNSEL_REQ_DATETIME
+			 , A.COUNSEL_REVIEWD
+			 , A.COUNSEL_CREATED_AT
+			 , A.COUNSEL_UPDATED_AT
+			 , A.COUNSEL
+			 , A.COUNSEL_URL_COU
+
+			 , CL.CL_IDX
+             , CL.CL_CONTENT
+             , CL.CL_DIFFICULTY
+             , CL.CL_CONTINUE
+             , CL.CL_CONFIRM
+             , CL.CREATED_AT
+             , CL.UPDATED_AT
+             , CL.FILE_GROUP_ID
+             , CL.CL_ETC
+		  FROM COUNSELING A
+               LEFT JOIN MEMBER M1 ON A.MEM_ID = M1.MEM_ID
+               LEFT JOIN MEMBER M2 ON A.COUNSEL = M2.MEM_ID
+               LEFT OUTER JOIN COUNSELING_LOG CL ON CL.COUNSEL_ID = A.COUNSEL_ID
+         WHERE A.COUNSEL_ID = #{counselId}
+	</select>
+
+	<update id="updateCnsLog" parameterType="kr.or.ddit.cns.service.CounselingLogVO">
+		MERGE INTO COUNSELING_LOG CL
+		USING DUAL ON(
+		 CL.CL_IDX = #{clIdx}
+		)
+		WHEN MATCHED THEN
+		    UPDATE
+		    SET CL_CONTENT = #{clContent}
+		    , CL_DIFFICULTY = #{clDifficulty}
+		    , CL_CONTINUE = #{clContinue}
+		    , CL_CONFIRM = #{clConfirm}
+		    , UPDATED_AT = SYSDATE
+		    , FILE_GROUP_ID = #{fileGroupId}
+		WHEN NOT MATCHED THEN
+		    INSERT (
+			    CL_IDX
+				, COUNSEL_ID
+				, CL_CONTENT
+				, CL_DIFFICULTY
+				, CL_CONTINUE
+				, CL_CONFIRM
+				, CREATED_AT
+				, UPDATED_AT
+				, FILE_GROUP_ID
+		    )VALUES(
+		        (SELECT NVL(MAX(CL_IDX),0)+1 FROM COUNSELING_LOG)
+		        , #{counselId}
+		        , #{clContent}
+		        , #{clDifficulty}
+		        , #{clContinue}
+		        , #{clConfirm}
+		        , SYSDATE
+		        , SYSDATE
+		        , #{fileGroupId}
+		    )
+	</update>
+
+	<select id="selectCounselList" resultType="kr.or.ddit.cns.service.CounselingVO">
+		SELECT
+		       COUNSEL_ID
+		     , MEM_ID
+		     , COUNSEL
+		     , COUNSEL_CATEGORY
+		     , COUNSEL_METHOD
+		     , COUNSEL_TITLE
+		     , COUNSEL_DESCRIPTION
+		     , COUNSEL_STATUS
+		     , COUNSEL_REQ_DATETIME
+		     , COUNSEL_URL_COU
+		     , COUNSEL_REVIEWD
+		     , COUNSEL_CREATED_AT
+		     , COUNSEL_UPDATED_AT
+		     , COUNSEL_URL_USER
+		  FROM COUNSELING
+	</select>
+
+	<select id="selectTotalMyVationList" resultType="int" parameterType="kr.or.ddit.cns.service.VacationVO">
+				SELECT COUNT(VA_ID)
+				  FROM VACATION
+				 WHERE VA_REQUESTOR = #{vaRequestor}
+				 <if test="filter!=null and filter!='' ">
+				   AND VA_CONFIRM = #{filter}
+				 </if>
+	</select>
+	<select id="selectMyVationList" resultType="kr.or.ddit.cns.service.VacationVO" parameterType="kr.or.ddit.cns.service.VacationVO">
+		SELECT
+			   VA_ID
+			 , VA_REQUESTOR
+			 , VA_APPROVER
+			 , VA_CONFIRM
+			 , VA_START
+			 , VA_END
+			 , VA_REASON
+			 , VA_ETC
+			 , FILE_GROUP_ID
+			 , REQUESTED_AT
+		  FROM
+			(
+			SELECT
+				   ROWNUM RN
+				 , A.*
+			FROM
+				(SELECT
+				       VA_ID
+				     , VA_REQUESTOR
+				     , VA_APPROVER
+				     , VA_CONFIRM
+				     , VA_START
+				     , VA_END
+				     , VA_REASON
+				     , VA_ETC
+				     , FILE_GROUP_ID
+				     , REQUESTED_AT
+				  FROM VACATION
+				 WHERE VA_REQUESTOR = #{vaRequestor}
+				 <if test="filter!=null and filter!='' ">
+				   AND VA_CONFIRM = #{filter}
+				 </if>
+			 	<if test="sortBy!=null and sortBy=='reqDesc' ">
+			 		ORDER BY REQUESTED_AT DESC
+			 	</if>
+			 	<if test="sortBy!=null and sortBy=='reqAsc' ">
+			 		ORDER BY REQUESTED_AT ASC
+			 	</if>
+			 	<if test="sortBy!=null and sortBy=='startDesc' ">
+			 		ORDER BY VA_START DESC
+			 	</if>
+			 	<if test="sortBy!=null and sortBy=='startAsc' ">
+			 		ORDER BY VA_START ASC
+			 	</if>
+				 ) A
+			 		) X
+  		  WHERE X.RN > #{startNo}
+		    AND X.RN <![CDATA[<=]]> #{endNo}
+	</select>
+
+	<insert id="insertVacation" parameterType="kr.or.ddit.cns.service.VacationVO">
+		<selectKey keyProperty="vaId" order="BEFORE" resultType="int">
+			SELECT NVL(MAX(VA_ID),0)+1 FROM VACATION
+		</selectKey>
+		INSERT INTO VACATION (
+		    VA_ID
+		    , VA_REQUESTOR
+		    , VA_CONFIRM
+		    , VA_START
+		    , VA_END
+		    , VA_REASON
+		    <if test="fileGroupId!=null and fileGroupId!=0L">
+		    , FILE_GROUP_ID
+		    </if>
+		    , REQUESTED_AT
+		) VALUES (
+			  #{vaId}
+			, #{vaRequestor}
+			, #{vaConfirm}
+			, #{vaStart}
+			, #{vaEnd}
+			, #{vaReason}
+			<if test="fileGroupId!=null and fileGroupId!=0L">
+			, #{fileGroupId}
+			</if>
+			, SYSDATE
+		)
+	</insert>
+
+	<select id="selectMyDeterminedCounselList" parameterType="int" resultType="kr.or.ddit.cns.service.CounselingVO">
+		SELECT
+		       COUNSEL_REQ_DATETIME
+		  FROM COUNSELING
+		 WHERE COUNSEL_STATUS = 'S04003'
+		   AND COUNSEL_REQ_DATETIME >= SYSDATE
+		   AND COUNSEL = #{counsel}
+	</select>
+
+	<select id="selectMyInProgressVacationList" parameterType="int" resultType="kr.or.ddit.cns.service.VacationVO">
+		SELECT
+		       VA_START
+		     , VA_END
+		  FROM VACATION
+		 WHERE VA_CONFIRM != 'S03002'
+		   AND VA_END >= SYSDATE
+		   AND VA_REQUESTOR = #{vaRequestor}
+	</select>
+	
+	
+	<select id="selectCounselingSchedules" parameterType="kr.or.ddit.cns.service.CounselingVO" resultType="kr.or.ddit.cns.service.CounselingVO">
+	  SELECT
+		    a.counsel_id,
+		    a.mem_id,
+		    a.counsel,
+		    a.counsel_category,
+		    a.counsel_method,
+		    a.counsel_title,
+		    a.counsel_description,
+		    a.counsel_status,
+		    a.counsel_req_datetime,
+		    a.counsel_url_cou,
+		    b.MEM_EMAIL,
+		    b.MEM_NAME,
+		    b.MEM_GEN,
+		    b.MEM_BIRTH,
+		    b.MEM_PHONE_NUMBER,
+		    c.cc_name counsel_category_str,
+		    d.cc_name counsel_method_str,
+		    e.cc_name mem_gen_str,
+		    f.cc_name counsel_status_str
+		FROM
+		         counseling a
+		    JOIN member b ON a.mem_id = b.mem_id
+		    JOIN COM_CODE C ON a.counsel_category = c.cc_id
+		    JOIN COM_CODE d ON a.counsel_method = d.cc_id
+		    JOIN COM_CODE e ON b.MEM_GEN = e.cc_id
+		    JOIN COM_CODE f ON a.counsel_status = f.cc_id
+		
+		WHERE
+		        counsel = #{counsel}
+		    AND trunc(counsel_req_datetime) = trunc(#{counselReqDatetime})
+		order by a.counsel_req_datetime 
+    </select>
+    
+	<update id="updateCounselStatus" parameterType="kr.or.ddit.cns.service.CounselingVO">
+	  UPDATE COUNSELING
+	  <set>
+	    <if test="counselStatus != null">
+	      COUNSEL_STATUS = #{counselStatus},
+	    </if>
+	    <if test="counselUrlCou != null">
+	      COUNSEL_URL_COU = #{counselUrlCou},
+	    </if>
+	    <if test="counselUrlUser != null">
+	      COUNSEL_URL_USER = #{counselUrlUser},
+	    </if>
+	  </set>
+	  WHERE counsel_id = #{counselId}
+	</update>
+	
+	<update id="plusPayConsultCnt" parameterType="int">
+		UPDATE PAYMENT
+			SET PAY_CONSULT_CNT = PAY_CONSULT_CNT + 1
+			WHERE PAY_ID = #{payId}
+	</update>
+
+	<select id="selectMonthlyCounselingData" parameterType="kr.or.ddit.cns.service.CounselingVO" resultType="kr.or.ddit.cns.service.CounselingVO">
+	    <![CDATA[
+	    
+	    SELECT
+		    COUNSEL_ID,
+		    COUNSEL_REQ_DATETIME,
+		    COUNSEL_STATUS
+		FROM
+		    COUNSELING
+		WHERE
+		    counsel_req_datetime BETWEEN #{counselReqDatetime} AND LAST_DAY(#{counselReqDatetime})
+		    AND counsel = #{counsel}
+	    ]]>
+	</select>
+</mapper>

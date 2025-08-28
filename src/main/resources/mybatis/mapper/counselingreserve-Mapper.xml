@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.cnslt.resve.crsv.service.impl.CounselingReserveMapper">
+
+	<!-- 최종 상담신청  -->
+	<insert id="insertReservation" parameterType="kr.or.ddit.cnslt.resve.crsv.service.CounselingVO">
+		INSERT
+		    INTO counseling (
+		        counsel_id,
+		        mem_id,
+		        counsel,
+		        counsel_title,
+		        counsel_category,
+		        counsel_method,
+		        counsel_description,
+		        counsel_status,
+		        counsel_req_datetime,
+		        counsel_created_at,
+		        counsel_updated_at
+		    )
+		VALUES (COUNSEL_ID_SEQ.NEXTVAL,
+		        #{memId},
+		        #{counsel},
+		        #{counselTitle},
+		        #{counselCategory},
+		        #{counselMethod},
+		        #{counselDescription},
+		        'S04001',
+		        #{counselReqDatetime},
+		        sysdate,
+		        sysdate
+		        )
+	</insert>
+
+	<!-- 회원 상담중복 검사 -->
+    <select id="selectDuplicateCounselingByMemId" resultType="int" parameterType="kr.or.ddit.cnslt.resve.crsv.service.CounselingVO">
+        SELECT count(*)
+        FROM COUNSELING
+        WHERE MEM_ID = #{memId}
+        AND COUNSEL_REQ_DATETIME = #{counselReqDatetime}
+        AND COUNSEL_STATUS IN ('S04001', 'S04003')
+    </select>
+    
+    <!-- 상담사 예약  확인 -->
+    <select id="selectReservationByCounselorAndTime" parameterType="kr.or.ddit.cnslt.resve.crsv.service.CounselingVO" resultType="int">
+    SELECT count(*)
+        FROM COUNSEL
+        WHERE COUNSEL = #{counsel}
+        AND COUNSEL_REQ_DATETIME = #{counselReqDatetime}
+        AND COUNSEL_STATUS IN ('S04001', 'S04003')
+    </select>
+    
+    <!-- {vaRequestor} 상담사 id로 검색 -->
+    <select id="selectCounselorVacations" resultType="int" parameterType="kr.or.ddit.cnslt.resve.crsv.service.VacationVO">
+        SELECT count(*)
+        FROM VACATION
+        WHERE VA_REQUESTOR = #{vaRequestor}
+        AND VA_CONFIRM = 'S03003'  AND #{vaStart} BETWEEN VA_START AND VA_END
+    </select>
+    
+    <update id="updateReservationStatus" parameterType="kr.or.ddit.cnslt.resve.crsv.service.CounselingVO">
+        UPDATE COUNSELING
+        SET COUNSEL_STATUS = #{counselStatus},
+            COUNSEL_UPDATED_AT = SYSDATE
+        WHERE COUNSEL_ID  = #{counselId}
+    </update>
+    
+     <select id="selectBookedTimesByCounselorAndDate" resultType="java.util.Date" parameterType="kr.or.ddit.cnslt.resve.crsv.service.CounselingVO">
+	    SELECT COUNSEL_REQ_DATETIME
+	    FROM COUNSELING
+	    WHERE COUNSEL = #{counsel}
+	    AND TRUNC(COUNSEL_REQ_DATETIME) = TRUNC(#{counselReqDatetime, jdbcType=DATE})
+	    AND COUNSEL_STATUS IN ('S04001', 'S04003')
+    </select>
+    
+    <!-- 상담사 목록 가져오기 -->
+	    <select id="selectCounselorList" resultType="kr.or.ddit.main.service.MemberVO">
+	    select MEM_ID, MEM_NICKNAME, MEM_NAME, MEM_GEN, MEM_ROLE, MEM_EMAIL
+			from MEMBER
+			where MEM_ROLE = 'R01003'
+    </select>
+    
+    <!-- 상담목적 가져오기 -->
+    <select id="selectCounselCategoryList" resultType="kr.or.ddit.com.ComCodeVO">
+	    select CC_ID, CC_NAME
+			from COM_CODE
+			where CL_CODE = 'G07'
+    </select>
+    
+    <!-- 상담방법 가져오기 -->
+    <select id="selectCounselMethodList" resultType="kr.or.ddit.com.ComCodeVO">
+	    select CC_ID, CC_NAME
+			from COM_CODE
+			where CL_CODE = 'G08'
+			and CC_ID != 'G08004'
+	</select>
+
+	<!-- 회원 인적사항 가져오기 -->
+	<select id="counselingReserveMapper" parameterType="kr.or.ddit.main.service.MemberVO" resultType="kr.or.ddit.main.service.MemberVO">
+		SELECT
+		    mem_id,
+		    mem_email,
+		    mem_nickname,
+		    mem_phone_number,
+		    mem_name,
+		    c.cc_name mem_gen,
+		    mem_birth
+		FROM
+		    member m
+		join
+		    COM_CODE c 
+		on  c.CC_ID = m.mem_gen
+		WHERE
+		    mem_id = #{memId}
+	</select>
+	
+	<select id="selectLastSubcription" parameterType="kr.or.ddit.mpg.pay.service.MemberSubscriptionVO" resultType="kr.or.ddit.mpg.pay.service.PaymentVO">
+		SELECT
+		    pay_id,
+		    ms_id,
+		    pay_date,
+		    pay_consult_cnt
+		FROM
+		    payment
+		WHERE
+		    ms_id = #{msId}
+		ORDER BY
+		    pay_id DESC
+		FETCH FIRST 1 ROW ONLY
+	</select>
+	
+	<update id="minusPayConsultCnt" parameterType="int">
+		UPDATE PAYMENT
+			SET PAY_CONSULT_CNT = PAY_CONSULT_CNT - 1
+			WHERE PAY_ID = #{payId} AND PAY_CONSULT_CNT > 0
+	</update>
+</mapper>

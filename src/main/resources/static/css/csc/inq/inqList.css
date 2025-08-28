@@ -1,0 +1,266 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   1:1문의 전용 스타일 (userCommon.css 클래스 확장)
+   ========================================================================== */
+
+/* 문의 아이콘과 텍스트 정렬용 */
+.inq-icon-title {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+}
+
+.inq-title-left {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex: 1;
+}
+
+.inq-icon {
+	width: 20px;
+	height: 20px;
+	background-color: #e0f2ff;
+	color: #3a8dff;
+	border-radius: 50%;
+	font-size: 13px;
+	font-weight: bold;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+.inq-title-text {
+	font-weight: 600;
+	color: #222;
+	font-size: 16px;
+}
+
+/* 문의 상태 뱃지 */
+.inquiry-status {
+	display: inline-flex;
+	align-items: center;
+	padding: 4px 12px;
+	border-radius: 12px;
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.inquiry-status--completed {
+	background-color: #d4edda;
+	color: #155724;
+	border: 1px solid #c3e6cb;
+}
+
+.inquiry-status--pending {
+	background-color: #fff3cd;
+	color: #856404;
+	border: 1px solid #ffeaa7;
+}
+
+/* 문의 내용 스타일 */
+.inquiry-content {
+	grid-column: 1/-1;
+}
+
+.inquiry-text {
+	line-height: 1.75;
+	color: #374151;
+	word-break: break-word;
+	white-space: pre-wrap;
+	font-size: 15px;
+	padding: 16px 20px;
+	margin: 8px 0;
+	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* 답변 내용 스타일 */
+.inquiry-reply {
+	grid-column: 1/-1;
+}
+
+.reply-text {
+	line-height: 1.75;
+	color: #0f172a;
+	word-break: break-word;
+	white-space: pre-wrap;
+	font-size: 15px;
+	padding: 16px 20px;
+	margin: 8px 0;
+	background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+	border: 1px solid #bae6fd;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+	position: relative;
+}
+
+.reply-text::before {
+	content: '"';
+	font-size: 3em;
+	color: #3b82f6;
+	position: absolute;
+	top: 8px;
+	right: 16px;
+	opacity: 0.3;
+}
+
+/* 문의 전용 아코디언 컬럼 스타일 재정의 */
+.accordion-list__col--company-name {
+	flex: 2;
+	justify-content: flex-start;
+	text-align: left;
+}
+
+.accordion-list__item-header {
+	padding: 25px;
+}
+
+.accordion-list__col--meta {
+	flex: 2.5;
+	display: flex;
+	justify-content: space-between;
+	gap: 15px;
+}
+
+.accordion-list__col--author {
+	flex: 1;
+}
+
+.accordion-list__col--date {
+	flex: 1;
+}
+
+.accordion-list__status {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/* 문의 아이템 호버 효과 강화 */
+.accordion-list__item:hover {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+	border-color: #d1d5db;
+}
+
+/* 문의 활성화 상태 스타일 */
+.accordion-list__item-header.is-active {
+	border-bottom: 1px solid #e5e7eb;
+}
+
+/* 문의 검색 결과가 없을 때 메시지 */
+.content-list__no-results {
+	text-align: center;
+	padding: 60px 20px;
+	color: #6b7280;
+	font-size: 16px;
+	border: 1px dashed #e5e7eb;
+	border-radius: 8px;
+	background-color: #f9fafb;
+}
+
+.content-list {
+	margin-bottom: 0;
+}
+
+/* 페이지 액션 버튼 (문의하기) */
+.page-actions {
+	display: flex;
+	justify-content: flex-end;
+	margin: 20px 0;
+}
+
+.page-actions__button {
+	padding: 10px 20px;
+	border: none;
+	border-radius: 8px;
+	background-color: #7881f5;
+	color: white;
+	font-weight: bold;
+	font-size: 14px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.page-actions__button:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 문의 상세 정보 그리드 스타일 조정 */
+.detail-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px 24px;
+	margin-bottom: 20px;
+}
+
+.detail-item {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.detail-label {
+	font-size: 12px;
+	font-weight: 500;
+	color: #656d76;
+}
+
+.detail-value {
+	font-size: 14px;
+	color: #24292f;
+}
+
+/* ==========================================================================
+   반응형 스타일
+   ========================================================================== */
+@media ( max-width : 768px) {
+	.accordion-list__header {
+		display: none;
+	}
+	.accordion-list__item-header {
+		flex-wrap: wrap;
+		padding: 16px 20px;
+	}
+	.accordion-list__col--company-name, .accordion-list__col--meta {
+		flex-basis: 100%;
+	}
+	.accordion-list__col--meta {
+		justify-content: space-around;
+		font-size: 0.9rem;
+		padding-top: 8px;
+	}
+	.accordion-list__col--toggle {
+		position: absolute;
+		top: 15px;
+		right: 20px;
+	}
+	.inq-icon-title {
+		gap: 8px;
+	}
+	.inq-title-text {
+		font-size: 15px;
+	}
+	.inquiry-text, .reply-text {
+		font-size: 13px;
+		padding: 12px;
+	}
+	.detail-grid {
+		grid-template-columns: 1fr;
+	}
+	.inquiry-status {
+		font-size: 11px;
+		padding: 3px 8px;
+	}
+	.accordion-list__item-content.is-active {
+		padding: 16px 20px;
+	}
+}

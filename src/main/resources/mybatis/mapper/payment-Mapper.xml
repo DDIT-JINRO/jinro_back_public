@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.mpg.pay.service.impl.PaymentMapper">
+
+	<resultMap id="paymentMap" type="kr.or.ddit.mpg.pay.service.PaymentVO">
+		<id property="payId" column="PAY_ID" />
+		<result property="msId" column="MS_ID"/>
+		<result property="payDate" column="PAY_DATE" />
+		<result property="payAmount" column="PAY_AMOUNT" />
+		<result property="impUid" column="IMP_UID" />
+		<result property="payResumeCnt" column="PAY_RESUME_CNT" />
+		<result property="payCoverCnt" column="PAY_COVER_CNT" />
+		<result property="payConsultCnt" column="PAY_CONSULT_CNT" />
+		<result property="payMockCnt" column="PAY_MOCK_CNT" />
+		<result property="merchantUid" column="MERCHANT_UID" />
+		<result property="subName" column="SUB_NAME" />
+	</resultMap>
+
+	<!--  새로운 결제 정보를 데이터베이스에 삽입.
+	public int insertPayment(PaymentVO paymentVO); -->
+	<insert id="insertPayment" parameterType="kr.or.ddit.mpg.pay.service.PaymentVO">
+		<selectKey keyProperty="payId" resultType="int" order="BEFORE">
+			SELECT PAYMENT_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+        INSERT INTO PAYMENT (
+             PAY_ID
+            ,MS_ID
+            ,PAY_DATE
+            ,PAY_AMOUNT
+            ,IMP_UID
+            ,PAY_RESUME_CNT
+            ,PAY_COVER_CNT
+            ,PAY_CONSULT_CNT
+            ,PAY_MOCK_CNT
+            ,MERCHANT_UID
+        )
+        VALUES (
+            #{payId}
+           ,#{msId}
+           ,SYSDATE
+           ,#{payAmount}
+           ,#{impUid}
+           ,NVL(#{payResumeCnt}, 0)
+           ,NVL(#{payCoverCnt}, 0)
+           ,NVL(#{payConsultCnt}, 0)
+           ,NVL(#{payMockCnt}, 0)
+           ,#{merchantUid}
+        )
+	</insert>
+
+	<!--
+	//전체 결제 내역 조회 (구독 결제 내역 표시)
+	public List<PaymentVO> selectPaymentHistory(int memId);
+	 -->
+	 <select id="selectPaymentHistory" parameterType="int" resultMap="paymentMap">
+	    SELECT
+				p.PAY_ID
+	           ,p.PAY_DATE
+	           ,p.PAY_AMOUNT
+	           ,p.IMP_UID
+	           ,p.PAY_RESUME_CNT
+	           ,p.PAY_COVER_CNT
+	           ,p.PAY_CONSULT_CNT
+	           ,p.PAY_MOCK_CNT
+	           ,p.MERCHANT_UID
+	           ,s.SUB_NAME
+        FROM
+        		PAYMENT p
+        JOIN
+        		MEMBER_SUBSCRIPTION ms ON (p.MS_ID = ms.MS_ID)
+        JOIN
+        		SUBSCRIBE s ON (ms.SUB_ID = s.SUB_ID)
+        WHERE
+        		MEM_ID = #{memId}
+        ORDER BY
+        		p.PAY_DATE DESC
+	</select>
+
+	<!--
+	// 구독 월간 기능 횟수 초기화
+	public int resetUsageCounts()
+	 -->
+	<update id="resetUsageCounts">
+		UPDATE	PAYMENT
+		SET		PAY_RESUME_CNT = 0
+			   ,PAY_COVER_CNT = 0
+			   ,PAY_CONSULT_CNT = 0
+			   ,PAY_MOCK_CNT = 0
+		WHERE	TRUNC(ADD_MONTHS(PAY_DATE, 1) + 1) = TRUNC(SYSDATE)
+	</update>
+
+	<update id="minusPayMockCnt" parameterType="int">
+		UPDATE PAYMENT
+		   SET PAY_MOCK_CNT = PAY_MOCK_CNT - 1
+		 WHERE PAY_ID = #{payId}
+		   AND PAY_MOCK_CNT > 0
+	</update>
+
+	<!-- 가장 최근 결제 정보 불러오기 -->
+	<select id="selectLastSubcription" parameterType="kr.or.ddit.mpg.pay.service.MemberSubscriptionVO" resultType="kr.or.ddit.mpg.pay.service.PaymentVO">
+		SELECT
+		    pay_id,
+		    ms_id,
+		    pay_date,
+		    pay_consult_cnt
+		FROM
+		    payment
+		WHERE
+		    ms_id = #{msId}
+		ORDER BY
+		    pay_id DESC
+		FETCH FIRST 1 ROW ONLY
+	</select>
+
+</mapper>

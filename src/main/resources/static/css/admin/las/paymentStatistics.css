@@ -1,0 +1,56 @@
+.revenueChart {
+	justify-content: flex-end;
+}
+
+.left-column {
+	width: 792.5px;
+}
+
+.large-panel {
+	width: 792.5px;
+	height: 540px;
+}
+
+.chart-container {
+	margin-top: auto;
+	height: 400px;
+}
+
+.panel-right {
+	width: 792.5px;
+	height: 710px;
+}
+
+.subscriberCanvas {
+	margin-top: auto;
+	height: 550px;
+}
+
+.subscriberChart {
+	justify-content: flex-end;
+}
+
+.productPanel {
+	width: 800px;
+}
+
+.aiServiceSpace {
+	width: 800px;
+}
+
+.productChartBtnGroup {
+	justify-content: flex-end;
+}
+
+.productPanel {
+	height: 550px;
+}
+
+.chart-container4 {
+	margin-top: auto;
+	height: 400px;
+}
+
+.aiServiceChart {
+	justify-content: flex-end;
+}

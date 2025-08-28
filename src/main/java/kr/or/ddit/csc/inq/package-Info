@@ -1,0 +1,7 @@
+/**
+ * inq : inqury (문의사항)
+ * 문의사항과 관련된 패키지
+ * 
+ * kr\or\ddit\csc\inq\web\InqryController.java
+ * : 사용자는 관리자에게 1:1문의를 보내고, 관리자는 이에 응답 및 관리하는 클래스
+ */

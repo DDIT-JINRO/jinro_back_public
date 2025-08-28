@@ -1,0 +1,410 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   또래 게시판 작성 페이지 - 모던 테마
+   ========================================================================== */
+
+:root {
+  --card-bg: #fff;
+  --card-border: #E8ECEF;
+  --card-radius: 16px;
+  --card-shadow: rgba(0, 0, 0, 0.08);
+  --primary: #7881f5;
+  --primary-light: rgba(120, 129, 245, 0.1);
+  --primary-hover: #6e74d7;
+  --text-dark: #2d3748;
+  --text-mid: #4a5568;
+  --text-light: #718096;
+  --gap: 20px;
+  --border-light: rgba(120, 129, 245, 0.15);
+  --gradient-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 249, 255, 0.9));
+  --gradient-primary: linear-gradient(135deg, var(--primary), #4facfe);
+  --gradient-secondary: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+/* 메인 컨테이너 */
+.Insert-write {
+  background: var(--gradient-bg);
+  border: 2px solid var(--border-light);
+  border-radius: var(--card-radius);
+  padding: 40px;
+  box-shadow: 0 4px 20px var(--card-shadow);
+  backdrop-filter: blur(10px);
+  animation: fadeInUp 0.6s ease-out;
+  position: relative;
+}
+
+/* 제목 섹션 */
+.titleSpace {
+  display: flex;
+  gap: var(--gap);
+  padding-bottom: 40px;
+  align-items: center;
+  animation: fadeInUp 1s ease-out;
+}
+
+.insertTitle {
+  text-align: center;
+  align-content: center;
+  width: 120px;
+  height: 50px;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(120, 129, 245, 0.3);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.Insert-title {
+  border: 2px solid var(--border-light);
+  border-radius: 12px;
+  width: calc(100% - 140px);
+  box-sizing: border-box;
+  height: 50px;
+  font-size: 16px;
+  padding: 0 16px;
+  background: #fff;
+  color: var(--text-dark);
+  transition: all 0.3s ease;
+  font-family: 'Noto Sans KR', sans-serif;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.Insert-title:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.Insert-title::placeholder {
+  color: var(--text-light);
+  transition: all 0.3s ease;
+}
+
+.Insert-title:focus::placeholder {
+  opacity: 0.6;
+}
+
+/* 에디터 컨테이너 */
+.editor-container {
+  margin-bottom: 30px;
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border: 2px solid var(--border-light);
+  background: #fff;
+  transition: all 0.3s ease;
+}
+
+.editor-container:hover {
+  border-color: rgba(120, 129, 245, 0.3);
+}
+
+.ck-editor__editable {
+  min-height: 350px;
+  padding: 24px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-mid);
+  border: none;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.ck-editor__editable:focus {
+  box-shadow: none;
+}
+
+.ck.ck-toolbar.ck-toolbar_grouping {
+    border-width: 0;
+}
+
+.ck.ck-content.ck-editor__editable.ck-rounded-corners.ck-editor__editable_inline.ck-blurred {
+	border-width: 2px 0 0 0;
+    border-color: var(--border-light);
+    transition: all 0.2s ease;
+}
+
+.ck.ck-content.ck-editor__editable.ck-rounded-corners.ck-editor__editable_inline.ck-focused {
+	border-radius: 0 0 16px 16px;
+	border-width: 1px;
+	border-color: var(--primary);
+	transition: all 0.2s ease;
+}
+
+/* 파일 업로드 섹션 */
+.file-label {
+  display: inline-block;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: var(--text-dark);
+  font-size: 16px;
+  position: relative;
+}
+
+.file-label::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: var(--gradient-primary);
+  border-radius: 1px;
+}
+
+.file-upload-container {
+  display: flex;
+  flex-direction: column;
+  border: 2px dashed var(--border-light);
+  border-radius: var(--card-radius);
+  padding: 30px;
+  margin-bottom: 30px;
+  background: linear-gradient(135deg, #fafbff, #f0f4ff);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.file-upload-container:hover {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, #f0f4ff, #e8f2ff);
+}
+
+#fileInput {
+  display: block;
+  padding: 16px;
+  font-size: 14px;
+  color: var(--text-mid);
+  background: #fff;
+  border: 2px solid rgba(120, 129, 245, 0.2);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#fileInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+#fileInput::file-selector-button {
+  padding: 10px 20px;
+  margin-right: 15px;
+  background: var(--gradient-primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#fileInput::file-selector-button:hover {
+	transform: scale(1.03);
+  background: linear-gradient(135deg, var(--primary-hover), #3a8bfc);
+}
+
+/* 파일 리스트 */
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-list li {
+  background: linear-gradient(135deg, #fff, #f8f9ff);
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--text-mid);
+  border: 1px solid rgba(120, 129, 245, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.file-list li::before {
+  content: '📎';
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.file-list li:hover {
+  border-color: var(--primary);
+}
+
+/* 버튼 그룹 */
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 40px;
+  animation: fadeInUp 1s ease-out;
+}
+
+.submit-btn {
+  width: 120px;
+  height: 50px;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(120, 129, 245, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-btn:hover {
+	background-color: #5c68d9;
+    transform: scale(1.03);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.submit-btn:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(120, 129, 245, 0.3);
+}
+
+.cancel-btn {
+  width: 120px;
+  height: 50px;
+  border: 2px solid rgba(120, 129, 245, 0.2);
+  border-radius: 12px;
+  background: var(--gradient-secondary);
+  color: var(--text-mid);
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.cancel-btn:hover {
+  background-color: #e8eaed;
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.cancel-btn:active {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* 애니메이션 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .Insert-write {
+    padding: 25px 20px;
+  }
+
+  .titleSpace {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+
+  .insertTitle {
+    width: 100%;
+    height: 45px;
+  }
+
+  .Insert-title {
+    width: 100%;
+    height: 45px;
+    font-size: 14px;
+  }
+
+  .ck-editor__editable {
+    min-height: 250px;
+    padding: 16px;
+    font-size: 14px;
+  }
+
+  .file-upload-container {
+    padding: 20px;
+  }
+
+  .button-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .submit-btn,
+  .cancel-btn {
+    width: 100%;
+    height: 45px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .Insert-write {
+    padding: 20px 15px;
+  }
+
+  .insertTitle {
+    height: 40px;
+    font-size: 13px;
+  }
+
+  .Insert-title {
+    height: 40px;
+    font-size: 13px;
+    padding: 0 12px;
+  }
+
+  .ck-editor__editable {
+    min-height: 200px;
+    padding: 12px;
+    font-size: 13px;
+  }
+
+  .submit-btn,
+  .cancel-btn {
+    height: 40px;
+    font-size: 13px;
+  }
+}
