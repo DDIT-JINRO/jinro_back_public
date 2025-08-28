@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/views/include/header.jsp"%>
 <link rel="stylesheet" href="/css/common/insertInterviewFeedbackView.css">
 <link rel="stylesheet" href="/css/cnslt/rvw/insertCnsReviewView.css">
-<section class="channel">
+<section class="channel counsel">
 	<div class="channel-title">
 		<!-- 대분류 -->
 		<div class="channel-title-text">상담</div> 

@@ -4,7 +4,7 @@
 <link rel="stylesheet"
 	href="/css/cdp/aifdbck/sint/aiFeedbackSelfIntro.css">
 <!-- 스타일 여기 적어주시면 가능 -->
-<section class="channel">
+<section class="channel personalHistory">
 	<!-- 	여기가 네비게이션 역할을 합니다.  -->
 	<div class="channel-title">
 		<!-- 대분류 -->

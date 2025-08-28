@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/views/include/header.jsp"%>
 <link rel="stylesheet" href="/css/common/comparsionView.css">
 
-<section class="channel">
+<section class="channel education">
 	<div class="channel-title">
 		<div class="channel-title-text">진학 정보</div>
 	</div>

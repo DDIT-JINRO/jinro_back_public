@@ -9,7 +9,7 @@
 	</script>
 </c:if>
 
-<section class="channel">
+<section class="channel personalHistory">
 	<div class="channel-title">
 		<div class="channel-title-text">경력관리</div>
 	</div>

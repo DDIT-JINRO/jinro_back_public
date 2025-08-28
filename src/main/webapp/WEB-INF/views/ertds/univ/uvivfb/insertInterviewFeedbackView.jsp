@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/views/include/header.jsp"%>
 <link rel="stylesheet" href="/css/common/insertInterviewFeedbackView.css">
 <!-- 스타일 여기 적어주시면 가능 -->
-<section class="channel">
+<section class="channel education">
 	<!-- 	여기가 네비게이션 역할을 합니다.  -->
 	<div class="channel-title">
 		<!-- 대분류 -->

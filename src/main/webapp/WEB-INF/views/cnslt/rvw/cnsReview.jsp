@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/views/include/header.jsp"%>
 <link rel="stylesheet" href="/css/cnslt/rvw/cnsReview.css">
 
-<section class="channel">
+<section class="channel counsel">
 	<div class="channel-title">
 		<div class="channel-title-text">상담</div>
 	</div>

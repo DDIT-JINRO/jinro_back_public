@@ -2,9 +2,9 @@
 <%@ include file="/WEB-INF/views/include/header.jsp"%>
 <link rel="stylesheet" href="/css/common/listCard.css">
 
-<section class="channel">
+<section class="channel personalHistory">
 	<div class="channel-title">
-		<div class="channel-title-text">경력 관리</div>
+		<div class="channel-title-text">경력관리</div>
 	</div>
 	<div class="channel-sub-sections">
 		<div class="channel-sub-section-itemIn">
