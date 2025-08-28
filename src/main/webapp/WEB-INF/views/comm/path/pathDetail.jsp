@@ -40,7 +40,13 @@
 		</div>
 
 		<div class="public-wrapper-main">
-			<div class="boardEtcBtn" id="boardEtcBtn">...</div>
+			<div class="boardEtcBtn" id="boardEtcBtn">
+			    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+			        <circle cx="6" cy="12" r="2.2"></circle>
+			        <circle cx="12" cy="12" r="2.2"></circle>
+			        <circle cx="18" cy="12" r="2.2"></circle>
+			    </svg>
+			</div>
 			<div class="boardEtcContainer" data-board-id="${boardVO.boardId }">
 
 				<c:choose>
@@ -124,7 +130,13 @@
 			<div class="comment-section">
 				<c:forEach var="reply" items="${replyVO}">
 					<div class="reply-box" id="reply-${boardVO.boardId}-${reply.replyId }" data-reply-mem="${reply.memId }">
-						<span class="etcBtn">…</span>
+						<span class="etcBtn">
+						    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+						        <circle cx="6" cy="12" r="2.2"></circle>
+						        <circle cx="12" cy="12" r="2.2"></circle>
+						        <circle cx="18" cy="12" r="2.2"></circle>
+						    </svg>
+						</span>
 						<div class="etc-container">
 							<c:choose>
 								<c:when test="${reply.memId == memId }">
@@ -168,7 +180,13 @@
 					<div class="reply-child-container" data-parent-id="${reply.replyId }">
 						<c:forEach var="child" items="${reply.childReplyVOList}">
 							<div class="reply-box reply-child" data-reply-mem="${child.memId}" id="reply-${child.boardId}-${child.replyId }">
-								<span class="etcBtn">…</span>
+								<span class="etcBtn">
+								    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+								        <circle cx="6" cy="12" r="2.2"></circle>
+								        <circle cx="12" cy="12" r="2.2"></circle>
+								        <circle cx="18" cy="12" r="2.2"></circle>
+								    </svg>
+								</span>
 								<div class="etc-container">
 									<c:choose>
 										<c:when test="${child.memId == memId }">
