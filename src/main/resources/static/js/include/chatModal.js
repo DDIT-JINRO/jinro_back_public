@@ -23,6 +23,13 @@ document.addEventListener('DOMContentLoaded', function(){
 		        sendCurrentInput();
 		    }
 		});
+		
+		const backBtn = document.querySelector('.chat-back-btn');
+		if (backBtn) {
+		    backBtn.addEventListener('click', function() {
+		        history.back();
+		    });
+		}
 
 		function sendCurrentInput() {
 		    const content = inputEl.value.trim();
@@ -268,6 +275,7 @@ function cleanInputDatas(){
 }
 // 모달 닫기
 function closeChatModal(){
+	document.body.classList.remove('modal-open');
 	cleanInputDatas();
 	// 채팅방 목록 비우기
 	document.getElementById('chatRoomList').innerHTML = "";
@@ -296,33 +304,50 @@ function closeChatModal(){
 }
 
 // 모달 열기
-async function openChatModal(){
-	if(!memId || memId=='anonymousUser') {
-		showConfirm("로그인 후 이용 가능합니다.", "로그인하시겠습니까?",
-			() => {
-				sessionStorage.setItem("redirectUrl", location.href);
-				location.href = "/login";
-			},
-			() => {
+async function openChatModal() {
+    document.body.classList.add('modal-open');
+    if (!memId || memId == 'anonymousUser') {
+        showConfirm("로그인 후 이용 가능합니다.", "로그인하시겠습니까?",
+            () => {
+                sessionStorage.setItem("redirectUrl", location.href);
+                location.href = "/login";
+            },
+            () => {}
+        );
+    } else {
+        axios.post("/admin/las/chatVisitLog.do");
+        await printChatRoomList();
+        subscribeToUnreadDetail();
+        const modal = document.getElementById('chat-modal');
+        restoreChatModalState(modal);
+        modal.style.display = 'flex';
 
-			}
-		);
-	} else {
-		axios.post("/admin/las/chatVisitLog.do");
-		await printChatRoomList();
-		subscribeToUnreadDetail();
-		const modal = document.getElementById('chat-modal');
-		restoreChatModalState(modal);
-		modal.style.display = 'flex';
-		requestAnimationFrame(()=>{
-		  clampIntoViewport(modal);
-		  enableChatModalDragAndResize();
-		});
-	}
+        if (!history.state || history.state.chatState !== 'list') {
+            history.pushState({ chatState: 'list' }, 'Chat List');
+        }
+
+        requestAnimationFrame(() => {
+            clampIntoViewport(modal);
+            if (window.matchMedia("(min-width: 769px)").matches) {
+                enableChatModalDragAndResize();
+            }
+        });
+    }
 }
 
 function restoreChatModalState(modal) {
   if (!modal) return;
+  
+  if (window.matchMedia("(max-width: 768px)").matches) {
+  // 모바일에서는 CSS 기본값(100%)을 사용하도록 인라인 스타일을 제거
+    modal.style.width = '';
+    modal.style.height = '';
+    modal.style.top = '';
+    modal.style.left = '';
+    modal.style.right = '';
+    modal.style.bottom = '';
+    return;
+  }
 
   try {
     const st = JSON.parse(localStorage.getItem('chatModal.state') || '{}');
@@ -489,63 +514,56 @@ function subscribeToUnreadDetail() {
 
 // 채팅방 채팅 불러와서 채우기 -> 채팅방 목록 클릭했을 때 호출
 async function printFetchMessages(el) {
-	cleanInputDatas();
+    cleanInputDatas();
+
+    document.getElementById('chat-modal').classList.add('mobile-show-chat');
 
     const crId = el.dataset.crId;
-	document.getElementById('exitBtn').dataset.crId = crId;
-	const chatTitle = el.querySelector('.chat-room-title').textContent;
-	document.getElementById('chat-room-title').textContent=chatTitle;
-	// 채팅방 제목 띄워주기
-	document.querySelector('.chat-room-meta').style.display='flex';
+    document.getElementById('exitBtn').dataset.crId = crId;
+    const chatTitle = el.querySelector('.chat-room-title').textContent;
+    document.getElementById('chat-room-title').textContent = chatTitle;
+    document.querySelector('.chat-room-meta').style.display = 'flex';
 
-	// active 활성화된 채팅방 있으면 지우기.
-	const activeRoom = document.querySelectorAll('.chat-room-entry.active');
-	if(activeRoom || activeRoom.length > 0){
-		activeRoom.forEach(room =>{
-			room.classList.remove('active');
-		})
-	}
-	// 클릭된 div active 활성화
-	el.classList.add('active');
+    const activeRoom = document.querySelectorAll('.chat-room-entry.active');
+    if (activeRoom.length > 0) {
+        activeRoom.forEach(room => room.classList.remove('active'));
+    }
+    el.classList.add('active');
 
-    // 현재 채팅방 ID 업데이트
-    currentChatRoomId = crId;	// 현재 보고있는 채팅방 변경
-    unreadCounts[crId] = 0;		// 현재 채팅방 안읽음 숫자 변경
-    await removeUnreadBadge(crId);	// 현재 채팅방 안읽음 UI 제거
+    currentChatRoomId = crId;
+    unreadCounts[crId] = 0;
+    await removeUnreadBadge(crId);
 
-	// 채팅방 클릭 후 플로팅의 변경을 위해 안읽은 토탈카운트 호출
-	const resp = await fetch('/api/chat/totalUnread');
-	const data = await resp.json();
-	updateFloatingBadge(data.unreadCnt);
+    const resp = await fetch('/api/chat/totalUnread');
+    const data = await resp.json();
+    updateFloatingBadge(data.unreadCnt);
 
-	// 다른 채팅방 구독중이면 해제
-	if(chatRoomSubscription){
-		chatRoomSubscription.unsubscribe();
-	}
+    if (chatRoomSubscription) {
+        chatRoomSubscription.unsubscribe();
+    }
 
-	// 채팅 이력 불러오기
-	const container = document.getElementById('chat-container');
-	container.innerHTML = "";
+    const container = document.getElementById('chat-container');
+    container.innerHTML = "";
 
-	const chatInput = document.getElementById('chat-input');
+    const chatInput = document.getElementById('chat-input');
 
-	fetch(`/api/chat/message/list?crId=${crId}`)
-	    .then(resp => resp.json())
-	    .then(data => {
-			chatInput.style.display = 'flex';
-	        data.forEach(msgVO => appendMessage(msgVO));
-	    });
+    fetch(`/api/chat/message/list?crId=${crId}`)
+        .then(resp => resp.json())
+        .then(data => {
+            chatInput.style.display = 'flex';
+            data.forEach(msgVO => appendMessage(msgVO));
+        });
 
-    // 새 구독 등록 (현재 채팅방)
     const sub = stompClient.subscribe(`/sub/chat/room/${crId}`, (message) => {
         const msg = JSON.parse(message.body);
-
         if (currentChatRoomId === crId) {
             appendMessage(msg);
         }
     });
     chatRoomSubscription = sub;
 
+    // ✅ History 상태 추가: 채팅방에 들어왔음을 기록
+    history.pushState({ chatState: 'room' }, 'Chat Room');
 }
 
 // 소켓 연결 함수
@@ -950,3 +968,29 @@ function enableChatModalDragAndResize() {
 
   window.addEventListener('resize', ()=> clampIntoViewport(modal));
 }
+
+window.addEventListener('popstate', function(event) {
+    const modal = document.getElementById('chat-modal');
+    // 모달이 닫혀있으면 아무것도 안 함
+    if (modal.style.display === 'none') {
+        return;
+    }
+
+    const state = event.state;
+
+    // History 상태가 없거나 chatState가 아니면 모달을 닫음 (목록 -> 닫기)
+    if (!state || !state.chatState) {
+        closeChatModal();
+        return;
+    }
+
+    // History 상태가 'list'이면 채팅 목록을 보여줌 (채팅방 -> 목록)
+    if (state.chatState === 'list') {
+        modal.classList.remove('mobile-show-chat');
+        // 구독 해제 및 현재 채팅방 ID 초기화
+        if (chatRoomSubscription) {
+            chatRoomSubscription.unsubscribe();
+        }
+        currentChatRoomId = null;
+    }
+});
