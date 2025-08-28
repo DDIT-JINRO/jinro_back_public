@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/views/include/header.jsp"%>
 <link rel="stylesheet" href="/css/cnslt/resve/crsv/counselingreserveDetail.css">
-<section class="channel">
+<section class="channel counsel">
 	<div class="channel-title">
 		<!-- 대분류 -->
 		<div class="channel-title-text">상담</div> 

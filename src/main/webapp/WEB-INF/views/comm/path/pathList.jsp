@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/views/include/header.jsp"%>
 <link rel="stylesheet" href="/css/comm/peer/teen/teenList.css">
 <link rel="stylesheet" href="/css/cdp/rsm/rsmb/resumeBoardList.css">
-<section class="channel">
+<section class="channel community">
 	<div class="channel-title">
 		<div class="channel-title-text">커뮤니티</div>
 	</div>

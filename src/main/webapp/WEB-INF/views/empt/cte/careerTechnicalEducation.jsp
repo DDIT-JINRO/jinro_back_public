@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/views/include/header.jsp"%>
 <link rel="stylesheet" href="/css/empt/cte/careerTechnicalEducation.css">
-<section class="channel">
+<section class="channel employment">
 	<div class="channel-title">
 		<div class="channel-title-text">취업 정보</div>
 	</div>

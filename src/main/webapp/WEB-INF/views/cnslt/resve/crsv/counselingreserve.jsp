@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/views/include/header.jsp"%>
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
 <link rel="stylesheet" href="/css/cnslt/resve/crsv/counselingreserve.css">
-<section class="channel">
+<section class="channel counsel">
 	<div class="channel-title">
 		<!-- 대분류 -->
 		<div class="channel-title-text">상담</div> 

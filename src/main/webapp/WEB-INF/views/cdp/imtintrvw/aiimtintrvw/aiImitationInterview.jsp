@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/views/include/header.jsp"%>
 <link rel="stylesheet" href="/css/cdp/imtintrvw/aiimtintrvw/aimitationInterview.css">
 
-<section class="channel">
+<section class="channel personalHistory">
 	<div class="channel-title">
 		<div class="channel-title-text">경력관리</div>
 	</div>

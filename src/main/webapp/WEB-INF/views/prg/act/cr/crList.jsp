@@ -2,7 +2,7 @@
 <jsp:useBean id="now" class="java.util.Date" />
 <%@ include file="/WEB-INF/views/include/header.jsp"%>
 <link rel="stylesheet" href="/css/prg/ctt/cttList.css">
-<section class="channel">
+<section class="channel program">
 	<div class="channel-title">
 		<div class="channel-title-text">프로그램</div>
 	</div>

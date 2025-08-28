@@ -255,9 +255,9 @@ body {
 /* 진로 탐색 */
 .channel.careerQuest {
     background-color: #FFE6E6;
-    background-image: url('/images/main/mascot-careerpathAttitude.png'), url('/images/main/mascot-careerQuest.png');
-    background-position: 200px 40px, right 370px top 80px;
-    background-size: 150px, 100px;
+    background-image: url('/images/main/mascot/mascot-careerQuest1.png'), url('/images/main/mascot/mascot-careerQuest2.png');
+    background-position: 220px 5px, right 260px top 10px;
+    background-size: 220px, 200px;
     background-repeat: no-repeat;
 }
 
@@ -269,10 +269,10 @@ body {
 
 /* 진학 정보 */
 .channel.education {
-    background-color: #FFE5CE;
-    background-image: url('/images/main/mascot-careerpathAttitude.png'), url('/images/main/mascot-careerQuest.png');
-    background-position: 200px 40px, right 370px top 80px;
-    background-size: 150px, 100px;
+    background-color: #FFEEDF;
+    background-image: url('/images/main/mascot/mascot-education1.png'), url('/images/main/mascot/mascot-education2.png');
+    background-position: 200px 40px, right 200px top 40px;
+    background-size: 240px, 240px;
     background-repeat: no-repeat;
 }
 
@@ -285,9 +285,9 @@ body {
 /* 취업 정보 */
 .channel.employment {
     background-color: #FDFFDA;
-    background-image: url('/images/main/mascot-employment.png'), url('/images/main/mascot-employment2.png');
-    background-position: 120px 50px, right 170px top 70px;
-    background-size: 200px, 80px;
+    background-image: url('/images/main/mascot/mascot-employment1.png'), url('/images/main/mascot/mascot-employment2.png');
+    background-position: 160px 0px, right 200px top 5px;
+    background-size: 250px, 220px;
     background-repeat: no-repeat;
 }
 
@@ -300,9 +300,9 @@ body {
 /* 경력관리 */
 .channel.personalHistory {
     background-color: #E1FFDE;
-    background-image: url('/images/main/mascot-careerpathAttitude.png'), url('/images/main/mascot-careerQuest.png');
-    background-position: 200px 40px, right 370px top 80px;
-    background-size: 150px, 100px;
+    background-image: url('/images/main/mascot/mascot-personalHistory1.png'), url('/images/main/mascot/mascot-personalHistory2.png');
+    background-position: 200px 20px, right 220px top 20px;
+    background-size: 240px, 170px;
     background-repeat: no-repeat;
 }
 
@@ -314,15 +314,62 @@ body {
 
 /* 상담 */
 .channel.counsel {
-    background-color: #CFFFF1;
-    background-image: url('/images/main/mascot-careerpathAttitude.png'), url('/images/main/mascot-careerQuest.png');
-    background-position: 200px 40px, right 370px top 80px;
-    background-size: 150px, 100px;
+    background-color: #D0FBEF;
+    background-image: url('/images/main/mascot/mascot-counsel1.png'), url('/images/main/mascot/mascot-counsel2.png');
+    background-position: 200px 40px, right 230px top 40px;
+    background-size: 200px, 250px;
     background-repeat: no-repeat;
 }
 
 @media (max-width: 1918px), (min-width: 1922px) {
     .channel.counsel {
+        background-image: none;
+    }
+}
+
+/* 프로그램 */
+.channel.program {
+    background-color: #C9EDFF;
+    background-image: url('/images/main/mascot/mascot-program1.png'), url('/images/main/mascot/mascot-program2.png');
+    background-position: 200px 20px, right 250px top 10px;
+    background-size: 200px, 240px;
+    background-repeat: no-repeat;
+}
+
+@media (max-width: 1918px), (min-width: 1922px) {
+    .channel.program {
+        background-image: none;
+    }
+}
+
+/* 커뮤니티 */
+.channel.community {
+    background-color: #E8E3FF;
+    background-image: url('/images/main/mascot/mascot-community1.png'), url('/images/main/mascot/mascot-community2.png');
+    background-position: 200px 40px, right 250px top 40px;
+    background-size: 250px, 220px;
+    background-repeat: no-repeat;
+}
+
+
+@media (max-width: 1918px), (min-width: 1922px) {
+    .channel.community {
+        background-image: none;
+    }
+}
+
+/* 고객센터 */
+.channel.serviceCenter {
+    background-color: #F5DFF1;
+    background-image: url('/images/main/mascot/mascot-serviceCenter1.png'), url('/images/main/mascot/mascot-serviceCenter2.png');
+    background-position: 200px 40px, right 250px top 30px;
+    background-size: 180px, 200px;
+    background-repeat: no-repeat;
+}
+
+
+@media (max-width: 1918px), (min-width: 1922px) {
+    .channel.serviceCenter {
         background-image: none;
     }
 }
@@ -1627,6 +1674,8 @@ body {
 	.footer__nav-group {
 		flex-basis: calc(50% - 20px);
 	}
+	
+	
 }
 
 @media (max-width : 768px) {

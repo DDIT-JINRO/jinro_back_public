@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/views/include/header.jsp"%>
 <link rel="stylesheet" href="/css/prg/std/createStdGroup.css">
-<section class="channel">
+<section class="channel program">
 	<div class="channel-title">
 		<div class="channel-title-text">프로그램</div>
 	</div>

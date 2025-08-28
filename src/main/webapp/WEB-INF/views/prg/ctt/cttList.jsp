@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="/css/prg/ctt/cttList.css">
 <!-- 스타일 여기 적어주시면 가능 -->
 
-<section class="channel">
+<section class="channel program">
 	<!-- 네비게이션 -->
 	<div class="channel-title">
 		<div class="channel-title-text">프로그램</div>
