@@ -9,9 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const errorMessage = channelSection.dataset.errorMessage;
         if (successMessage){
 			showConfirm2(successMessage,"",()=>{});
+			return;
 		}
         if (errorMessage){
 			showConfirm2(errorMessage,"",()=>{});
+			return;
 		} 
     }
 
@@ -26,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 			}
 		);
+		return;
 	}
 
 	const subStatusBtn = document.querySelector(".subscription-status-box");
@@ -63,20 +66,19 @@ const handleImgFileSelect = (event) => {
 	if (files.length === 0) {
 		showConfirm2("파일이 선택되지 않았습니다.","",
 			() => {
-				return;
 			}
 		);
+		return;
 	}
 
 	const selectedFile = files[0];
 
 	if (selectedFile.type !== "image/jpeg" && selectedFile.type !== "image/png") {
-
 		showConfirm2("파일은 png 또는 jpg 형식만 가능합니다.","",
 			() => {
-				return;
 			}
 		);
+		return;
 	}
 
 	let formData = new FormData();
@@ -92,13 +94,12 @@ const handleImgFileSelect = (event) => {
 			showConfirm2(result.message,"",
 				() => {
 					if(profileImg) profileImg.src = result.imgPath; // 이미지 즉시 업데이트
-					return;
 				}
 			);
+			return;
         } else {
 			showConfirm2("프로필 사진 변경에 실패했습니다.","", 
 			   () => {
-					return;
 			    }
 			);
         }
@@ -107,7 +108,6 @@ const handleImgFileSelect = (event) => {
         console.error("프로필 이미지 업로드 중 에러 발생 : ", error);
 		showConfirm2("업로드 중 오류가 발생했습니다.","", 
 		   () => {
-				return;
 		    }
 		);
     });
@@ -198,20 +198,19 @@ const passwordCheckAPI = (password, errorMsg, passwordInput, closeModal) => {
 			closeModal();
 
 			if (!nicknameRegex.test(nickname)) {
-
-				showConfirm2("닉네임은 한글, 영문, 숫자 조합 2~10자로 입력해주세요.","",
+				showConfirm2("닉네임은 한글, 영문, 숫자 조합 ","2~10자로 입력해주세요.",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 
 			if (!nameRegex.test(name)) {
-				showConfirm2("이름은 공백 없이 한글 또는 영문 2~20자로 입력해주세요.","",
+				showConfirm2("이름은 공백 없이 한글 또는 영문 ","2~20자로 입력해주세요.",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 
 			mainForm.submit();
@@ -343,7 +342,6 @@ document.addEventListener("DOMContentLoaded", () => {
 					}).then(res => {
 						showConfirm2(res.data,
 							() => {
-								return;
 							}
 						);
 						location.reload();
@@ -351,7 +349,6 @@ document.addEventListener("DOMContentLoaded", () => {
 				} else {
 					showConfirm2('본인인증에 실패하였습니다.', "",
 						() => {
-							return;
 						},
 					);
 				}

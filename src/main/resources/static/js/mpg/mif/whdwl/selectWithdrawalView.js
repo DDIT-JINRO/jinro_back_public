@@ -11,17 +11,17 @@ document.addEventListener("DOMContentLoaded", () => {
         if (successMessage) {
 			showConfirm2(successMessage,"", 
 			   () => {
-					return;
 			    }
 			);
+			return;
 		}
 		
         if (errorMessage) {
 			showConfirm2(errorMessage,"", 
 			   () => {
-					return;
 			    }
 			);
+			return;
 		}
     }
     const withdrawalForm = document.querySelector(".withdrawal-form");
