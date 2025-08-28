@@ -6,9 +6,9 @@
 	<script type="text/javascript">
 		showConfirm2("${fn:escapeXml(errorMessage)}","",
 			() => {
-			    return;
 			}
 		);
+	    return;
 	</script>
 </c:if>
 

@@ -18,6 +18,7 @@
 			    history.back();
 			}
 		);
+  	return;
 </script>
 </body>
 </html>
