@@ -347,6 +347,12 @@ const fn_TopsWidget = () =>{
 	};
 
 	widgets.forEach(initWidget);
+	
+	document.addEventListener('click', (e) => {
+	    if (!e.target.closest('.trend-widget')) {
+	       closePanel()
+	    }
+	});
 }
 
 const fn_ContestBanner = async () =>{
