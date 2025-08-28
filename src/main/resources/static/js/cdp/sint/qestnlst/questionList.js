@@ -167,9 +167,9 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (selectedQuestions.length === 0) {
 				showConfirm2('자기소개서 작성을 위해 질문을 선택해주세요.',"",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			// 필요하다면 여기서 sessionStorage.removeItem('selectedQuestions');
 			document.getElementById('cartForm').submit();

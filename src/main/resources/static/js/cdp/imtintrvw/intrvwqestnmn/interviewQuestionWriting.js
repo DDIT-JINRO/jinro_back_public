@@ -30,7 +30,6 @@ document.addEventListener('DOMContentLoaded', function() {
 				() => {
 					mainForm.action = "/cdp/imtintrvw/intrvwqestnmn/delete.do";
 					mainForm.submit();
-					return;
 				},
 				() => {
 					
@@ -111,7 +110,6 @@ document.addEventListener('DOMContentLoaded', function() {
 					console.error("미리보기 오류:", err);
 					showConfirm2("PDF 미리보기를 생성하는 중 오류가 발생했습니다.","",
 						() => {
-							return;
 						}
 					);
 				});

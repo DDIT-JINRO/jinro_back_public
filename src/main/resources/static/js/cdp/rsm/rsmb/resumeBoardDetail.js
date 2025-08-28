@@ -1,14 +1,10 @@
-/**
- *
- */
-
 document.addEventListener('DOMContentLoaded', function() {
 
 	document.addEventListener('click', function(event) {
 		const likeButton = event.target.closest('.like-button');
 
 		if (!likeButton) {
-			return; // 클릭된 것이 좋아요 버튼이 아니면 무시
+			return;
 		}
 
 		const boardId = likeButton.dataset.boardId;
@@ -43,11 +39,9 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 			}).catch(error => {
 				console.error('좋아요 처리 실패:', error);
-				showConfirm2("오류가 발생했습니다.","잠시 후 다시 시도해 주세요.",
-					() => {
-						return;
-					}
-				);
+				showConfirm2("오류가 발생했습니다.", "잠시 후 다시 시도해 주세요.", () => {
+					// 필요시 UI 처리
+				});
 
 				likeButton.classList.toggle('liked', isCurrentlyLiked);
 				likeCountSpan.textContent = originalLikeCount;
@@ -62,12 +56,10 @@ document.addEventListener('DOMContentLoaded', function() {
 			const boardId = boardContainer?.dataset.boardId;
 
 			if (boardId) {
-				// 폼 생성
 				const form = document.createElement('form');
 				form.method = 'POST';
-				form.action = '/cdp/rsm/rsmb/resumeBoardUpdateView.do'; // 컨트롤러 매핑 주소
+				form.action = '/cdp/rsm/rsmb/resumeBoardUpdateView.do';
 
-				// boardId 파라미터 추가
 				const input = document.createElement('input');
 				input.type = 'hidden';
 				input.name = 'boardId';
@@ -77,16 +69,14 @@ document.addEventListener('DOMContentLoaded', function() {
 				document.body.appendChild(form);
 				form.submit();
 			} else {
-				showConfirm2('게시글 ID를 불러올 수 없습니다.',"",
-					() => {
-						return;
-					}
-				);
+				showConfirm2('게시글 ID를 불러올 수 없습니다.', "", () => {
+					// 필요시 UI 처리
+				});
 			}
 		})
 	}
 
-	// 게시글 삭제 버튼 클릭 시 삭제 요청 이벤트. 성공 시 목록으로
+	// 게시글 삭제 버튼 클릭 시 삭제 요청 이벤트
 	const boardDeleteBtn = document.getElementById('boardDeleteBtn');
 	if (boardDeleteBtn) {
 		boardDeleteBtn.addEventListener('click', function() {
@@ -100,38 +90,29 @@ document.addEventListener('DOMContentLoaded', function() {
 				body: JSON.stringify(data)
 			})
 				.then(resp => {
-
 					if (!resp.ok) throw new Error('에러');
 					else {
-						showConfirm2("성공적으로 삭제되었습니다.","",
-							() => {
-								window.location.href = "/cdp/rsm/rsmb/resumeBoardList.do";
-							}
-						);
+						showConfirm2("성공적으로 삭제되었습니다.", "", () => {
+							window.location.href = "/cdp/rsm/rsmb/resumeBoardList.do";
+						});
 					}
 				})
 				.catch(err => {
 					console.error(err);
-					showConfirm2("삭제도중 문제가 발생했습니다.","관리자측 문의바랍니다.",
-						() => {
-							return;
-						}
-					);
+					showConfirm2("삭제도중 문제가 발생했습니다.", "관리자측 문의바랍니다.", () => {
+						// 필요시 UI 처리
+					});
 				})
 		})
 	}
 
-	// 게시글에 달린 더보기 버튼 클릭 이벤트. 더보기 박스의 내용물은 jsp 단에서 채워져있음
+	// 게시글에 달린 더보기 버튼 클릭 이벤트
 	const boardEtcBtn = document.getElementById('boardEtcBtn');
 	if (boardEtcBtn) {
 		boardEtcBtn.addEventListener('click', function() {
 			document.querySelector('.boardEtcContainer').classList.toggle('board-etc-open');
 		})
 	}
-
-
-
-
 
 	//========================================== 동적요소 바인딩================================= //
 	const commentSection = document.querySelector('.comment-section');
@@ -146,7 +127,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	commentSection.addEventListener('click', eventEtcContainerClicked);
 	commentSection.addEventListener('click', modifyReplyAct);
 	commentSection.addEventListener('click', modifyReplyCancel);
-	//========================================== 동적요소 바인딩끝================================= //
 
 	//=====================신고모달 작동 시키는 스크립트=====================//
 	const modalOverlay = document.querySelector('#report-modal-overlay');
@@ -170,17 +150,16 @@ document.addEventListener('DOMContentLoaded', function() {
 			closeModal();
 		}
 	});
+
 	reportConfirmBtn.addEventListener("click", () => {
 		const reportContent = reportContentInput.value;
 		if (!reportContent) {
 			errorMsg.textContent = '사유를 입력해주세요';
 			return;
 		}
-		//신고 전송 함수 호출
 		confirmReport();
 	});
 
-	// 게시글 더보기버튼 -> 신고 버튼 클릭 시 모달 열기전에 이미 신고한 게시글인지 체크하도록 만들어둠
 	const boardReportBtn = document.getElementById('boardReportBtn');
 	if (boardReportBtn) {
 		boardReportBtn.addEventListener('click', async () => {
@@ -191,23 +170,24 @@ document.addEventListener('DOMContentLoaded', function() {
 						location.href = "/login";
 					},
 					() => {
-						return;
+						// 취소 시 아무것도 하지 않음
 					}
 				);
+				return;
 			}
+
+			// 로그인 체크 통과 시에만 실행
 			const targetId = boardReportBtn.closest('.boardEtcContainer').dataset.boardId;
 			const formData = new FormData();
 			formData.append('targetId', targetId);
 			formData.append('memId', memId);
 			formData.append('targetType', 'G10001');
-			// @@@@@@@@@ fetch()로 해당 게시글 신고한적 있는지 체크하고 신고한적 있으면 confirm 이미 신고한 게시물
+
 			const resp = await fetch('/api/report/selectReport', { method: 'POST', body: formData });
 			if (resp.status == 200) {
-				showConfirm2("이미 신고한 게시글입니다","",
-					() => {
-						return;
-					}
-				);
+				showConfirm2("이미 신고한 게시글입니다", "", () => {
+					// 필요시 UI 처리
+				});
 			} else {
 				setReportModal(targetId, 'G10001');
 				openModal();
@@ -216,14 +196,12 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 })
 
-// 신고하기 완료 클릭 시. 신고종류(게시글,댓글), 해당기본키값, 신고사유, 첨부파일 모달에서 챙겨옴.
+// 신고하기 완료 클릭 시
 function confirmReport() {
 	const targetId = document.getElementById('report-target-id').value;
 	const targetType = document.getElementById('report-target-type').value;
 	const reportReason = document.getElementById('report-content-input').value;
 	const reportFileEl = document.getElementById('report-file');
-	const FILE_MAX_M = 1;
-	const FILE_MAX_SIZE = FILE_MAX_M * 1024;
 
 	const formData = new FormData();
 	if (reportFileEl.files.length > 0) {
@@ -235,7 +213,6 @@ function confirmReport() {
 	formData.append('reportReason', reportReason);
 	formData.append('memId', memId);
 
-
 	fetch('/api/report/insertReport', {
 		method: 'POST',
 		body: formData
@@ -246,12 +223,9 @@ function confirmReport() {
 		})
 		.then(result => {
 			if (result) {
-				showConfirm2("신고 완료","",
-					() => {
-						// 신고 완료 시 새로고침
-						location.reload();
-					}
-				);
+				showConfirm2("신고 완료", "", () => {
+					location.reload();
+				});
 			}
 		})
 }
@@ -263,6 +237,7 @@ function setReportModal(targetId, targetType) {
 	inputId.value = targetId;
 	inputType.value = targetType;
 }
+
 function clearReportModal() {
 	document.getElementById('report-target-id').value = '';
 	document.getElementById('report-target-type').value = '';
@@ -271,12 +246,8 @@ function clearReportModal() {
 	document.getElementById('modal-error-msg').value = '';
 }
 
-//=====================신고모달 작동 시키는 스크립트 끝=====================//
-
-
-//=====================댓글(상위댓글) 만들어서 더해주는 함수===============//
+// 댓글 생성 함수들
 function createParentReply(replyVO, e) {
-
 	const div = document.createElement('div');
 	div.classList.add('reply-box');
 	const createdTime = new Date(replyVO.replyCreatedAt);
@@ -336,9 +307,7 @@ function createParentReply(replyVO, e) {
 	document.querySelector('.comment-section').prepend(div);
 	e.target.querySelector('textarea').value = '';
 }
-//=====================댓글(상위댓글) 만들어서 더해주는 함수 끝=================//
 
-//=====================답글(대댓글) 만들어서 더해주는 함수 ===================//
 function createChildReply(replyVO, e) {
 	const childReply = document.createElement('div');
 	childReply.classList.add('reply-box');
@@ -381,9 +350,8 @@ function createChildReply(replyVO, e) {
 		replyChildCntSpan.textContent = 1;
 	}
 }
-//=====================답글(대댓글) 만들어서 더해주는 함수 끝===================//
 
-// 이벤트 함수 1. 답글버튼 토글 ; click
+// 이벤트 함수들
 function eventReplyToggle(e) {
 	if (!e.target.classList.contains('reply-child-btn')) return;
 
@@ -395,7 +363,7 @@ function eventReplyToggle(e) {
 		childContainer.style.maxHeight = '0';
 	}
 }
-// 이벤트 함수 2 댓글입력 글자수체크 ; input
+
 function eventReplyInput(e) {
 	if (e.target.nodeName != 'TEXTAREA') return;
 
@@ -405,17 +373,14 @@ function eventReplyInput(e) {
 	if (charCountEl) {
 		const charCountArr = charCountEl.textContent.split(' / ');
 		charCountArr[0] = curLength;
-
 		charCountEl.textContent = charCountArr.join(' / ');
 	} else if (commentFooter.nodeName == 'SPAN') {
 		const charCountArr = commentFooter.textContent.split(' / ');
 		charCountArr[0] = curLength;
 		commentFooter.textContent = charCountArr.join(' / ');
 	}
-
 }
 
-// 이벤트 함수 3 답글닫기 버튼 이벤트 ; click
 function closeReplyBtn(e) {
 	if (!e.target.closest('.closeReplyBtn')) return;
 
@@ -429,7 +394,6 @@ function closeReplyBtn(e) {
 	}
 }
 
-// 이벤트 함수 4 댓글,답글 작성 비동기 호출 이벤트 ; submit
 function submitCreateReply(e) {
 	e.preventDefault();
 	if (!e.target.classList.contains('comment-form')) return false;
@@ -456,7 +420,6 @@ function submitCreateReply(e) {
 		})
 }
 
-// 이벤트 함수 5 ...버튼 클릭시 박스 표시
 function toggleEtcBtn(e) {
 	if (!e.target.classList.contains('etcBtn')) return;
 
@@ -467,7 +430,6 @@ function toggleEtcBtn(e) {
 	if (replyModifyCancelBtn) replyModifyCancelBtn.click();
 }
 
-// 이벤트 함수 6 ...버튼 바깥 클릭시 박스 제거
 function closeEtcBtn(e) {
 	if (e.target.classList.contains('etc-container')) return;
 	if (!e.target.classList.contains('etcBtn')) {
@@ -478,7 +440,6 @@ function closeEtcBtn(e) {
 	}
 }
 
-// 이벤트 함수 7 container 버튼 클릭시
 function eventEtcContainerClicked(e) {
 	if (!e.target.closest('.etc-container')) return;
 	const el = e.target;
@@ -487,10 +448,7 @@ function eventEtcContainerClicked(e) {
 	if (!e.target.classList.contains('etc-act-btn')) return;
 
 	const action = el.textContent.trim();
-	showConfirm2("이 댓글을 정말로 ${action} 하시겠습니까?","",
-		() => {
-		}
-	);
+
 	if (!memId || memId == 'anonymousUser') {
 		showConfirm("로그인 후 이용 가능합니다.", "로그인하시겠습니까?",
 			() => {
@@ -498,11 +456,13 @@ function eventEtcContainerClicked(e) {
 				location.href = "/login";
 			},
 			() => {
-				return;
+				// 취소 시 아무것도 하지 않음
 			}
 		);
-		
+		return;
 	}
+
+	// 로그인 체크 통과 시에만 실행
 	const targetReply = el.closest('.reply-box');
 	const targetReplyChildBox = targetReply.nextElementSibling;
 	const targetReplyId = targetReply.id.split('-')[2];
@@ -535,10 +495,9 @@ function eventEtcContainerClicked(e) {
 
 					targetReply.remove();
 					setTimeout(() => {
-						showConfirm2("삭제되었습니다","",
-							() => {
-							}
-						);
+						showConfirm2("삭제되었습니다", "", () => {
+							// 필요시 UI 처리
+						});
 					})
 				}
 			})
@@ -555,12 +514,9 @@ function eventEtcContainerClicked(e) {
 			formData.append('targetType', 'G10002');
 			const resp = await fetch('/api/report/selectReport', { method: 'POST', body: formData });
 			if (resp.status == 200) {
-
-				showConfirm2("이미 신고한 댓글입니다.","",
-					() => {
-						return;
-					}
-				);
+				showConfirm2("이미 신고한 댓글입니다.", "", () => {
+					// 필요시 UI 처리
+				});
 			} else {
 				setReportModal(targetReplyId, 'G10002');
 				document.body.classList.add('scroll-lock');
@@ -570,8 +526,6 @@ function eventEtcContainerClicked(e) {
 	}
 
 	if (action == '수정') {
-		// 열려있는 수정 창들 찾아서 취소버튼 클릭해주기.
-
 		const targetReplyContent = targetReply.querySelector('.reply-content').textContent;
 		const modifyForm = `
 		<div class="reply-content">
@@ -587,7 +541,6 @@ function eventEtcContainerClicked(e) {
 	}
 }
 
-// 이벤트 함수 8 boardEtcContainer바깥 클릭시 닫기 ; click
 function closeBoardEtcContainer(e) {
 	if (e.target.classList.contains('boardEtcContainer')) return;
 	if (e.target.id == 'boardEtcBtn') return;
@@ -598,8 +551,6 @@ function closeBoardEtcContainer(e) {
 		cont.classList.remove('board-etc-open');
 	}
 }
-
-// 이벤트 함수 9 댓글 수정 완료버튼 클릭 시 fetch ; click
 
 function modifyReplyAct(e) {
 	const modifyActEl = e.target;
@@ -626,7 +577,6 @@ function modifyReplyAct(e) {
 			if (result) {
 				const contentArea = modifyActEl.closest('.reply-content');
 				const modifiedContent = contentArea.querySelector('textarea').value.trim();
-
 				contentArea.innerHTML = modifiedContent;
 			}
 		})
@@ -635,31 +585,27 @@ function modifyReplyAct(e) {
 		})
 }
 
-// 이벤트 함수 10 댓글 수정하다가 취소 클릭 시 ; click
 function modifyReplyCancel(e) {
 	const modifyCancelEl = e.target;
 	if (!modifyCancelEl || !modifyCancelEl.classList.contains('cancel-btn')) return;
 
 	const contentArea = modifyCancelEl.closest('.reply-content')
 	const previousContent = contentArea.querySelector('textarea').placeholder.trim();
-
 	contentArea.innerHTML = previousContent;
 }
 
+// PDF 미리보기 기능
 document.addEventListener("DOMContentLoaded", function() {
-
 	const fileContainer = document.querySelector('.fileClass');
 
 	if (fileContainer) {
 		fileContainer.addEventListener('click', function(event) {
-			// 클릭된 요소가 미리보기 버튼인지 확인
 			if (event.target.classList.contains('btn-pdf-preview')) {
 				const button = event.target;
 				const pdfUrl = button.dataset.pdfUrl;
 				const targetId = button.dataset.targetId;
 				const previewContainer = document.getElementById(targetId);
 
-				// 컨테이너가 현재 열려있지 않은 상태라면, 미리보기를 생성하고 보여줌
 				if (!previewContainer.classList.contains('open')) {
 					const allPreviews = document.querySelectorAll('.pdf-preview-container.open');
 					const allButtons = document.querySelectorAll('.btn-pdf-preview');
@@ -667,27 +613,20 @@ document.addEventListener("DOMContentLoaded", function() {
 					allPreviews.forEach(preview => preview.classList.remove('open'));
 					allButtons.forEach(btn => btn.textContent = '미리보기 보기');
 					
-					// iframe이 아직 생성되지 않았다면 생성
 					if (previewContainer.innerHTML === '') {
 						const iframe = document.createElement('iframe');
-
-						let cleanPdfUrl = pdfUrl.replace(/\\/g, '/'); // 모든 '\'를 '/'로 변경
+						let cleanPdfUrl = pdfUrl.replace(/\\/g, '/');
 						if (!cleanPdfUrl.startsWith('/')) {
-							cleanPdfUrl = '/' + cleanPdfUrl; // 경로가 '/'로 시작하지 않으면 추가
+							cleanPdfUrl = '/' + cleanPdfUrl;
 						}
-
 						const viewerURL = `/js/pdfjs/web/viewer.html?file=${encodeURIComponent(cleanPdfUrl)}#zoom=page-fit`;
-
 						iframe.src = viewerURL;
 						iframe.title = "PDF 미리보기";
 						previewContainer.appendChild(iframe);
 					}
 
-					// 부드럽게 열기
 					previewContainer.classList.add('open');
 					button.textContent = '미리보기 닫기';
-
-					// 컨테이너가 이미 보이는 상태라면, 숨김
 				} else {
 					previewContainer.classList.remove('open');
 					button.textContent = '미리보기 보기';
@@ -697,28 +636,21 @@ document.addEventListener("DOMContentLoaded", function() {
 	}
 });
 
+// 북마크 기능
 document.addEventListener('DOMContentLoaded', function() {
-
-	// 모든 북마크 버튼
 	const bookmarkButtons = document.querySelectorAll('.bookmark-button');
 
-	// 이벤트 추가
 	bookmarkButtons.forEach(button => {
 		button.addEventListener('click', function(event) {
 			event.preventDefault();
-
-			// 함수 전달
 			handleBookmarkToggle(this);
 		});
 	});
-
 });
 
 const handleBookmarkToggle = (button) => {
 	const bmCategoryId = button.dataset.categoryId;
 	const bmTargetId = button.dataset.targetId;
-
-	// 현재 버튼이 'active' 클래스를 가지고 있는지 확인
 	const isBookmarked = button.classList.contains('is-active');
 
 	const data = {
@@ -743,26 +675,19 @@ const handleBookmarkToggle = (button) => {
 		})
 		.then(data => {
 			if (data.success) {
-				showConfirm2(data.message,"",
-					() => {
-						button.classList.toggle('is-active');
-					}
-				);
+				showConfirm2(data.message, "", () => {
+					button.classList.toggle('is-active');
+				});
 			} else {
-				showConfirm2("북마크 처리에 실패했습니다.","",
-					() => {
-						return;
-					}
-				);
+				showConfirm2("북마크 처리에 실패했습니다.", "", () => {
+					// 필요시 UI 처리
+				});
 			}
 		})
 		.catch(error => {
-			// 네트워크 오류나 서버 응답 실패 시
 			console.error('북마크 처리 중 오류 발생:', error);
-			showConfirm2("오류가 발생했습니다.","잠시 후 다시 시도해주세요.",
-				() => {
-					return;
-				}
-			);
+			showConfirm2("오류가 발생했습니다.", "잠시 후 다시 시도해주세요.", () => {
+				// 필요시 UI 처리
+			});
 		});
 }
