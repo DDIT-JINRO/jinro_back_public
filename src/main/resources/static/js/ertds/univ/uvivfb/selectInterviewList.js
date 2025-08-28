@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
    			    }
    			);
 		}
+		return;
 	}
 
 	document.getElementById('btnWrite').addEventListener('click', function() {
@@ -26,9 +27,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 				}
 			);
-		} else {
-			location.href = "/ertds/univ/uvivfb/insertInterviewFeedbackView.do";
-		}
+			return;
+		} 
+	
+		location.href = "/ertds/univ/uvivfb/insertInterviewFeedbackView.do";
 	})
 
 	const cardHeaders = document.querySelectorAll(".accordion-list__item-header");
@@ -54,9 +56,9 @@ document.addEventListener('DOMContentLoaded', function() {
 			if (dataMemId != memId) {
 				showConfirm2("허용되지 않은 접근입니다.","",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			location.href = `/ertds/univ/uvivfb/updateInterviewFeedbackView.do?irId=${irId}`;
 		})
@@ -214,7 +216,6 @@ function deleteInterviewFeedback(irId) {
 			           } else {
 						showConfirm2("삭제 중 오류가 발생했습니다.","잠시 후 다시 시도해주세요.", 
 			   			   () => {
-			   					return;
 			   			    }
 			   			);
 			           }
@@ -223,7 +224,6 @@ function deleteInterviewFeedback(irId) {
 			           console.error('Error:', error);
 					   showConfirm2("삭제 중 오류가 발생했습니다.","잠시 후 다시 시도해주세요.", 
 			   			   () => {
-			   					return;
 			   			    }
 			   			);
 			       });

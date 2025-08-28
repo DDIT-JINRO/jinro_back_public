@@ -152,6 +152,7 @@ const handleBookmarkToggle = (button) => {
 
 			}
 		);
+		return;
     }
 	const bmCategoryId = button.dataset.categoryId;
 	const bmTargetId = button.dataset.targetId;
@@ -183,14 +184,12 @@ const handleBookmarkToggle = (button) => {
 			if (data.success) {
 				showConfirm2(data.message,"",
 					() => {
-
 					}
 				);
 				button.classList.toggle('is-active');
 			} else {
 				showConfirm2("북마크 처리에 실패했습니다.","", 
 				   () => {
-						return;
 				    }
 				);
 			}
@@ -200,7 +199,6 @@ const handleBookmarkToggle = (button) => {
 			console.error('북마크 처리 중 오류 발생:', error);
 			showConfirm2("오류가 발생했습니다.","잠시 후 다시 시도해주세요.", 
 			   () => {
-					return;
 			    }
 			);
 		});

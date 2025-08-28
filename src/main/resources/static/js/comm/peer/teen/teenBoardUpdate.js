@@ -21,12 +21,11 @@ document.addEventListener("DOMContentLoaded", function () {
 		const content = editorInstance.getData();
 
 		if (!title || !content) {
-
 			showConfirm2("제목과 내용을 모두 입력해 주세요.","",
 				() => {
-					return;
 				}
 			);
+			return;
 		}
 
 		const formData = new FormData();
@@ -66,7 +65,6 @@ document.addEventListener("DOMContentLoaded", function () {
 			console.error("등록 중 오류:", error);
 			showConfirm2("등록에 실패했습니다.","",
 				() => {
-				    return;
 				}
 			);
 		}

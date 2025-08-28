@@ -20,10 +20,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 			}
 		);
+		return;
 
-      } else {
-        location.href = '/prg/std/createStdGroup.do';
-      }
+      } 
+      
+	  location.href = '/prg/std/createStdGroup.do';
     });
   }
 

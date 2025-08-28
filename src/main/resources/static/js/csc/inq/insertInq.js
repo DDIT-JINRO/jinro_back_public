@@ -7,16 +7,16 @@ function insertInq() {
     if (!title) {
 		showConfirm2("제목을 입력해주세요.","",
 			() => {
-			    return;
 			}
 		);
+	    return;
     }
     if (!content) {
 		showConfirm2("문의 내용을 입력해주세요.","",
 			() => {
-			    return;
 			}
 		);
+	    return;
     }
 
     // 전송
@@ -31,7 +31,6 @@ function insertInq() {
         } else {
 			showConfirm2("등록에 실패했습니다.","",
 				() => {
-				    return;
 				}
 			);
         }
@@ -40,7 +39,6 @@ function insertInq() {
         console.error(err);
 		showConfirm2("서버 오류가 발생했습니다.","",
 			() => {
-			    return;
 			}
 		);
     });

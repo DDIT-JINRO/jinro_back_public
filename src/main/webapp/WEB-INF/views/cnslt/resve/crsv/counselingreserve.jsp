@@ -103,9 +103,9 @@
 	<script>
 		showConfirm2("${errorMessage}","",
 			() => {
-				return;
 			}
 		);
+		return;
 	</script>
 </c:if>
 <%@ include file="/WEB-INF/views/include/footer.jsp"%>

@@ -149,7 +149,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 const handleBookmarkToggle = (button) => {
 	if (memId == "" || memId == "anonymousUser") {
-
 		showConfirm("로그인 후 이용 가능합니다.","로그인하시겠습니까?", 
 		    () => {
 		        sessionStorage.setItem("redirectUrl", location.href);
@@ -159,6 +158,7 @@ const handleBookmarkToggle = (button) => {
 		        
 		    }
 		);
+		return;
     }
 
 	const bmCategoryId = button.dataset.categoryId;
@@ -191,14 +191,12 @@ const handleBookmarkToggle = (button) => {
 			if (data.success) {
 				showConfirm2(data.message,"",
 					() => {
-
 					}
 				);
 				button.classList.toggle('is-active');
 			} else {
 				showConfirm2("북마크 처리에 실패했습니다.","", 
 				   () => {
-						return;
 				    }
 				);
 			}
@@ -208,7 +206,6 @@ const handleBookmarkToggle = (button) => {
 			console.error('북마크 처리 중 오류 발생:', error);
 			showConfirm2("오류가 발생했습니다.","잠시 후 다시 시도해주세요.", 
 			   () => {
-					return;
 			    }
 			);
 		});
@@ -296,6 +293,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				() => {
 				}
 			);
+			return;
         }
 
 		for (const uddId in currentCompareList)  {
@@ -347,9 +345,10 @@ const createCompareCard = (button, compareListContainer) => {
        
 		showConfirm2("학과 비교는 최대 5개 까지만 가능합니다.","",
 			() => {
-		        button.checked = false;
 			}
 		);
+        button.checked = false;
+		return;
     }
 
     compareList[deptData.uddId] = deptData;

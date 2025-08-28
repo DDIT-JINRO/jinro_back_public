@@ -76,7 +76,6 @@ document.addEventListener('DOMContentLoaded', function(){
 				console.log(err);
 				showConfirm2("삭제도중 문제가 발생했습니다.","관리자측 문의바랍니다.", 
 				   () => {
-						return;
 				    }
 				);
 			})
@@ -97,7 +96,6 @@ document.addEventListener('DOMContentLoaded', function(){
 		enterChatBtn.addEventListener('click', function(){
 			if(this.classList.contains('disabled')) return;
 
-
 			if(!memId || memId =='anonymousUser'){
 				showConfirm("로그인 후 이용 가능합니다.", "로그인하시겠습니까?",
 					() => {
@@ -108,26 +106,28 @@ document.addEventListener('DOMContentLoaded', function(){
 
 					}
 				);
-			}else {
-				showConfirm("채팅방에 입장하시겠습니까?", "",
-					() => {
-						const data = { crId, memId };
-						fetch('/prg/std/api/enterStdGroup', {
-							method: "POST",
-							headers: { "Content-Type": "application/json;charset=utf-8" },
-							body: JSON.stringify(data),
-						})
-							.then(async resp => {
-								if (resp.ok) {
-									location.reload();
-								}
-							})
-					},
-					() => {
-						return;
-					}
-				);
+				return;
 			}
+			
+			showConfirm("채팅방에 입장하시겠습니까?", "",
+				() => {
+					const data = { crId, memId };
+					fetch('/prg/std/api/enterStdGroup', {
+						method: "POST",
+						headers: { "Content-Type": "application/json;charset=utf-8" },
+						body: JSON.stringify(data),
+					})
+						.then(async resp => {
+							if (resp.ok) {
+								location.reload();
+							}
+						})
+				},
+				() => {
+					return;
+				}
+			);
+			
 			
 		})
 	}
@@ -219,6 +219,7 @@ document.addEventListener('DOMContentLoaded', function(){
 				);
 				return;
 			}
+			
 			const targetId = boardReportBtn.closest('.boardEtcContainer').dataset.boardId;
 			const formData = new FormData();
 			formData.append('targetId', targetId);
@@ -229,13 +230,13 @@ document.addEventListener('DOMContentLoaded', function(){
 			if(resp.status==200){
 				showConfirm2("이미 신고한 게시글입니다","",
 					() => {
-						return;
 					}
 				);
-			}else{
-				setReportModal(targetId, 'G10001');
-				openModal();
+				return;
 			}
+	
+			setReportModal(targetId, 'G10001');
+			openModal();
 		})
 	}
 })
@@ -449,7 +450,6 @@ function submitCreateReply(e){
 	if (!memId || memId === 'anonymousUser') {
 		showConfirm2("로그인이 필요합니다.","", 
 		   () => {
-				return;
 		    }
 		);
 	    
@@ -522,9 +522,9 @@ function eventEtcContainerClicked(e){
 				location.href = "/login";
 			},
 			() => {
-				return;
 			}
 		);
+		return;
 	}
 	const targetReply = el.closest('.reply-box');
 	const targetReplyChildBox = targetReply.nextElementSibling;
@@ -559,7 +559,6 @@ function eventEtcContainerClicked(e){
 				setTimeout(() => {
 					showConfirm2("삭제되었습니다.","",
 						() => {
-							return;
 						}
 					);
 				})
@@ -579,14 +578,13 @@ function eventEtcContainerClicked(e){
 			if(resp.status==200){
 				showConfirm2("이미 신고한 댓글입니다.","",
 					() => {
-						return;
 					}
 				);
-			}else{
-				setReportModal(targetReplyId, 'G10002');
-				document.body.classList.add('scroll-lock');
-				document.querySelector('#report-modal-overlay').classList.add('show');
+				return;
 			}
+			setReportModal(targetReplyId, 'G10002');
+			document.body.classList.add('scroll-lock');
+			document.querySelector('#report-modal-overlay').classList.add('show');
 		}).apply();
 	}
 

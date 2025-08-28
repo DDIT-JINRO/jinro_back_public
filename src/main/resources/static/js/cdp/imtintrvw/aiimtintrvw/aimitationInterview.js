@@ -7,10 +7,10 @@ let questionList = [];
 function loadCustomQuestionList() {
     const select = document.getElementById('questionSelect');
     
-	if(!memId || memId =='anonymousUser') {
-		return;
-	}
-	
+    if(!memId || memId =='anonymousUser') {
+        return;
+    }
+    
     // 로딩 상태 표시
     select.classList.add('loading');
     select.innerHTML = '<option value="" disabled selected class="loading-text">질문 리스트를 불러오는 중...</option>';
@@ -37,7 +37,6 @@ function loadCustomQuestionList() {
         console.error('질문 리스트 로딩 오류:', error);
         select.classList.remove('loading');
         select.innerHTML = '<option value="" disabled selected>질문 리스트를 불러올 수 없습니다. 새로고침 후 다시 시도해주세요.</option>';
-        // 에러 시에도 버튼 상태 업데이트
         updateStartButton();
     });
 }
@@ -47,10 +46,10 @@ function loadCustomQuestionList() {
  */
 function loadIndustryList() {
     const select = document.getElementById('questionSelect');
-	
-	if(!memId || memId =='anonymousUser') {
-		return;
-	}
+    
+    if(!memId || memId =='anonymousUser') {
+        return;
+    }
     
     // 로딩 상태 표시
     select.classList.add('loading');
@@ -78,7 +77,6 @@ function loadIndustryList() {
         console.error('업종 리스트 로딩 오류:', error);
         select.classList.remove('loading');
         select.innerHTML = '<option value="" disabled selected>업종 리스트를 불러올 수 없습니다. 새로고침 후 다시 시도해주세요.</option>';
-        // 에러 시에도 버튼 상태 업데이트
         updateStartButton();
     });
 }
@@ -114,7 +112,6 @@ function populateQuestionSelect(data, type) {
         placeholderOption.textContent = noDataText;
         placeholderOption.classList.add('no-data');
         
-        // select 값을 명시적으로 빈 문자열로 설정
         select.value = '';
         updateStartButton();
         return;
@@ -125,11 +122,9 @@ function populateQuestionSelect(data, type) {
         const option = document.createElement('option');
         
         if (type === 'industry') {
-            // 업종 리스트의 경우
             option.value = item.iqGubun;
             option.textContent = item.industryName;
         } else {
-            // 커스텀 질문 리스트의 경우
             option.value = item.idlId;
             option.textContent = item.idlTitle;
             
@@ -145,12 +140,10 @@ function populateQuestionSelect(data, type) {
     if (currentValue && select.querySelector(`option[value="${currentValue}"]`)) {
         select.value = currentValue;
     } else {
-        // placeholder를 선택된 상태로 확실히 설정
         select.selectedIndex = 0;
         select.value = '';
     }
     
-    // 버튼 상태 업데이트
     updateStartButton();
 }
 
@@ -168,18 +161,15 @@ function updateQuestionListByType(type) {
     select.selectedIndex = 0;
     
     if (type === 'random') {
-        // 랜덤 질문 면접의 경우 업종별 리스트 로드
         select.disabled = false;
         sectionTitle.textContent = '업종 선택';
         loadIndustryList();
     } else {
-        // 저장 질문 면접의 경우 질문 리스트 로드
         select.disabled = false;
         sectionTitle.textContent = '사용 질문 리스트';
         loadCustomQuestionList();
     }
     
-    // 버튼 상태 즉시 업데이트 (선택값이 초기화되었으므로 비활성화됨)
     updateStartButton();
 }
 
@@ -208,7 +198,6 @@ function checkQuestionListSelected() {
     const select = document.getElementById('questionSelect');
     const selectedValue = select.value;
     
-    // 빈 문자열이거나 null이거나 undefined면 선택되지 않은 것
     const isSelected = selectedValue && selectedValue.trim() !== '';
     
     return isSelected && !select.disabled;
@@ -223,11 +212,9 @@ function updateStartButton() {
     const questionSelected = checkQuestionListSelected();
         
     if (allChecked && questionSelected) {
-        // 모든 조건이 만족됨 - 버튼 활성화
         button.classList.remove('disabled');
         button.disabled = false;
     } else {
-        // 조건이 만족되지 않음 - 버튼 비활성화
         button.classList.add('disabled');
         button.disabled = true;
     }
@@ -261,9 +248,7 @@ function validateInterviewSettings(selectedValue) {
         }
         
         let url = "/cdp/imtintrvw/aiimtintrvw/getInterviewQuestions?" + params.toString();
-        console.log("🔍 검증 URL:", url);
         
-        // 간단한 검증만 수행 (실제 데이터는 React에서 로드)
         fetch(url, {
             method: 'GET',
             headers: {
@@ -316,12 +301,10 @@ function startMockInterview() {
     
     // 미디어 장치 확인
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-		showConfirm2('이 브라우저는 카메라/마이크 기능을 지원하지 않습니다.'," 최신 브라우저를 사용해주세요.",
-		    () => {
-				resetButton();
-				return;
-		    }
-		);
+        showConfirm2('이 브라우저는 카메라/마이크 기능을 지원하지 않습니다.', " 최신 브라우저를 사용해주세요.", () => {
+            resetButton();
+        });
+        return;
     }
     
     // 카메라/마이크 권한 확인
@@ -334,16 +317,14 @@ function startMockInterview() {
             validateInterviewSettings(selectedValue)
                 .then(interviewSettings => {
                     openMockInterviewPopup(interviewSettings);
-					// 정상적으로 팝업 오픈 후에 로그찍기
-					axios.post('/admin/las/aiImitaionInterviewVisitLog.do');
+                    // 정상적으로 팝업 오픈 후에 로그찍기
+                    axios.post('/admin/las/aiImitaionInterviewVisitLog.do');
                 })
                 .catch(error => {
                     console.error('❌ 면접 설정 검증 실패:', error);
-					showConfirm2("면접 설정을 확인할 수 없습니다.","",
-						() => {
-							return;
-						}
-					);
+                    showConfirm2("면접 설정을 확인할 수 없습니다.", "", () => {
+                        // 필요시 UI 처리
+                    });
                     resetButton();
                 });
         })
@@ -351,7 +332,7 @@ function startMockInterview() {
             console.error('미디어 장치 접근 오류:', error);
             
             let errorMessage1 = '카메라와 마이크 접근 권한이 필요합니다.\n\n';
-            let errorMessage2 ="";
+            let errorMessage2 = "";
             if (error.name === 'NotAllowedError') {
                 errorMessage2 += '브라우저에서 카메라/마이크 권한을 허용해주세요.';
             } else if (error.name === 'NotFoundError') {
@@ -361,12 +342,9 @@ function startMockInterview() {
             } else {
                 errorMessage2 += '미디어 장치에 접근할 수 없습니다.';
             }
-			showConfirm2(errorMessage1, errorMessage2, 
-			    () => {
-					resetButton();
-					return;   
-			    }
-			);
+            showConfirm2(errorMessage1, errorMessage2, () => {
+                resetButton();
+            });
         });
 }
 
@@ -400,12 +378,10 @@ function openMockInterviewPopup(interviewSettings) {
         );
         
         if (!popup) {
-			showConfirm2('팝업이 차단되었습니다.', "팝업 차단을 해제한 후 다시 시도해주세요.",
-			    () => {
-					resetButton();
-					return;
-			    }
-			);
+            showConfirm2('팝업이 차단되었습니다.', "팝업 차단을 해제한 후 다시 시도해주세요.", () => {
+                resetButton();
+            });
+            return;
         }
         
         popup.focus();
@@ -422,11 +398,9 @@ function openMockInterviewPopup(interviewSettings) {
         
     } catch (error) {
         console.error('❌ 팝업 열기 실패:', error);
-		showConfirm2("면접을 시작할 수 없습니다.","다시 시도해주세요.",
-			() => {
-				return;
-			}
-		);
+        showConfirm2("면접을 시작할 수 없습니다.", "다시 시도해주세요.", () => {
+            // 필요시 UI 처리
+        });
         resetButton();
     }
 }
@@ -451,16 +425,12 @@ function initializeEventListeners() {
     const checkboxes = document.querySelectorAll('.checkbox');
     checkboxes.forEach(function(checkbox) {
         checkbox.addEventListener('click', function() {
-            // 체크 상태 토글
             if (this.classList.contains('checked')) {
-                // 체크 해제
                 this.classList.remove('checked');
             } else {
-                // 체크 설정
                 this.classList.add('checked');
             }
             
-            // 버튼 상태 업데이트
             updateStartButton();
         });
     });
@@ -469,17 +439,13 @@ function initializeEventListeners() {
     const tags = document.querySelectorAll('.tag');
     tags.forEach(function(tag) {
         tag.addEventListener('click', function() {
-            // 이미 활성화된 태그를 다시 클릭한 경우 무시
             if (this.classList.contains('active')) {
                 return;
             }
             
-            // 모든 태그에서 active 클래스 제거
             tags.forEach(t => t.classList.remove('active'));
-            // 클릭한 태그에 active 클래스 추가
             this.classList.add('active');
             
-            // 면접 타입 변경
             const type = this.getAttribute('data-type');
             updateQuestionListByType(type);
         });
@@ -510,13 +476,8 @@ function initializeAiInterviewPage() {
         return;
     }
     
-    // 초기 질문 리스트 로드
     loadCustomQuestionList();
-    
-    // 초기 버튼 상태 설정 (비활성화)
     updateStartButton();
-    
-    // 이벤트 리스너 초기화
     initializeEventListeners();
 }
 

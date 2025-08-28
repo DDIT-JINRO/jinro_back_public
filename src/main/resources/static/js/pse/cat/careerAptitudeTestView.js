@@ -123,7 +123,6 @@ function startTest(type, title) {
 			console.error("요청 실패:", error);
 			showConfirm2("검사 시작에 실패했습니다.","", 
 			   () => {
-					return;
 			    }
 			);
 		});

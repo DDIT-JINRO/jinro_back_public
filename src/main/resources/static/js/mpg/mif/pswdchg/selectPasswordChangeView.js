@@ -15,16 +15,16 @@ document.addEventListener("DOMContentLoaded", () => {
         if (successMessage){
 			showConfirm2(successMessage,"",
 				() => {
-					return;
 				}
 			);
+			return;
 		}
         if (errorMessage){
 			showConfirm2(errorMessage,"",
 				() => {
-					return;
 				}
 			);
+			return;
 		}
 		
     }
@@ -54,10 +54,10 @@ document.addEventListener("DOMContentLoaded", () => {
 		if (!isOldValid) {
 			showConfirm2("현재 비밀번호를 입력해주세요.","",
 				() => {
-					oldPasswordInput.focus();
-					return;
 				}
 			);
+			oldPasswordInput.focus();
+			return;
 		}
 		
 		if (isNewValidate && isConfirmValidate) {
@@ -87,14 +87,12 @@ document.addEventListener("DOMContentLoaded", () => {
 				console.error("비밀번호 변경 중 에러 발생 : ", error);
 				showConfirm2("비밀번호 변경 중 오류가 발생했습니다.","", 
 				   () => {
-						return;
 				    }
 				);
 			});
 		} else {
 			showConfirm2("입력 내용을 다시 확인해주세요.","",
 				() => {
-					return;
 				}
 			);
 		}

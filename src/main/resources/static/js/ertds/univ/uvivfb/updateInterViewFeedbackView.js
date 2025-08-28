@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function() {
    			    }
    			);
 		}
+		return;
 	}
 
 	document.querySelector("#submit-btn").addEventListener("click", async function() {
@@ -19,17 +20,17 @@ document.addEventListener("DOMContentLoaded", function() {
 		if (interviewRating === 0) {
 			showConfirm2("대학 평가를 선택해 주세요.", "",
 			    () => {
-				return;
 			    }
 			);
+			return;
 		}
 
 		if (!interviewDetail) {
 			showConfirm2("면접 후기를 입력해 주세요.","", 
 			    () => {
-				    return;
 			    }
 			);
+		    return;
 		}
 		
 	    // FormData 생성
@@ -57,7 +58,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	            } else {
 					showConfirm2("수정에 실패했습니다.","", 
 		   			   () => {
-		   					return;
 		   			    }
 		   			);
 	            }
@@ -68,7 +68,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	        console.error("수정 중 오류:", error);
 			showConfirm2("수정에 실패했습니다.","", 
    			   () => {
-   					return;
    			    }
    			);
 	    }

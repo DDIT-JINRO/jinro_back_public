@@ -137,13 +137,11 @@ function requestSubscription(subInfo, userInfo) {
 								showConfirm2("결제가 성공적으로 완료되었습니다.","",
 									() => {
 										location.reload();
-										
 									}
 								);
 							} else {
 								showConfirm2("결제를 처리하지 못했습니다.","잠시 후 다시 시도해주세요.",
 									() => {
-										return;
 									}
 								);
 							}
@@ -152,7 +150,6 @@ function requestSubscription(subInfo, userInfo) {
 							console.error("서버 검증 중 오류:", error);
 							showConfirm2("결제를 처리하지 못했습니다.","잠시 후 다시 시도해주세요.",
 								() => {
-									return;
 								}
 							);
 						});
@@ -187,9 +184,9 @@ function requestSubscription(subInfo, userInfo) {
 
 					showConfirm2(userMsg,"",
 						() => {
-							return;
 						}
 					);
+					return;
 				}
 			},
 		);
@@ -197,7 +194,6 @@ function requestSubscription(subInfo, userInfo) {
 		console.error("IMP.request_pay() 호출 중 예외 발생:", error);
 		showConfirm2("결제창을 여는 도중 오류가 발생했습니다.","새로고침 후 다시 시도해주세요.", 
 		   () => {
-				return;
 		    }
 		);
 	}
@@ -230,7 +226,6 @@ function cancelSubscription() {
 					console.Error("Error : ", error);
 					showConfirm2("취소 중 에러가 발생했습니다.","", 
 					   () => {
-							return;
 					    }
 					);	
 				});

@@ -25,49 +25,49 @@ document.addEventListener("DOMContentLoaded", function() {
 		if (!cpId) {
 			showConfirm2("기업명을 선택해 주세요.","",
 				() => {
-				    return;
 				}
 			);
+		    return;
 		}
 		
 		if (!interviewDate) {
 			showConfirm2("면접 일자를 입력해 주세요.","", 
 			    () => {
-					return;
 			    }
 			);
+			return;
 		}
 
 		if (interviewRating === 0) {
 			showConfirm2("기업 평가를 선택해 주세요.","", 
 			    () => {
-					return;
 			    }
 			);
+			return;
 		}
 
 		if (!interviewDetail) {
 			showConfirm2("면접 후기를 입력해 주세요.","", 
 			    () => {
-					return ;	
 			    }
 			);
+			return ;
 		}
 
 		if (files.length === 0) {
 			showConfirm2("증빙자료를 첨부해 주세요.", "",
 			    () => {
-					return;
 			    }
 			);
+			return;
 		}
 
 		if (files.length > 1) {
 			showConfirm2("증빙자료는 1장만 첨부해 주세요.","", 
 			   () => {
-			    	return;    
 			    }
 			);
+	    	return;
 		}
 
 		// FormData 생성
@@ -100,7 +100,6 @@ document.addEventListener("DOMContentLoaded", function() {
 				} else {
 					showConfirm2("등록에 실패했습니다.","", 
 					   () => {
-					    	return;    
 					    }
 					);
 				}
@@ -111,7 +110,6 @@ document.addEventListener("DOMContentLoaded", function() {
 			console.error("등록 중 오류:", error);
 			showConfirm2("등록에 실패했습니다.","", 
 			   () => {
-			    	return;    
 			    }
 			);
 			

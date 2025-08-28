@@ -24,14 +24,14 @@ document.addEventListener('DOMContentLoaded', function() {
 			if(descriptionTextarea.value == '' || descriptionTextarea.value == null) {
 				showConfirm2("신청 동기를 작성해주세요.","",
 					() => {
-					    return;
 					}
 				);
-			} else {
-				bg.style.display = 'block';
-				modal.style.display = 'block';
-				modal.focus();				
+			    return;
 			}
+			
+			bg.style.display = 'block';
+			modal.style.display = 'block';
+			modal.focus();				
 		});
 	}
 

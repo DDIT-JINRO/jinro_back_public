@@ -12,9 +12,9 @@ function selectEmailBtn() {
 		if (!name || !phone) {
 			showConfirm2("이름과 전화번호를 모두 입력해주세요.","",
 				() => {
-				    return;
 				}
 			);
+		    return;
 		}
 
 		try {
@@ -50,7 +50,6 @@ function selectEmailBtn() {
 			console.error("에러 발생:", error);
 			showConfirm2("서버 통신에 실패했습니다.","",
 				() => {
-				    return;
 				}
 			);
 			resultBox.style.display = "none";

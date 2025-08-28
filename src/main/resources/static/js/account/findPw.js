@@ -10,9 +10,9 @@ function ReissuePwBtn() {
 		if (!email || !name ) {
 			showConfirm2("모든 항목을 입력해주세요.","",
 	  			() => {
-					return;
 	  			}
 	  		);
+			return;
 		}
 		
 		button.disabled = true;
@@ -34,13 +34,11 @@ function ReissuePwBtn() {
 			if (result === "success") {
 				showConfirm2("임시 비밀번호 발급 요청 메일이 전송되었습니다.","",
 		  			() => {
-						return;
 		  			}
 		  		);
 		    } else {
 				showConfirm2("입력하신 정보가 일치하지 않습니다.","",
 		  			() => {
-						return;
 		  			}
 		  		);
 		    }
@@ -49,7 +47,6 @@ function ReissuePwBtn() {
 			console.error("에러 발생:", error);
 			showConfirm2("서버 오류가 발생했습니다.","",
 	  			() => {
-					return;
 	  			}
 	  		);
 		})

@@ -191,9 +191,9 @@ document.addEventListener("DOMContentLoaded", function() {
 			if (!resumeId || resumeId === "0") {
 				showConfirm2("삭제할 이력서가 없습니다.","",
 					() => {
-					return;
 					}
 				);
+				return;
 			}
 
 			showConfirm("정말 삭제하시겠습니까?", "",
@@ -203,14 +203,13 @@ document.addEventListener("DOMContentLoaded", function() {
 							if (response.data.status === 'success') {
 								showConfirm2("이력서가 삭제되었습니다.","",
 									() => {
-										location.href = "/cdp/rsm/rsm/resumeList.do"; // 삭제 후 목록 페이지 등으로 이동
+										location.href = "/cdp/rsm/rsm/resumeList.do";
 									}
 								);
 
 							} else {
 								showConfirm2("삭제에 실패했습니다.","",
 									() => {
-										return;
 									}
 								);
 							}
@@ -220,13 +219,11 @@ document.addEventListener("DOMContentLoaded", function() {
 						});
 				},
 				() => {
-					return;
 				}
 			);
-			
-			
 		})
 	}
+	
 	document.querySelectorAll("#btn-submit-Temp, #btn-submit")
 		.forEach(button => {
 			button.addEventListener("click", function(event) {
@@ -240,13 +237,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
 				//제목 검사
 				if (resumeTitle.hasAttribute("required") && !resumeTitleVal.trim()) {
-	
 					showConfirm2("제목을 입력해주세요.","",
 						() => {
 							resumeTitle.focus();
-							return;
 						}
 					);
+					return;
 				}
 
 				for (let i = 0; i < objs.length; i++) {
@@ -266,9 +262,9 @@ document.addEventListener("DOMContentLoaded", function() {
 						showConfirm2("필수 입력 항목을 입력해주세요.","",
 							() => {
 								updatedInput.focus();
-								return; // 함수 종료하여 submit 중단
 							}
 						);						
+						return;
 					}
 
 
@@ -279,9 +275,9 @@ document.addEventListener("DOMContentLoaded", function() {
 							showConfirm2("이메일 형식이 올바르지 않습니다.","",
 								() => {
 									updatedInput.focus();
-									return;
 								}
 							);
+							return;
 						}
 					}
 
@@ -291,9 +287,9 @@ document.addEventListener("DOMContentLoaded", function() {
 							showConfirm2("전화번호 형식이 올바르지 않습니다.","예: 01012345678",
 								() => {
 									updatedInput.focus();
-									return;	
 								}
 							);
+							return;	
 						}
 					}
 
@@ -449,7 +445,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	            } else {
 					showConfirm2("이미지 파일만 드래그할 수 있습니다.","",
 						() => {
-							return;
 						}
 					);
 	            }

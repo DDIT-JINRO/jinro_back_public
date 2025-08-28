@@ -70,7 +70,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			} else {
 				showConfirm2("게시글 ID를 불러올 수 없습니다.","",
 					() => {
-					    return;
 					}
 				);
 			}
@@ -106,7 +105,6 @@ document.addEventListener('DOMContentLoaded', function() {
 					console.log(err);
 					showConfirm2("삭제도중 문제가 발생했습니다.","관리자측 문의바랍니다.",
 						() => {
-						    return;
 						}
 					);
 				})
@@ -186,6 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 					}
 				);
+				return;
 			}
 			const targetId = boardReportBtn.closest('.boardEtcContainer').dataset.boardId;
 			const formData = new FormData();
@@ -197,13 +196,13 @@ document.addEventListener('DOMContentLoaded', function() {
 			if (resp.status == 200) {
 				showConfirm2("이미 신고한 게시글 입니다.","",
 					() => {
-						return;
 					}
 				);
-			} else {
-				setReportModal(targetId, 'G10001');
-				openModal();
+				return;
 			}
+	
+			setReportModal(targetId, 'G10001');
+			openModal();
 		})
 	}
 })
@@ -492,6 +491,7 @@ function eventEtcContainerClicked(e) {
 
 			}
 		);
+		return;
 	}
 	const targetReply = el.closest('.reply-box');
 	const targetReplyChildBox = targetReply.nextElementSibling;
@@ -529,7 +529,6 @@ function eventEtcContainerClicked(e) {
 							() => {
 							}
 						);
-						return;
 					})
 				}
 			})
@@ -548,14 +547,14 @@ function eventEtcContainerClicked(e) {
 			if (resp.status == 200) {
 				showConfirm2("이미 신고한 댓글입니다.","",
 					() => {
-						return;
 					}
 				);
-			} else {
-				setReportModal(targetReplyId, 'G10002');
-				document.body.classList.add('scroll-lock');
-				document.querySelector('#report-modal-overlay').classList.add('show');
+				return;
 			}
+		
+			setReportModal(targetReplyId, 'G10002');
+			document.body.classList.add('scroll-lock');
+			document.querySelector('#report-modal-overlay').classList.add('show');
 		}).apply();
 	}
 

@@ -65,7 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 );
             }
-            // 로그인 상태면 기본 링크 (/csc/inq/inqryList.do)로 이동
         });
     }
 });

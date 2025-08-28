@@ -49,34 +49,32 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	});
 
-	// 2. 폼 제출 로직 수정 (버튼 클릭 -> 폼 제출 이벤트)
 	const cartForm = document.getElementById('cartForm');
 	if (cartForm) {
 		cartForm.addEventListener('submit', function(event) {
 			event.preventDefault(); // 기본 제출 동작을 막습니다.
 
 			if (!currentMemId) {
-				
 				showConfirm("로그인 후 이용 가능합니다.", "로그인하시겠습니까?", 
 				    () => {
 				        sessionStorage.setItem("redirectUrl", location.href);
 				        location.href = "/login";
 				    },
 				    () => {
-				        
+				        // 취소 시 아무것도 하지 않음
 				    }
 				);
+				return;
 			}
 
 			if (selectedInterviewQuestions.length === 0) {
-				// 3. 알림 메시지 수정
-				showConfirm2('면접 질문을 하나 이상 선택해주세요.',"", 
-				    () => {
-						return;	
-				    }
-				);
+				showConfirm2('면접 질문을 하나 이상 선택해주세요.', "", () => {
+					// 필요시 UI 처리
+				});
+				return;
 			}
 
+			// 모든 validation 통과 시에만 실행
 			sessionStorage.removeItem('selectedInterviewQuestions');
 			uncheckAllQuestionCheckboxes();
 			this.submit(); // 유효성 검사 통과 후 폼 제출
@@ -211,13 +209,10 @@ function updateQuestionIdsInput() {
 
 // 질문 checkbox 초기화
 function uncheckAllQuestionCheckboxes() {
-  // 클래스가 'question-item__checkbox'인 모든 체크박스를 선택합니다.
-  const checkboxes = document.querySelectorAll('.question-item__checkbox');
-
-  // 반복문을 돌면서 모든 체크박스의 'checked' 속성을 false로 만듭니다.
-  checkboxes.forEach((checkbox) => {
-    checkbox.checked = false;
-  });
+	const checkboxes = document.querySelectorAll('.question-item__checkbox');
+	checkboxes.forEach((checkbox) => {
+		checkbox.checked = false;
+	});
 }
 
 window.toggleQuestion = toggleQuestion;

@@ -21,23 +21,22 @@ document.addEventListener("DOMContentLoaded", function() {
 		if (!title || !content) {
 			showConfirm2("제목과 내용을 모두 입력해 주세요.","",
 				() => {
-					return;
 				}
 			);
+			return;
 		}
 
 		const formData = new FormData();
 		formData.append('title', title);
 		formData.append('content', content);
 
-		console.log(fileInput.files);
 		const files = fileInput.files;
 		if (files.length == 0) {
 			showConfirm2("템플릿 파일을 등록해주세요.","",
 				() => {
-					return;
 				}
 			);
+			return;
 		}
 
 		for (let i = 0; i < files.length; i++) {
@@ -61,7 +60,6 @@ document.addEventListener("DOMContentLoaded", function() {
 			console.error("등록 중 오류:", error);
 			showConfirm2("등록에 실패했습니다.","",
 				() => {
-					return;
 				}
 			);
 		}
