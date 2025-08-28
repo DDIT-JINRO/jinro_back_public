@@ -440,6 +440,10 @@ body {
 	border-color: rgba(217, 217, 217, 0.5);
 }
 
+.header__brand {
+	flex: 0 0 190px;
+}
+
 .header__brand a {
 	display: block;
 }
@@ -449,15 +453,19 @@ body {
 	width: auto;
 }
 
+.header__nav-container--desktop {
+	flex: 1;
+	padding: 0 40px;
+}
+
 .main-nav {
 	display: flex;
 	align-items: center;
+	justify-content: space-around;
 	list-style: none;
 	margin: 0;
 	padding: 0;
 	position: relative;
-	gap: 90px;
-	max-width: 1160px;
 	left: -3.5%;
 }
 
@@ -564,6 +572,7 @@ body {
 }
 
 .header__user-actions--desktop {
+	flex: 0 0 125px;
 	display: flex;
 	align-items: center;
 	gap: 20px;

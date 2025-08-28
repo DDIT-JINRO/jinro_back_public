@@ -254,7 +254,13 @@ function createParentReply(replyVO, e) {
 	const createdTimeFormat = `${createdTime.getFullYear()}. ${("0" + (createdTime.getMonth() + 1)).slice(-2)}. ${("0" + (createdTime.getDate())).slice(-2)}. ${("0" + (createdTime.getHours())).slice(-2)}:${("0" + (createdTime.getMinutes())).slice(-2)}`;
 	div.id = `reply-${replyVO.boardId}-${replyVO.replyId}`;
 	div.innerHTML = `
-	<span class="etcBtn">…</span>
+	<span class="etcBtn">
+	    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+	        <circle cx="6" cy="12" r="2.2"></circle>
+	        <circle cx="12" cy="12" r="2.2"></circle>
+	        <circle cx="18" cy="12" r="2.2"></circle>
+	    </svg>
+	</span>
 	<div class="etc-container">
 		<div class="etc-act-btn">수정</div>
 		<hr/>
@@ -318,7 +324,13 @@ function createChildReply(replyVO, e) {
 	const createdTime = new Date(replyVO.replyCreatedAt);
 	const createdTimeFormat = `${createdTime.getFullYear()}. ${("0" + (createdTime.getMonth() + 1)).slice(-2)}. ${createdTime.getDate()}. ${createdTime.getHours()}:${createdTime.getMinutes()}`;
 	childReply.innerHTML = `
-		<span class="etcBtn">…</span>
+	<span class="etcBtn">
+	    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+	        <circle cx="6" cy="12" r="2.2"></circle>
+	        <circle cx="12" cy="12" r="2.2"></circle>
+	        <circle cx="18" cy="12" r="2.2"></circle>
+	    </svg>
+	</span>
 		<div class="etc-container">
 			<div class="etc-act-btn">수정</div>
 			<hr/>
@@ -421,9 +433,10 @@ function submitCreateReply(e) {
 }
 
 function toggleEtcBtn(e) {
-	if (!e.target.classList.contains('etcBtn')) return;
+	const etcBtn = e.target.closest('.etcBtn');
+	if (!etcBtn) return;
 
-	const etcContainer = e.target.nextElementSibling;
+	const etcContainer = etcBtn.nextElementSibling;
 	if (etcContainer) etcContainer.classList.toggle('etc-open');
 
 	const replyModifyCancelBtn = document.getElementById('cancelBtn');
