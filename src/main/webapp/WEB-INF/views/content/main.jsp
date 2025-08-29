@@ -85,7 +85,7 @@
 							<h1 class="main-banner__title">꿈을 찾는 길</h1>
 							<p class="main-banner__subtitle">대학에 꿈을 가진 청소년에게<br> 미래를 설계하는데 필요한 학과 비교 페이지
 							</p>
-							<a href="/ertds/univ/dpsrch/selectDeptList.do" class="BtnData">학과비교 바로가기</a>
+							<a href="/ertds/univ/dpsrch/selectDeptList.do" class="main-banner__button BtnData">학과비교 바로가기</a>
 						</div>
 						<div class="main-banner__visuals">
 							<img src="/images/main/loadMapIcon-board.png" class="main-banner__float-icon main-banner__float-icon--1" />
@@ -108,7 +108,7 @@
 							<h1 class="main-banner__title">꿈이 현실이 되는 길</h1>
 							<p class="main-banner__subtitle">꿈을 향해 달려가는 멋진 청년에게<br> 진로를 설계하는데 필요한 직업 비교 페이지
 							</p>
-							<a href="/pse/cr/crl/selectCareerList.do" class="BtnData">직업비교 바로가기</a>
+							<a href="/pse/cr/crl/selectCareerList.do" class="main-banner__button BtnData">직업비교 바로가기</a>
 						</div>
 
 						<div class="main-banner__visuals">

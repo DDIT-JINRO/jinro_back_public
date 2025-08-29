@@ -219,13 +219,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	const resetBtn = document.querySelector(".compare-popup__button--clear");
 	const submitBtn = document.querySelector(".compare-popup__button--submit");
 	const selectButtons = document.querySelectorAll(".compare-button input");
-	const floatingBar = document.querySelector(".floating-bar");
-
-	if (!floatingBar || !popup) return;
-
-    const popupOpenBtn = `<button type="button" class="compare-float-button__button">비교</button>`;
-
-    floatingBar.insertAdjacentHTML('beforeend', popupOpenBtn);
 
     // 기존 데이터 가져오기
     const initialCompareList = getCompareList();
@@ -242,6 +235,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
+	
+	updateCompareButtonState();
 
     // 비교 체크 박스 클릭
     selectButtons.forEach(button => {
@@ -329,6 +324,40 @@ const saveCompareList = (compareList) => {
     sessionStorage.setItem('deptCompareList', JSON.stringify(compareList));
 }
 
+const updateCompareButtonState = () => {
+    const floatingBar = document.querySelector(".floating-bar");
+    if (!floatingBar) return;
+
+    const compareList = getCompareList();
+    const count = Object.keys(compareList).length;
+    let compareButton = document.querySelector(".compare-float-button__button");
+
+    if (count > 0) {
+        if (!compareButton) {
+            const popupOpenBtnHTML = `
+                <button type="button" class="floating-bar__button compare-float-button__button">
+                    비교
+                    <span id="deptCompareBtn" class="compare-float-button__badge">${count}</span>
+                </button>
+            `;
+            floatingBar.insertAdjacentHTML('beforeend', popupOpenBtnHTML);
+        } else {
+		    const badge = compareButton.querySelector('.compare-float-button__badge');
+            if (badge) {
+                badge.textContent = count;
+            }
+        }
+    } else {
+        if (compareButton) {
+            compareButton.classList.add('is-hiding');
+			
+			setTimeout(() => {
+			    compareButton.remove();
+			}, 400);
+        }
+    }
+};
+
 // 비교 카드 생성하기
 const createCompareCard = (button, compareListContainer) => {
     const deptData = {
@@ -354,6 +383,7 @@ const createCompareCard = (button, compareListContainer) => {
     compareList[deptData.uddId] = deptData;
     saveCompareList(compareList);
     renderCompareItem(deptData, compareListContainer);
+	updateCompareButtonState();
 }
 
 const renderCompareItem = (deptData, container) => {
@@ -396,6 +426,7 @@ const deleteCompareCard = (itemId) => {
     const compareList = getCompareList();
     delete compareList[itemId];
     saveCompareList(compareList);
+	updateCompareButtonState();
 
     if (Object.keys(compareList).length === 0) {
         document.querySelector(".compare-popup--dept").classList.remove('is-open');
