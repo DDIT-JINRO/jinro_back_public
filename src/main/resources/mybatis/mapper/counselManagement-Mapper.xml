@@ -46,7 +46,7 @@
 		                    a.MEM_NAME,
 		                    COUNT(b.COUNSEL_ID) AS COUNSEL_COUNT,
 		                    COUNT(c.CR_ID) AS COUNSEL_REVIEW_COUNT,
-		                    ROUND(AVG(c.CR_RATE)) AS RATING_AVERAGE
+		                    ROUND(AVG(c.CR_RATE),2) AS RATING_AVERAGE
 		                FROM
 		                    MEMBER a
 		                JOIN
@@ -108,7 +108,7 @@
 		LEFT JOIN (
 		    SELECT
 		        c.counsel,
-		        ROUND(AVG(cr.cr_rate)) AS counsel_review_avg,
+		        ROUND(AVG(cr.cr_rate),2) AS counsel_review_avg,
 		        COUNT(DISTINCT c.counsel_id) AS counsel_count,
 		        COUNT(DISTINCT v.va_id) AS vacation_count
 		    FROM

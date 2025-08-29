@@ -238,7 +238,7 @@ function confirmReport() {
 		}
 	})
 	.catch(err => {
-        console.log(err);
+        console.error(err);
         showConfirm2("신고 도중 오류가 발생했습니다.", "관리자에게 문의 바랍니다.", () => {});
     });
 }
@@ -451,7 +451,7 @@ function submitCreateReply(e) {
 			}
 		})
 		.catch(err => {
-			console.log(err);
+			console.error(err);
 		})
 }
 
@@ -633,7 +633,7 @@ function modifyReplyAct(e) {
 			}
 		})
 		.catch(err => {
-			console.log(err);
+			console.error(err);
 		})
 }
 

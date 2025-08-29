@@ -6,7 +6,7 @@
 	    WITH date_list AS (
 	        SELECT TRUNC(SYSDATE) - (LEVEL - 1) AS login_date
 	        FROM dual
-	        CONNECT BY LEVEL <= 7
+	        CONNECT BY LEVEL <= 14
 	    ),
 	    daily_login_counts AS (
 	        SELECT
@@ -15,26 +15,30 @@
 	        FROM LOGIN_LOG ll
 	        JOIN MEMBER m ON ll.MEM_ID = m.MEM_ID
 	        WHERE ll.LL_STATUS = 'I'
-	          AND ll.LL_CREATED_AT >= TRUNC(SYSDATE) - 6
+	          AND ll.LL_CREATED_AT >= TRUNC(SYSDATE) - 13
 	          AND ll.LL_CREATED_AT < TRUNC(SYSDATE) + 1
 	    ]]>
-		<if test="gender != null and gender eq 'G11001'">
-			AND m.MEM_GEN = 'G11001'
-		</if>
-		<if test="gender != null and gender eq 'G11002'">
-			AND m.MEM_GEN = 'G11002'
-		</if>
-		<if test="ageGroup != null and ageGroup != '' and ageGroup eq 'teen'">
-	    	AND TRUNC(MONTHS_BETWEEN(ll.LL_CREATED_AT, m.MEM_BIRTH) / 12) &lt;= 19
+	    <if test="gender != null and gender eq 'G11001'">
+	        AND m.MEM_GEN = 'G11001'
+	    </if>
+	    <if test="gender != null and gender eq 'G11002'">
+	        AND m.MEM_GEN = 'G11002'
+	    </if>
+	    <if test="ageGroup != null and ageGroup != '' and ageGroup eq 'teen'">
+	        AND TRUNC(MONTHS_BETWEEN(ll.LL_CREATED_AT, m.MEM_BIRTH) / 12) &lt;= 19
 	    </if>
 	    <if test="ageGroup != null and ageGroup != '' and ageGroup eq 'youth'">
-	    	AND TRUNC(MONTHS_BETWEEN(ll.LL_CREATED_AT, m.MEM_BIRTH) / 12) &gt;= 20
+	        AND TRUNC(MONTHS_BETWEEN(ll.LL_CREATED_AT, m.MEM_BIRTH) / 12) &gt;= 20
 	    </if>
 	    <![CDATA[
 	        GROUP BY TO_CHAR(ll.LL_CREATED_AT, 'YYYY-MM-DD')
 	    )
 	    SELECT
 	        TO_CHAR(d.login_date, 'YYYY-MM-DD') AS login_date,
+	        CASE
+	            WHEN d.login_date >= TRUNC(SYSDATE) - 6 THEN 'THIS_WEEK'
+	            WHEN d.login_date >= TRUNC(SYSDATE) - 13 THEN 'LAST_WEEK'
+	        END AS week_type,
 	        NVL(l.user_count, 0) AS user_count
 	    FROM date_list d
 	    LEFT JOIN daily_login_counts l
@@ -45,191 +49,118 @@
 
 
 	<select id="monthlyUserInquiry" resultType="kr.or.ddit.admin.las.service.UsageStatsVO">
-	    <![CDATA[
-		WITH month_list AS (
-		    SELECT ADD_MONTHS(TRUNC(SYSDATE, 'YY'), LEVEL - 1) AS login_month_date
-		    FROM dual
-		    CONNECT BY LEVEL <= MONTHS_BETWEEN(TRUNC(SYSDATE, 'MM'), TRUNC(SYSDATE, 'YY')) + 1
-		),
-		monthly_login_counts AS (
-		    SELECT
-		        TO_CHAR(ll.LL_CREATED_AT, 'YYYY-MM') AS login_month,
-		        COUNT(DISTINCT ll.MEM_ID) AS user_count
-		    FROM LOGIN_LOG ll
-		    JOIN MEMBER m ON ll.MEM_ID = m.MEM_ID
-		    WHERE ll.LL_STATUS = 'I'
-		      AND ll.LL_CREATED_AT >= TRUNC(SYSDATE, 'YY')
-		      AND ll.LL_CREATED_AT < ADD_MONTHS(TRUNC(SYSDATE, 'YY'), 12)
-		]]>
-		    <if test="gender != null and gender eq 'G11001'">
-		        AND m.MEM_GEN = 'G11001'
-		    </if>
-		    <if test="gender != null and gender eq 'G11002'">
-		        AND m.MEM_GEN = 'G11002'
-		    </if>
-		    <if test="ageGroup != null and ageGroup != '' and ageGroup eq 'teen'">
-		    	AND TRUNC(MONTHS_BETWEEN(ll.LL_CREATED_AT, m.MEM_BIRTH) / 12) &lt;= 19
-		    </if>
-		    <if test="ageGroup != null and ageGroup != '' and ageGroup eq 'youth'">
-		    	AND TRUNC(MONTHS_BETWEEN(ll.LL_CREATED_AT, m.MEM_BIRTH) / 12) &gt;= 20
-		    </if>
-		<![CDATA[
-		    GROUP BY TO_CHAR(ll.LL_CREATED_AT, 'YYYY-MM')
-		)
-		SELECT
-		    TO_CHAR(d.login_month_date, 'YYYY-MM') AS loginDate,
-		    NVL(l.user_count, 0) AS userCount
-		FROM month_list d
-		LEFT JOIN monthly_login_counts l
-		  ON TO_CHAR(d.login_month_date, 'YYYY-MM') = l.login_month
-		ORDER BY d.login_month_date
-		]]>
-
+	    WITH params AS (
+	        SELECT TRUNC(SYSDATE, 'YY') AS current_start_date,
+	               ADD_MONTHS(TRUNC(SYSDATE, 'YY'), 12) AS current_end_date,
+	               ADD_MONTHS(TRUNC(SYSDATE, 'YY'), -12) AS prev_start_date,
+	               TRUNC(SYSDATE, 'YY') AS prev_end_date
+	        FROM DUAL
+	    )
+	    -- 올해 월별 접속자 수
+	    SELECT
+	        TO_CHAR(ll.LL_CREATED_AT, 'YYYY-MM') AS loginDate,
+	        'THIS_YEAR' AS periodType,
+	        COUNT(DISTINCT ll.MEM_ID) AS userCount
+	    FROM LOGIN_LOG ll
+	    JOIN MEMBER m ON ll.MEM_ID = m.MEM_ID, params p
+	    WHERE ll.LL_STATUS = 'I'
+	          AND ll.LL_CREATED_AT &gt;= p.current_start_date
+	          AND ll.LL_CREATED_AT &lt; p.current_end_date
+	    <if test="gender != null and gender eq 'G11001'">
+	        AND m.MEM_GEN = 'G11001'
+	    </if>
+	    <if test="gender != null and gender eq 'G11002'">
+	        AND m.MEM_GEN = 'G11002'
+	    </if>
+	    <if test="ageGroup != null and ageGroup != '' and ageGroup eq 'teen'">
+	        AND TRUNC(MONTHS_BETWEEN(ll.LL_CREATED_AT, m.MEM_BIRTH) / 12) &lt;= 19
+	    </if>
+	    <if test="ageGroup != null and ageGroup != '' and ageGroup eq 'youth'">
+	        AND TRUNC(MONTHS_BETWEEN(ll.LL_CREATED_AT, m.MEM_BIRTH) / 12) &gt;= 20
+	    </if>
+	    GROUP BY TO_CHAR(ll.LL_CREATED_AT, 'YYYY-MM')
+	    UNION ALL
+	    -- 작년 월별 접속자 수
+	    SELECT
+	        TO_CHAR(ADD_MONTHS(ll.LL_CREATED_AT, 12), 'YYYY-MM') AS loginDate,
+	        'LAST_YEAR' AS periodType,
+	        COUNT(DISTINCT ll.MEM_ID) AS userCount
+	    FROM LOGIN_LOG ll
+	    JOIN MEMBER m ON ll.MEM_ID = m.MEM_ID, params p
+	    WHERE ll.LL_STATUS = 'I'
+	          AND ll.LL_CREATED_AT &gt;= p.prev_start_date
+	          AND ll.LL_CREATED_AT &lt; p.prev_end_date
+	    <if test="gender != null and gender eq 'G11001'">
+	        AND m.MEM_GEN = 'G11001'
+	    </if>
+	    <if test="gender != null and gender eq 'G11002'">
+	        AND m.MEM_GEN = 'G11002'
+	    </if>
+	    <if test="ageGroup != null and ageGroup != '' and ageGroup eq 'teen'">
+	        AND TRUNC(MONTHS_BETWEEN(ll.LL_CREATED_AT, m.MEM_BIRTH) / 12) &lt;= 19
+	    </if>
+	    <if test="ageGroup != null and ageGroup != '' and ageGroup eq 'youth'">
+	        AND TRUNC(MONTHS_BETWEEN(ll.LL_CREATED_AT, m.MEM_BIRTH) / 12) &gt;= 20
+	    </if>
+	    GROUP BY TO_CHAR(ADD_MONTHS(ll.LL_CREATED_AT, 12), 'YYYY-MM')
+	    ORDER BY loginDate ASC
 	</select>
 
 	<select id="customUserInquiry" resultType="kr.or.ddit.admin.las.service.UsageStatsVO">
-		<![CDATA[
-		WITH date_list AS (
-		    SELECT TRUNC(TO_DATE(#{startDate}, 'YYYY-MM-DD')) + LEVEL - 1 AS login_date
-		    FROM dual
-		    CONNECT BY LEVEL <= TRUNC(TO_DATE(#{endDate}, 'YYYY-MM-DD'))
-		                        - TRUNC(TO_DATE(#{startDate}, 'YYYY-MM-DD')) + 1
-		),
-
-		daily_login_counts AS (
-		    SELECT
-		        TO_CHAR(ll.LL_CREATED_AT, 'YYYY-MM-DD') AS login_date,
-		        COUNT(DISTINCT ll.MEM_ID) AS user_count
-		    FROM LOGIN_LOG ll
-		        JOIN MEMBER m ON ll.MEM_ID = m.MEM_ID
-		    WHERE ll.LL_STATUS = 'I'
-		      AND ll.LL_CREATED_AT >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
-		      AND ll.LL_CREATED_AT < TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
-		 ]]>
-		    <if test="gender != null and gender == 'G11001'">
-		        AND m.MEM_GEN = 'G11001'
-		    </if>
-		    <if test="gender != null and gender == 'G11002'">
-		        AND m.MEM_GEN = 'G11002'
-		    </if>
-			<if test="ageGroup != null and ageGroup != '' and ageGroup eq 'teen'">
-		    	AND TRUNC(MONTHS_BETWEEN(ll.LL_CREATED_AT, m.MEM_BIRTH) / 12) &lt;= 19
-		    </if>
-		    <if test="ageGroup != null and ageGroup != '' and ageGroup eq 'youth'">
-		    	AND TRUNC(MONTHS_BETWEEN(ll.LL_CREATED_AT, m.MEM_BIRTH) / 12) &gt;= 20
-		    </if>
-		<![CDATA[
-		    GROUP BY TO_CHAR(ll.LL_CREATED_AT, 'YYYY-MM-DD')
-		)
-		SELECT
-		    TO_CHAR(d.login_date, 'YYYY-MM-DD') AS loginDate,
-		    NVL(l.user_count, 0) AS userCount
-		FROM date_list d
-		LEFT JOIN daily_login_counts l
-		  ON TO_CHAR(d.login_date, 'YYYY-MM-DD') = l.login_date
-		ORDER BY d.login_date
-		]]>
-	</select>
-
-	<select id="liveUserList" parameterType="map" resultType="map">
-		SELECT
-		*
-		FROM (
-		SELECT
-		ROW_NUMBER() OVER (ORDER BY A.MEM_ID DESC) AS RNUM,
-		A.MEM_ID,
-		A.MEM_NAME,
-		A.LOGIN_TYPE,
-		A.MEM_STUDENT,
-		A.MEM_GEN,
-		CASE WHEN
-		A.LOGIN_TYPE = 'G33001' THEN '일반'
-		WHEN A.LOGIN_TYPE = 'G33002' THEN
-		'네이버'
-		WHEN A.LOGIN_TYPE = 'G33003' THEN '카카오'
-		ELSE '그 외 로그인'
-		END AS
-		LOGIN_TYPE_NAME,
-		CASE WHEN A.MEM_STUDENT = 'N' THEN '대학생'
-		WHEN
-		A.MEM_STUDENT = 'Y' THEN '청소년'
-		ELSE '일반인'
-		END AS MEM_STUDENT_NAME,
-		CASE
-		WHEN TO_CHAR(A.MEM_GEN) = 'G11001' THEN '남'
-		WHEN TO_CHAR(A.MEM_GEN) =
-		'G11002' THEN '여'
-		ELSE '그 외 성별'
-		END AS MEM_GEN_NAME
-		FROM
-		MEMBER A
-		INNER
-		JOIN (
-		SELECT
-		MEM_ID
-		FROM
-		LOGIN_LOG
-		GROUP BY
-		MEM_ID
-		HAVING
-		COUNT(CASE WHEN
-		LL_STATUS = 'I' THEN 1 END) > COUNT(CASE WHEN LL_STATUS = 'O'
-		THEN 1
-		END)
-		) B ON A.MEM_ID = B.MEM_ID
-		<where>
-			<if test="gen != null and gen != ''">
-				AND A.MEM_GEN = #{gen}
-			</if>
-			<if test="loginType != null and loginType != ''">
-				AND A.LOGIN_TYPE = #{loginType}
-			</if>
-			<if test="keyword != null and keyword != ''">
-				AND (
-				A.MEM_NAME LIKE '%' || #{keyword} || '%'
-				OR A.MEM_ID
-				LIKE '%' || #{keyword} || '%'
-				)
-			</if>
-		</where>
-		ORDER BY A.MEM_ID DESC
-		)
-		WHERE RNUM BETWEEN #{startNo} AND #{endNo}
-	</select>
-	<select id="liveUserListCount" parameterType="map"
-		resultType="int">
-		SELECT
-		COUNT(*)
-		FROM
-		MEMBER A
-		INNER JOIN (
-		SELECT
-		MEM_ID
-		FROM
-		LOGIN_LOG
-		GROUP
-		BY
-		MEM_ID
-		HAVING
-		COUNT(CASE WHEN LL_STATUS = 'I' THEN 1 END) > COUNT(CASE
-		WHEN LL_STATUS = 'O'
-		THEN 1 END)
-		) B ON A.MEM_ID = B.MEM_ID
-		<where>
-			<if test="gen != null and gen != ''">
-				AND A.MEM_GEN = #{gen}
-			</if>
-			<if test="loginType != null and loginType != ''">
-				AND A.LOGIN_TYPE = #{loginType}
-			</if>
-			<if test="keyword != null and keyword != ''">
-				AND (
-				A.MEM_NAME LIKE '%' || #{keyword} || '%'
-				OR A.MEM_ID
-				LIKE '%' || #{keyword} || '%'
-				)
-			</if>
-		</where>
+	    WITH params AS (
+	        SELECT TO_DATE(#{startDate}, 'YYYY-MM-DD') AS current_start_date,
+	               TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1 AS current_end_date,
+	               ADD_MONTHS(TO_DATE(#{startDate}, 'YYYY-MM-DD'), -12) AS prev_start_date,
+	               ADD_MONTHS(TO_DATE(#{endDate}, 'YYYY-MM-DD'), -12) + 1 AS prev_end_date
+	        FROM DUAL
+	    )
+	    -- 선택 기간의 올해 데이터
+	    SELECT
+	        TO_CHAR(ll.LL_CREATED_AT, 'YYYY-MM-DD') AS loginDate,
+	        'THIS_YEAR' AS periodType,
+	        COUNT(DISTINCT ll.MEM_ID) AS userCount
+	    FROM LOGIN_LOG ll
+	    JOIN MEMBER m ON ll.MEM_ID = m.MEM_ID, params p
+	    WHERE ll.LL_STATUS = 'I'
+	          AND ll.LL_CREATED_AT &gt;= p.current_start_date
+	          AND ll.LL_CREATED_AT &lt; p.current_end_date
+	    <if test="gender != null and gender == 'G11001'">
+	        AND m.MEM_GEN = 'G11001'
+	    </if>
+	    <if test="gender != null and gender == 'G11002'">
+	        AND m.MEM_GEN = 'G11002'
+	    </if>
+	    <if test="ageGroup != null and ageGroup != '' and ageGroup eq 'teen'">
+	        AND TRUNC(MONTHS_BETWEEN(ll.LL_CREATED_AT, m.MEM_BIRTH) / 12) &lt;= 19
+	    </if>
+	    <if test="ageGroup != null and ageGroup != '' and ageGroup eq 'youth'">
+	        AND TRUNC(MONTHS_BETWEEN(ll.LL_CREATED_AT, m.MEM_BIRTH) / 12) &gt;= 20
+	    </if>
+	    GROUP BY TO_CHAR(ll.LL_CREATED_AT, 'YYYY-MM-DD')
+	    UNION ALL
+	    -- 선택 기간의 작년 데이터
+	    SELECT
+	        TO_CHAR(ADD_MONTHS(ll.LL_CREATED_AT, 12), 'YYYY-MM-DD') AS loginDate,
+	        'LAST_YEAR' AS periodType,
+	        COUNT(DISTINCT ll.MEM_ID) AS userCount
+	    FROM LOGIN_LOG ll
+	    JOIN MEMBER m ON ll.MEM_ID = m.MEM_ID, params p
+	    WHERE ll.LL_STATUS = 'I'
+	          AND ll.LL_CREATED_AT &gt;= p.prev_start_date
+	          AND ll.LL_CREATED_AT &lt; p.prev_end_date
+	    <if test="gender != null and gender == 'G11001'">
+	        AND m.MEM_GEN = 'G11001'
+	    </if>
+	    <if test="gender != null and gender == 'G11002'">
+	        AND m.MEM_GEN = 'G11002'
+	    </if>
+	    <if test="ageGroup != null and ageGroup != '' and ageGroup eq 'teen'">
+	        AND TRUNC(MONTHS_BETWEEN(ll.LL_CREATED_AT, m.MEM_BIRTH) / 12) &lt;= 19
+	    </if>
+	    <if test="ageGroup != null and ageGroup != '' and ageGroup eq 'youth'">
+	        AND TRUNC(MONTHS_BETWEEN(ll.LL_CREATED_AT, m.MEM_BIRTH) / 12) &gt;= 20
+	    </if>
+	    GROUP BY TO_CHAR(ADD_MONTHS(ll.LL_CREATED_AT, 12), 'YYYY-MM-DD')
 	</select>
 
 	<select id="dailyPageVisitCount" resultType="kr.or.ddit.admin.las.service.VisitVO">

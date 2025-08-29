@@ -422,7 +422,6 @@ document.addEventListener('DOMContentLoaded', function() {
 				allCompanies = result.companyList;
 				
 				if (typeof Hangul !== 'undefined') {
-					console.log('Hangul.js 로드 완료 - 한글 자음 검색 가능');
 				} else {
 					console.warn('Hangul.js 미로드 - 일반 검색만 가능');
 				}

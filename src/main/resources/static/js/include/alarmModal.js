@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			}
 		})
 		.catch(err =>{
-			console.error(err);
+			// console.error(err);
 		})
 
 		// SSE 연결
@@ -50,15 +50,13 @@ document.addEventListener('DOMContentLoaded', function(){
 		})
 
 		eventSource.addEventListener('connected', function(e){
-			//console.log(e.data);
 		})
 
 		eventSource.onopen = () =>{
-			//console.log("sse연결됨");
 		}
 
 		eventSource.onerror = (e) =>{
-			//console.log("e :", e);
+			console.error("error : ", e);
 		}
 
 		// 알림 전체삭제 요청 버튼 이벤트 추가
@@ -155,7 +153,7 @@ function updateReadAlarm(e){
 		updateAlarmFloatingBadge(-1);
 	})
 	.catch(err =>{
-		console.log(err);
+		console.error(err);
 	})
 }
 
@@ -195,7 +193,7 @@ function removeAlarmItem(alarmDeleteBtn){
 		}
 	})
 	.catch(err =>{
-		console.log(err);
+		console.error(err);
 	})
 }
 

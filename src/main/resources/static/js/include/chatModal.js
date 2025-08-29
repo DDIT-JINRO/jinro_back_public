@@ -395,9 +395,6 @@ function clampIntoViewport(modal) {
   const L = Math.max(PAD, Math.min(leftNow, maxL));
   const T = Math.max(PAD, Math.min(topNow,  maxT));
 
-  // 디버깅 원하면 주석 해제
-  // console.log({ leftNow, topNow, maxL, maxT, L, T });
-
   modal.style.left   = `${L}px`;
   modal.style.top    = `${T}px`;
   modal.style.right  = 'auto';
@@ -447,7 +444,6 @@ async function printChatRoomList() {
 	  return a.idx - b.idx;
 	});
 
-	console.log(indexed);
 	// DOM 빌드: 리플로우 최소화를 위해 fragment 사용
 	const frag = document.createDocumentFragment();
 
@@ -486,7 +482,6 @@ async function printChatRoomList() {
 	const newCrId = localStorage.getItem('newCrId');
 	if(newCrId){
 		const targetChatRoom = document.querySelector(`.chat-room-entry[data-cr-id="${newCrId}"]`);
-		console.log("targetChatRoom", targetChatRoom);
 		if(targetChatRoom){
 			targetChatRoom.click();
 		}
@@ -588,8 +583,6 @@ function connectSocket() {
 
 		// 플로팅 뱃지에 전체 안읽음 갯수를 세팅하기 위한 구독
 		stompClient.subscribe(`/sub/chat/unread/summary/${memId}`, (message) => {
-			console.log(message);
-			const data = JSON.parse(message.body);
 		    const { unreadCnt } = JSON.parse(message.body);
 		    updateFloatingBadge(unreadCnt);
 		});
@@ -840,7 +833,6 @@ async function removeUnreadBadge(roomId) {
 	    console.error("읽음 처리 오류:", err);
 	});
 
-	console.log(unreadCounts);
 }
 
 // 플로팅 버튼 안읽음 업데이트

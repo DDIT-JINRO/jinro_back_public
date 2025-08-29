@@ -350,7 +350,9 @@ const fn_TopsWidget = () =>{
 	
 	document.addEventListener('click', (e) => {
 	    if (!e.target.closest('.trend-widget')) {
-	       panel.classList.add('hidden');
+	        widgets.forEach(widget => {
+	            widget.querySelector('.trend-panel').classList.add('hidden');
+	        });
 	    }
 	});
 }
@@ -442,7 +444,7 @@ async function yotubeInMain() {
 				})
 			});
 	} catch (err) {
-		console.log("error : ", err);
+		console.error("error : ", err);
 	}
 }
 

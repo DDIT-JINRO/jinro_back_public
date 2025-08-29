@@ -31,7 +31,6 @@ function selectEmailBtn() {
 			})
 			.then(response => response.json())  
 	  		.then(data => {
-	  			console.log(data);
 	  			findEmailResult.style.display = "block";
 	  			resultText.textContent = data.count + "개";
 	  			
