@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			}
 		})
 		.catch(err =>{
-			console.error(err);
+			// console.error(err);
 		})
 
 		// SSE 연결
