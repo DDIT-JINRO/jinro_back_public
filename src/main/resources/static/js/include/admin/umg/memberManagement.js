@@ -5,7 +5,7 @@ function memberManagement() {
 	let doughnutChart = null;
 
 	let currentSortOrder = 'asc';
-	let currentSortBy = 'id';
+	let currentSortBy = '';
 	let currentPage = 1;
 
 	const hiddenInput = document.getElementById('comCalendarInput');
@@ -41,8 +41,8 @@ function memberManagement() {
 	const table3 = document.getElementById('tableContainer3');
 
 	const searchInput = document.getElementById('search');
-	searchInput.addEventListener('keydown',function(e){
-		if(e.code === 'Enter'){
+	searchInput.addEventListener('keydown', function(e) {
+		if (e.code === 'Enter') {
 			document.querySelector('.searchUserBtn')?.click();
 		}
 	})
@@ -66,11 +66,11 @@ function memberManagement() {
 	memberChartAllBtn.classList.add('active');
 
 	topButtons.forEach(button => {
-	    button.addEventListener('click', () => {
-	        topButtons.forEach(btn => btn.classList.remove('active'));
+		button.addEventListener('click', () => {
+			topButtons.forEach(btn => btn.classList.remove('active'));
 
-	        button.classList.add('active');
-	    });
+			button.classList.add('active');
+		});
 	});
 
 	memberMngBtn.addEventListener('click', function() {
@@ -86,9 +86,9 @@ function memberManagement() {
 	replyListSortOrder.addEventListener('click', function() {
 		const userId = document.getElementById('mem-id').value;
 		if (!userId) {
-			showConfirm2("회원을 선택하세요.","",
+			showConfirm2("회원을 선택하세요.", "",
 				() => {
-				    return;
+					return;
 				}
 			);
 		}
@@ -141,9 +141,9 @@ function memberManagement() {
 	boardListSortOrder.addEventListener('click', function() {
 		const userId = document.getElementById('mem-id').value;
 		if (!userId) {
-			showConfirm2("회원을 선택하세요.","",
+			showConfirm2("회원을 선택하세요.", "",
 				() => {
-				    return;
+					return;
 				}
 			);
 		}
@@ -184,12 +184,17 @@ function memberManagement() {
 		table1.style.display = 'none';
 		table2.style.display = 'none';
 		table3.style.display = 'none';
+		
+		document.getElementById('memDetailBoardListPagenationSpace').style.display='none';
+		document.getElementById('memDetailReplyListPagenationSpace').style.display = 'none';
+
 
 		// 선택된 옵션의 값에 따라 해당 테이블을 표시
 		if (this.value === 'table1') {
 			const userId = document.getElementById('mem-id').value;
 			userDetailBoardList(userId);
 			table1.style.display = 'block';
+			document.getElementById('memDetailBoardListPagenationSpace').style.display = 'block'; // 게시글 페이지네이션 표시
 		} else if (this.value === 'table2') {
 			const userId = document.getElementById('mem-id').value;
 			const replyTbody = document.getElementById('userDetailReplyList');
@@ -201,6 +206,7 @@ function memberManagement() {
 			}
 			userDetailReplyList(userId);
 			table2.style.display = 'block';
+			document.getElementById('memDetailReplyListPagenationSpace').style.display = 'block'; // 댓글 페이지네이션 표시
 		} else if (this.value === 'table3') {
 			table3.style.display = 'block';
 		}
@@ -225,9 +231,9 @@ function memberManagement() {
 		boardListIdBtn.addEventListener('click', function() {
 			const userId = document.getElementById('mem-id').value;
 			if (userId == null || userId == "") {
-				showConfirm2("회원을 선택하세요.","",
+				showConfirm2("회원을 선택하세요.", "",
 					() => {
-					    return;
+						return;
 					}
 				);
 			}
@@ -239,9 +245,9 @@ function memberManagement() {
 		boardListdelYnBtn.addEventListener('click', function() {
 			const userId = document.getElementById('mem-id').value;
 			if (userId == null || userId == "") {
-				showConfirm2("회원을 선택하세요.","",
+				showConfirm2("회원을 선택하세요.", "",
 					() => {
-					    return;
+						return;
 					}
 				);
 			}
@@ -253,9 +259,9 @@ function memberManagement() {
 		boardListDateBtn.addEventListener('click', function() {
 			const userId = document.getElementById('mem-id').value;
 			if (userId == null || userId == "") {
-				showConfirm2("회원을 선택하세요.","",
+				showConfirm2("회원을 선택하세요.", "",
 					() => {
-					    return;
+						return;
 					}
 				);
 			}
@@ -268,9 +274,9 @@ function memberManagement() {
 		replyListIdBtn.addEventListener('click', function() {
 			const userId = document.getElementById('mem-id').value;
 			if (userId == null || userId == "") {
-				showConfirm2("회원을 선택하세요.","",
+				showConfirm2("회원을 선택하세요.", "",
 					() => {
-					    return;
+						return;
 					}
 				);
 			}
@@ -282,9 +288,9 @@ function memberManagement() {
 		replyListDelYnBtn.addEventListener('click', function() {
 			const userId = document.getElementById('mem-id').value;
 			if (userId == null || userId == "") {
-				showConfirm2("회원을 선택하세요.","",
+				showConfirm2("회원을 선택하세요.", "",
 					() => {
-					    return;
+						return;
 					}
 				);
 			}
@@ -296,9 +302,9 @@ function memberManagement() {
 		replyListDateBtn.addEventListener('click', function() {
 			const userId = document.getElementById('mem-id').value;
 			if (userId == null || userId == "") {
-				showConfirm2("회원을 선택하세요.","",
+				showConfirm2("회원을 선택하세요.", "",
 					() => {
-					    return;
+						return;
 					}
 				);
 			}
@@ -376,9 +382,9 @@ function memberManagement() {
 		profileUpload.addEventListener('change', function(event) {
 			const file = event.target.files[0];
 			if (file.type !== "image/jpeg" && file.type !== "image/png") {
-				showConfirm2("파일은 png 또는 jpg 형식만 가능합니다.","",
+				showConfirm2("파일은 png 또는 jpg 형식만 가능합니다.", "",
 					() => {
-					    return;
+						return;
 					}
 				);
 			}
@@ -394,7 +400,7 @@ function memberManagement() {
 	}
 
 	// 3. fetchUserList 함수의 inFilter 파라미터를 추가하고, 함수 시작 시점에 값을 가져오도록 수정
-	function fetchUserList(page = 1, sortBy = 'id', sortOrder = 'asc', inFilter = '') {
+	function fetchUserList(page = 1, sortBy = '', sortOrder = 'asc', inFilter = '') {
 		currentPage = page;
 
 		const pageSize = 10;
@@ -703,44 +709,44 @@ function memberManagement() {
 			const nameRegex = /^[가-힣a-zA-Z]{2,20}$/;
 			const nicknameRegex = /^[가-힣a-zA-Z0-9]{2,10}$/;
 			if (!emailRegex.test(email)) {
-				showConfirm2("올바른 이메일 형식을 입력해주세요.","",
+				showConfirm2("올바른 이메일 형식을 입력해주세요.", "",
 					() => {
-					    return;
+						return;
 					}
 				);
 			}
 			if (!nameRegex.test(name)) {
-				showConfirm2("닉네임을 입력해주세요.","",
-									() => {
-									    return;
-									}
-								);
+				showConfirm2("닉네임을 입력해주세요.", "",
+					() => {
+						return;
+					}
+				);
 			}
 			if (!nickname) {
-				showConfirm2("닉네임을 입력해주세요.","",
+				showConfirm2("닉네임을 입력해주세요.", "",
 					() => {
-					    return;
+						return;
 					}
 				);
 			}
 			if (!nicknameRegex.test(nickname)) {
-				showConfirm2("닉네임은 한글, 영문, 숫자 조합","2~10자로 입력해주세요.",
+				showConfirm2("닉네임은 한글, 영문, 숫자 조합", "2~10자로 입력해주세요.",
 					() => {
-					    return;
+						return;
 					}
 				);
 			}
 			if (!passwordRegex.test(password)) {
-				showConfirm2("비밀번호는 영문, 숫자, 특수문자로","8~16자로 입력해주세요.",
+				showConfirm2("비밀번호는 영문, 숫자, 특수문자로", "8~16자로 입력해주세요.",
 					() => {
-					    return;
+						return;
 					}
 				);
 			}
 			if (!phoneRegex.test(phone)) {
-				showConfirm2("010-XXXX-XXXX 형식으로 입력해주세요.","",
+				showConfirm2("010-XXXX-XXXX 형식으로 입력해주세요.", "",
 					() => {
-					    return;
+						return;
 					}
 				);
 			}
@@ -755,9 +761,9 @@ function memberManagement() {
 			const profileFile = document.getElementById('profileUpload').files[0];
 			if (profileFile) {
 				if (profileFile.type !== "image/jpeg" && profileFile.type !== "image/png") {
-					showConfirm2("파일은 png 또는 jpg 형식만 가능합니다.","",
+					showConfirm2("파일은 png 또는 jpg 형식만 가능합니다.", "",
 						() => {
-						    return;
+							return;
 						}
 					);
 				}
@@ -769,15 +775,15 @@ function memberManagement() {
 			}
 			axios.post('/admin/umg/insertUserByAdmin.do', formData).then(res => {
 				if (res.data == 'success') {
-					showConfirm2("유저 등록 성공","",
+					showConfirm2("유저 등록 성공", "",
 						() => {
-						    return;
+							return;
 						}
 					);
 				} else {
-					showConfirm2("등록 중 오류 발생","",
+					showConfirm2("등록 중 오류 발생", "",
 						() => {
-						    return;
+							return;
 						}
 					);
 				}
@@ -789,13 +795,13 @@ function memberManagement() {
 	function modifyFn() {
 		const modifyButton = document.getElementById('userModify');
 		modifyButton.addEventListener('click', function() {
-			showConfirm("정말로 수정하시겠습니까?","",
+			showConfirm("정말로 수정하시겠습니까?", "",
 				() => {
 					const memId = document.getElementById('mem-id').value;
 					if (memId == null || memId == "") {
-						showConfirm2("수정할 대상이 없습니다.","",
+						showConfirm2("수정할 대상이 없습니다.", "",
 							() => {
-							    return;
+								return;
 							}
 						);
 					}
@@ -812,9 +818,9 @@ function memberManagement() {
 					axios.post('/admin/umg/updateMemberInfo.do', formData)
 						.then(res => {
 							if (res.data != 1) {
-								showConfirm2("수정 실패","",
+								showConfirm2("수정 실패", "",
 									() => {
-									    return;
+										return;
 									}
 								);
 							} else {
@@ -822,16 +828,16 @@ function memberManagement() {
 								formId.set("id", memId);
 								userDetail(formId);
 								fetchUserList();
-								showConfirm2("수정 완료","",
+								showConfirm2("수정 완료", "",
 									() => {
-									    return;
+										return;
 									}
 								);
 							}
 						})
 				},
 				() => {
-					
+
 				}
 			);
 		})
@@ -844,15 +850,15 @@ function memberManagement() {
 			const email = document.getElementById('insertEmail').value;
 			const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 			if (email == null || email == "") {
-				showConfirm2("이메일을 입력하세요.","",
+				showConfirm2("이메일을 입력하세요.", "",
 					() => {
-					    return;
+						return;
 					}
 				);
 			} else if (!emailRegex.test(email)) {
-				showConfirm2("올바른 이메일 형식을 입력하세요.","",
+				showConfirm2("올바른 이메일 형식을 입력하세요.", "",
 					() => {
-					    return;
+						return;
 					}
 				);
 			}
@@ -860,9 +866,9 @@ function memberManagement() {
 			formData.set("email", email);
 			axios.post('/admin/umg/selectEmailByAdmin.do', formData)
 				.then(res => {
-					showConfirm2(res.data,"",
+					showConfirm2(res.data, "",
 						() => {
-						    return;
+							return;
 						}
 					);
 				})
@@ -876,15 +882,15 @@ function memberManagement() {
 			const nickname = document.getElementById('insertNickname').value;
 			const nicknameRegex = /^[가-힣a-zA-Z0-9]{2,10}$/;
 			if (nickname == null || nickname == "") {
-				showConfirm2("닉네임을 입력하세요.","",
+				showConfirm2("닉네임을 입력하세요.", "",
 					() => {
-					    return;
+						return;
 					}
 				);
 			} else if (!nicknameRegex.test(nickname)) {
-				showConfirm2("닉네임은 한글, 영문, 숫자 조합","2~10자로 입력해주세요.",
+				showConfirm2("닉네임은 한글, 영문, 숫자 조합", "2~10자로 입력해주세요.",
 					() => {
-					    return;
+						return;
 					}
 				);
 			}
@@ -892,9 +898,9 @@ function memberManagement() {
 			formData.set("nickname", nickname);
 			axios.post('/admin/umg/selectNicknameByAdmin.do', formData)
 				.then(res => {
-					showConfirm2(res.data,"",
+					showConfirm2(res.data, "",
 						() => {
-						    return;
+							return;
 						}
 					);
 				})
@@ -1016,7 +1022,7 @@ function memberManagement() {
 
 			// 페이지네이션 렌더링
 			if (boardPaginationEl) {
-				let paginationHtml = `<a href="#" data-page="${startPage - 1}" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previus</a>`;
+				let paginationHtml = `<a href="#" data-page="${startPage - 1}" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 				for (let p = startPage; p <= endPage; p++) {
 					paginationHtml += `<a href="#" data-page="${p}" class="page-link ${p === currentPage ? 'active' : ''}">${p}</a>`;
 				}
@@ -1397,18 +1403,18 @@ function memberManagement() {
 						plugins: {
 							title: { display: true, text: [chartRange] },
 							tooltip: {
-							    mode: 'index',
-							    intersect: false,
-							    callbacks: {
-							        label: function(context) {
-							            let label = context.dataset.label || '';
-							            if (label) { label += ': '; }
-							            if (context.parsed.y !== null) {
-							                label += context.parsed.y.toLocaleString() + '명';
-							            }
-							            return label;
-							        }
-							    }
+								mode: 'index',
+								intersect: false,
+								callbacks: {
+									label: function(context) {
+										let label = context.dataset.label || '';
+										if (label) { label += ': '; }
+										if (context.parsed.y !== null) {
+											label += context.parsed.y.toLocaleString() + '명';
+										}
+										return label;
+									}
+								}
 							},
 							legend: {
 								position: 'bottom',
