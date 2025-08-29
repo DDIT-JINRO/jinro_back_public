@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		const secessionUsersData = chartData.secessionChart.map(item => item.MONTHLY_DELETION_COUNT);
 		const monthLabels = chartData.monthlyChart.map(item => item.MONTH + '월');
 		const ctxUser = document.getElementById('lineChart');
-		
+
 		if (ctxUser) {
 			 newChart = new Chart(ctxUser, {
 				type: 'line',
@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	const youthBtn = document.getElementById('youthBtn');
 	const teenBtn = document.getElementById('teenBtn');
 	const ctxDoughnut = document.getElementById('nestedDoughnutChart');
-	
+
 	function updateDoughnutChart(param) {
 		if (!ctxDoughnut) return;
 		if (doughnutChart) {
@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
 							display: true,
 							position: 'bottom',
 							labels: { color: '#555', padding: 25, font: { size: 14 } }
-						}, 
+						},
 						datalabels: {
 							formatter: (value, ctx) => {
 								const sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
@@ -307,7 +307,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	        downloadCanvas(doughnutChart, '컨텐츠 이용 통계.png', 'image/png');
 	    }
 	}
-	
+
 
 });
 
@@ -390,6 +390,8 @@ function showConfirm(message1, message2, onOk, onCancel) {
 	const okBtn = document.getElementById("confirmOk");
     const cancelBtn = document.getElementById("confirmCancel");
 
+	okBtn.focus();
+
     okBtn.onclick = () => {
         confirmBox.style.display = "none";
         if (onOk) onOk();
@@ -410,7 +412,9 @@ function showConfirm2(message1, message2, onOk) {
     confirmBox.style.display = "flex";
 
     const okBtn = document.getElementById("confirmOk2");
-	
+
+	okBtn.focus();
+
     okBtn.onclick = () => {
         confirmBox.style.display = "none";
         if (onOk) onOk();

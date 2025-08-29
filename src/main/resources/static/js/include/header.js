@@ -9,6 +9,8 @@ function showConfirm(message1, message2, onOk, onCancel) {
 	const okBtn = document.getElementById("confirmOk");
 	const cancelBtn = document.getElementById("confirmCancel");
 
+	okBtn.focus();
+
 	okBtn.onclick = () => {
 		confirmBox.style.display = "none";
 		if (onOk) onOk();
@@ -29,6 +31,7 @@ function showConfirm2(message1, message2, onOk) {
 	confirmBox.style.display = "flex";
 
 	const okBtn = document.getElementById("confirmOk2");
+	okBtn.focus();
 
 	okBtn.onclick = () => {
 		confirmBox.style.display = "none";
@@ -111,7 +114,7 @@ function header() {
 	    });
 	});
 
-	
+
 	// --- 사이드바 버튼 로직 ---
 	const worldcup = document.getElementById("worldcup");
 	const roadmap = document.getElementById("roadmap");

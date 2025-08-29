@@ -37,7 +37,7 @@
                     </if>
                 FROM UNIV_DEPT_DETAIL UD
                 <if test="memId != null and memId != ''">
-                LEFT JOIN (SELECT BM_ID, BM_TARGET_ID FROM BOOKMARK WHERE BM_CATEGORY_ID='G03006' AND MEM_ID=#{memId})B ON UD.UDD_ID = B.BM_TARGET_ID
+                LEFT JOIN (SELECT '1' as BM_ID, BM_TARGET_ID FROM BOOKMARK WHERE BM_CATEGORY_ID='G03006' AND MEM_ID=#{memId})B ON UD.UDD_ID = B.BM_TARGET_ID
                 </if>
                 LEFT JOIN COM_CODE CC1 ON UD.UDD_L_CLASS = CC1.CC_ID
                 LEFT JOIN COM_CODE CC2 ON UD.UDD_M_CLASS = CC2.CC_ID
