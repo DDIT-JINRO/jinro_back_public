@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
 	const channelSection = document.querySelector(".breadcrumb-container-space");
 	
-	console.log(channelSection);
-	
 	if (channelSection) {
 	    const errorMessage = channelSection.dataset.errorMessage;
 	    const serverError = channelSection.dataset.serverError;
@@ -164,7 +162,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	document.querySelectorAll('.content-list__item').forEach(jobs => {
-		console.log("click")
 		jobs.addEventListener('click', (e) => {
 			if (e.target.closest('.bookmark-button') || e.target.closest('.compare-button')) {
 				return;
@@ -221,7 +218,6 @@ const handleBookmarkToggle = (button) => {
         return response.json();
     })
     .then(data => {
-		console.log(data);
         if (data.success) {
 			showConfirm2(data.message,"",
 				() => {
