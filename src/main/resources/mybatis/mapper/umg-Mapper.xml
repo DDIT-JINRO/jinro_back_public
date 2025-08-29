@@ -723,7 +723,6 @@
 		                    <when test="sortBy == 'id'">M.MEM_ID</when>
 		                    <when test="sortBy == 'name'">M.MEM_NAME</when>
 		                    <when test="sortBy == 'email'">M.MEM_EMAIL</when>
-		                    <otherwise>M.MEM_ID</otherwise>
 		                </choose>
 		                <if test="sortOrder == 'desc'">DESC</if>
 		                <if test="sortOrder == 'asc' or sortOrder == null">ASC</if>
@@ -731,9 +730,9 @@
 		            <otherwise>
 		                ORDER BY
 		                CASE
-		                    WHEN P.MEM_ID IS NOT NULL THEN 0
-		                    WHEN L.LL_STATUS = 'I' THEN 1
-		                    WHEN L.LL_STATUS = 'O' THEN 2
+		                    WHEN L.LL_STATUS = 'I' THEN 0
+		                    WHEN L.LL_STATUS = 'O' THEN 1
+		                    WHEN P.MEM_ID IS NOT NULL THEN 2
 		                    ELSE 3
 		                END,
 		                NVL(L.LL_CREATED_AT, TO_DATE('1900-01-01', 'YYYY-MM-DD')) DESC
