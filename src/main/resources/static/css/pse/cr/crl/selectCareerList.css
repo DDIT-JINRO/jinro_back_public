@@ -216,34 +216,24 @@
    비교 플로팅 버튼
    ========================================================================== */
 .compare-float-button__button {
-	background-color: #7881f5;
-	color: white;
-	border: 1px solid transparent;
-	padding: 6px 18px;
-	border-radius: 25px;
-	cursor: pointer;
-	font-weight: 500;
-	font-size: 0.8rem;
-	transition: all 0.3s ease;
-	width: 64px;
-}
-.compare-float-button__button:hover {
-	transform: scale(1.03);
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-	background-color: #5c68d9;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    
+    color: #7881f5;
+    font-weight: 700;
+    font-size: 14px;
 }
 
-.compare-float-button__count {
-	background-color: white;
-	color: #7881f5;
-	border-radius: 50%;
-	width: 24px;
-	height: 24px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 0.9rem;
-	font-weight: bold;
+/* 가상 요소(::before)를 사용하여 아이콘을 추가합니다. */
+.compare-float-button__button::before {
+    content: '\f24e'; 
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-size: 20px;
+    color: #7881f5; 
 }
 
 /* ==========================================================================
@@ -280,9 +270,12 @@
 	}
 	
 	.compare-float-button__button {
-	    width: 50px;
-	    font-size: 0.7rem;
-	    padding: 5px;
+		font-size: 11px; /* 모바일에서 폰트 크기 축소 */
+		padding-top: 2px;
+	}
+
+	.compare-float-button__button::before {
+		font-size: 16px; /* 모바일에서 아이콘 크기 축소 */
 	}
 	
 	/* 비교 팝업 */
