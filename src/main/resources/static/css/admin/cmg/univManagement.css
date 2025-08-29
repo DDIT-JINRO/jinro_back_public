@@ -1,9 +1,5 @@
 @charset "UTF-8";
 
-.flex {
-	flex-direction: row-reverse;
-	gap: 20px;
-}
 .middleTitle{
 	margin-bottom: 20px;
 }
