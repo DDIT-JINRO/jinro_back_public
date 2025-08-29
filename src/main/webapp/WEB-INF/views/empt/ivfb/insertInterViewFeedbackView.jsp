@@ -164,5 +164,5 @@
 </div>
 <%@ include file="/WEB-INF/views/include/footer.jsp"%>
 </body>
-<script type="text/javascript" src="/js/empt/ivfb/insertInterviewFeedbackView.js"></script>
+<script type="text/javascript" src="/js/empt/ivfb/insertInterViewFeedbackView.js"></script>
 </html>
