@@ -86,7 +86,7 @@
 									, JOB_TARGET_ID
 									, (
 				                        SELECT
-				                        	BM_TARGET_ID
+				                        	'1'
 				                        FROM
 				                        	BOOKMARK
 				                        WHERE
