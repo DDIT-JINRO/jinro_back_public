@@ -74,7 +74,7 @@
 		                        <if test="memId != null and memId !=''">
 		                        , (
 			                        SELECT
-			                        	BM_TARGET_ID
+			                        	'1'
 			                        FROM
 			                        	BOOKMARK
 			                        WHERE
