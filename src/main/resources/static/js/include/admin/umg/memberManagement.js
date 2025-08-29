@@ -184,8 +184,8 @@ function memberManagement() {
 		table1.style.display = 'none';
 		table2.style.display = 'none';
 		table3.style.display = 'none';
-		
-		document.getElementById('memDetailBoardListPagenationSpace').style.display='none';
+
+		document.getElementById('memDetailBoardListPagenationSpace').style.display = 'none';
 		document.getElementById('memDetailReplyListPagenationSpace').style.display = 'none';
 
 
@@ -1328,6 +1328,8 @@ function memberManagement() {
 	}
 
 	// userOnlineChart 함수를 재정의하여 공통 변수를 사용하도록 수정
+	// memberManagement.js
+	// memberManagement.js
 	function userOnlineChart(selectUserInquiry = "daily", chartRange = "", startDate = "", endDate = "", gender = "") {
 		const ctx = document.getElementById('userOnlineChartCanvas').getContext('2d');
 
@@ -1355,75 +1357,138 @@ function memberManagement() {
 		}
 
 		axios.get('/admin/las/userInquiry.do', { params })
-			.then(res => {
-				const responseData = res.data;
+		    .then(res => {
+		        const responseData = res.data;
+		        
+		        // 데이터셋 분리 및 라벨 생성
+		        let labels;
+		        let currentPeriodData;
+		        let previousPeriodData;
+		        let currentLabel;
+		        let previousLabel;
+		        
+		        // dateValue에 따라 데이터 처리 로직 분기
+		        switch (dateValue) {
+		            case 'monthly':
+		                currentPeriodData = responseData.filter(item => item.periodType === 'THIS_YEAR');
+		                previousPeriodData = responseData.filter(item => item.periodType === 'LAST_YEAR');
+		                labels = currentPeriodData.map(item => formatMonthOnly(item.loginDate));
+		                currentLabel = '올해 접속자 수';
+		                previousLabel = '작년 접속자 수';
+		                break;
+		            case 'selectDays':
+		                currentPeriodData = responseData.filter(item => item.periodType === 'THIS_YEAR');
+		                previousPeriodData = responseData.filter(item => item.periodType === 'LAST_YEAR');
+		                
+		                // 라벨을 위해 모든 날짜를 합치고 정렬
+		                let allDates = Array.from(new Set(currentPeriodData.map(item => item.loginDate)
+		                    .concat(previousPeriodData.map(item => item.loginDate))));
+		                allDates.sort();
 
-				// ▼▼▼ 라벨 포맷 수정 ▼▼▼
-				let labels;
-				let chartLabel;
-				switch (dateValue) {
-					case 'monthly':
-						labels = responseData.map(item => formatMonthOnly(item.loginDate));
-						chartLabel = '월별 접속자 수';
-						break;
-					case 'daily':
-						labels = responseData.map(item => formatMonthDay(item.loginDate));
-						chartLabel = '일별 접속자 수';
-						break;
-					case 'selectDays':
-						labels = responseData.map(item => formatFullDate(item.loginDate));
-						chartLabel = '기간별 접속자 수';
-						break;
-					default:
-						labels = responseData.map(item => formatMonthDay(item.loginDate));
-						chartLabel = '일별 접속자 수';
-				}
-				// ▲▲▲ 여기까지 ▲▲▲
+		                labels = allDates.map(item => formatFullDate(item));
+		                currentLabel = '올해 접속자 수';
+		                previousLabel = '작년 접속자 수';
+		                break;
+		            case 'daily':
+		            default:
+		                currentPeriodData = responseData.filter(item => item.weekType === 'THIS_WEEK');
+		                previousPeriodData = responseData.filter(item => item.weekType === 'LAST_WEEK');
+		                labels = currentPeriodData.map(item => formatMonthDay(item.loginDate));
+		                currentLabel = '이번주 접속자 수';
+		                previousLabel = '지난주 접속자 수';
+		                break;
+		        }
+		        
+		        const currentValues = currentPeriodData.map(item => item.userCount);
+		        const previousValues = previousPeriodData.map(item => item.userCount);
+		        
+		        if (userOnlineChartInstance) {
+		            userOnlineChartInstance.destroy();
+		        }
+		        
+		        // 데이터셋의 모든 값에서 최대값을 찾습니다.
+		        const allDataValues = [...currentValues, ...previousValues];
+		        const maxDataValue = Math.max(...allDataValues, 0); // 0과 비교하여 음수 값이 없을 때도 최소 0 이상이 되도록 보장
+		        
+		        // suggestedMax를 최대값의 두 배로 설정합니다.
+		        const suggestedMax = maxDataValue * 1.5;
 
-				const dataValues = responseData.map(item => item.userCount);
+		        // 그라데이션 생성 (이번주/올해 데이터용 - 푸른색 계열)
+		        const thisPeriodGradient = ctx.createLinearGradient(0, 0, 0, 400);
+		        thisPeriodGradient.addColorStop(0, 'rgba(54, 162, 235, 0.5)'); 
+		        thisPeriodGradient.addColorStop(1, 'rgba(54, 162, 235, 0)');   
+		        
+		        // 그라데이션 생성 (지난주/작년 데이터용 - 붉은색 계열)
+		        const lastPeriodGradient = ctx.createLinearGradient(0, 0, 0, 400);
+		        lastPeriodGradient.addColorStop(0, 'rgba(255, 99, 132, 0.5)'); 
+		        lastPeriodGradient.addColorStop(1, 'rgba(255, 99, 132, 0)');   
 
-				userOnlineChartInstance = new Chart(ctx, {
-					type: 'line',
-					data: {
-						labels: labels,
-						datasets: [{
-							label: chartLabel,
-							data: dataValues,
-							fill: true,
-							borderColor: 'rgb(142, 110, 228)',
-							backgroundColor: 'rgba(142, 110, 228, 0.2)',
-							tension: 0.4,
-							pointRadius: 3,
-							pointHoverRadius: 6,
-							pointStyle: 'circle'
-						}]
-					},
-					options: {
-						maintainAspectRatio: false,
-						plugins: {
-							title: { display: true, text: [chartRange] },
-							tooltip: {
-								mode: 'index',
-								intersect: false,
-								callbacks: {
-									label: function(context) {
-										let label = context.dataset.label || '';
-										if (label) { label += ': '; }
-										if (context.parsed.y !== null) {
-											label += context.parsed.y.toLocaleString() + '명';
-										}
-										return label;
-									}
-								}
-							},
-							legend: {
-								position: 'bottom',
-							}
-						}
-					}
-				});
-			})
-			.catch(error => console.error("사용자 접속 통계 데이터 조회 중 에러:", error));
+		        userOnlineChartInstance = new Chart(ctx, {
+		            type: 'line',
+		            data: {
+		                labels: labels,
+		                datasets: [{
+		                    label: currentLabel,
+		                    data: currentValues,
+		                    fill: true,
+		                    borderColor: 'rgb(54, 162, 235)',
+		                    backgroundColor: thisPeriodGradient, 
+		                    tension: 0.4,
+		                    pointRadius: 3,
+		                    pointHoverRadius: 6,
+		                    pointStyle: 'circle'
+		                }, {
+		                    label: previousLabel,
+		                    data: previousValues,
+		                    fill: true, 
+		                    borderColor: 'rgb(255, 99, 132)',
+		                    backgroundColor: lastPeriodGradient, 
+		                    tension: 0.4,
+		                    pointRadius: 3,
+		                    pointHoverRadius: 6,
+		                    pointStyle: 'circle'
+		                }]
+		            },
+		            options: {
+		                maintainAspectRatio: false,
+		                plugins: {
+		                    title: {
+		                        display: false
+		                    },
+		                    tooltip: {
+		                        mode: 'index',
+		                        intersect: false,
+		                        callbacks: {
+		                            label: function(context) {
+		                                let label = context.dataset.label || '';
+		                                if (label) {
+		                                    label += ': ';
+		                                }
+		                                if (context.parsed.y !== null) {
+		                                    label += context.parsed.y.toLocaleString() + '명';
+		                                }
+		                                return label;
+		                            }
+		                        }
+		                    },
+		                    legend: {
+		                        position: 'bottom',
+		                    }
+		                },
+		                scales: {
+		                    y: {
+		                        beginAtZero: true,
+		                        ticks: {
+		                            precision: 0
+		                        },
+		                        // 여기에서 동적으로 계산된 값을 사용
+		                        suggestedMax: suggestedMax
+		                    }
+		                }
+		            }
+		        });
+		    })
+		    .catch(error => console.error("사용자 접속 통계 데이터 조회 중 에러:", error));
 	}
 	// 'YY.MM.DD' 형식 (기간별)
 	function formatFullDate(isoString) {
