@@ -52,6 +52,16 @@ public class LoginRestController {
 			resp.addCookie(accessTokenCookie);
 			resp.addCookie(refreshTokenCookie);
 
+			String saveId = memVO.getSaveId();
+			Cookie saveIdCookie = new Cookie("saveId", memVO.getMemEmail());
+			if("Y".equals(saveId)) {
+				saveIdCookie.setMaxAge(60 * 60 * 400);
+			}else{
+				saveIdCookie.setMaxAge(0);
+			}
+
+			resp.addCookie(saveIdCookie);
+
 			String memId = (String) resultMap.get("memId");
 			resultMap.remove("accessToken");
 			resultMap.remove("refreshToken");

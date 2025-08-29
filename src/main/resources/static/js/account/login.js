@@ -27,6 +27,7 @@ async function kakaoLogin() {
     });
 
     const kakaoAuthURL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&prompt=login`;
+    console.log("kakaoAuthURL", kakaoAuthURL);
     window.location.href = kakaoAuthURL;
 }
 
@@ -46,6 +47,7 @@ function checkRegist() {
 function loginBtn() {
     const getUserId = document.getElementById('login-user-email').value.trim();
     const getUserPw = document.getElementById('login-user-password').value.trim();
+	const saveId = document.querySelector('input[name="saveId"]');
 
     if (!getUserId) {
         showConfirm2("이메일을 입력해주세요.", "", () => {
@@ -77,11 +79,13 @@ function loginBtn() {
         body: JSON.stringify({
             memEmail: getUserId,
             memPassword: getUserPw,
-            loginType: "normal"
+            loginType: "normal",
+			saveId: saveId.checked ? saveId.value : '',
         })
     })
     .then(response => response.json())
     .then(data => {
+        console.log(data);
         if (data.status == 'success') {
             const redirectUrl = sessionStorage.getItem("redirectUrl");
             if (redirectUrl) {
