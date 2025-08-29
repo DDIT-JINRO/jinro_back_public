@@ -478,10 +478,17 @@
 	display: none !important;
 }
 
-.page-break {
-  page-break-before: always;   /* 구 버전 */
-  break-before: page;          /* 최신 */
+/* PDF 출력 시 페이지 나눔 최적화 (추가) */
+.personal-info-form,
+.form-JobWish,
+.form-Skills,
+.form-Education,
+.form-certificate,
+.form-activities {
+    page-break-inside: avoid; /* 요소 내부에서 페이지가 나뉘는 것을 방지 */
+    break-inside: avoid;      /* 최신 표준 속성 */
 }
+
 
 @media print {
   .resume-header {
