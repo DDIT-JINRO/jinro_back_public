@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					}
 				})
 				.catch(err => {
-					console.log(err);
+					console.error(err);
 					showConfirm2("삭제도중 문제가 발생했습니다.","관리자측 문의바랍니다.",
 						() => {
 						}
@@ -456,7 +456,7 @@ function submitCreateReply(e) {
 			}
 		})
 		.catch(err => {
-			console.log(err);
+			console.error(err);
 		})
 }
 
@@ -488,7 +488,6 @@ function eventEtcContainerClicked(e) {
 	if (!e.target.closest('.etc-container')) return;
 	const el = e.target;
 	if (!el.textContent.trim()) return;
-	console.log(el.textContent.trim());
 	if (el.classList.contains('reply-child-container')) return;
 	if (!e.target.classList.contains('etc-act-btn')) return;
 
@@ -546,7 +545,7 @@ function eventEtcContainerClicked(e) {
 				}
 			})
 			.catch(err => {
-				console.log(err);
+				console.error(err);
 			})
 	}
 
@@ -633,7 +632,7 @@ function modifyReplyAct(e) {
 			}
 		})
 		.catch(err => {
-			console.log(err);
+			console.error(err);
 		})
 }
 

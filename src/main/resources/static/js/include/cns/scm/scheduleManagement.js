@@ -15,7 +15,6 @@ document.getElementById('cns-logout').addEventListener('click', function() {
 
 		// 이미 캘린더 인스턴스가 존재하면 중단
 		if (calendarInstance) {
-			console.log("이미 캘린더가 초기화되어 있습니다.");
 			return;
 		}
 

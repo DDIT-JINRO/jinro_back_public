@@ -136,7 +136,6 @@ document.addEventListener('DOMContentLoaded', function() {
 				const radioToUncheck = Array.from(orderByRadios).find(
 					cb => cb.nextElementSibling.textContent === filterText
 				);
-				console.log(radioToUncheck);
 				if (radioToUncheck) {
 					radioToUncheck.checked = false;
 				}
