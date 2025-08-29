@@ -49,7 +49,7 @@
 		<div style="margin-top: 10px; text-align: center;">
 			<!-- 페이지네이션 자리 -->
 			<div class="card-footer clearfix">
-				<div class="panel-footer pagination"></div>
+				<div class="panel-footer pagination noticeListPaging"></div>
 			</div>
 		</div>
 	</div>

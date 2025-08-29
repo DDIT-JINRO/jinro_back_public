@@ -50,7 +50,7 @@
 
 		<div style="margin-top: 10px; text-align: center;">
 			<div class="card-footer clearfix">
-				 <div class="panel-footer pagination">
+				 <div class="panel-footer pagination inquiryListPagenation">
 
 				</div>
 			</div>
