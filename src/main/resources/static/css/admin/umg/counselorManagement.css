@@ -225,8 +225,62 @@
 }
 
 .star-rating {
-	color: #FFD700; /* 별 색상: 황금색 */
-	font-size: 18px;
+    position: relative;      /* 자식 요소의 위치 기준점 */
+    display: inline-block;   /* 다른 텍스트와 어울리도록 설정 */
+    font-size: 18px;         /* 별 크기 */
+    line-height: 1;          /* 줄 간격 제거 */
+    color: #ccc;            /* 기본 색상 (빈 별 색상) */
+}
+
+/* 배경으로 표시될 빈 별 5개 */
+.star-rating::before {
+    content: '★★★★★';
+}
+
+/* 평점만큼 채워질 꽉 찬 별 (전경) */
+.star-rating span {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    overflow: hidden;        /* 부모 너비를 벗어나는 부분은 숨김 */
+    white-space: nowrap;     /* 줄바꿈 방지 */
+    color: #FFD700;          /* 꽉 찬 별 색상 */
+}
+
+/* 꽉 찬 별의 실제 모양 */
+.star-rating span::before {
+    content: '★★★★★';
+}
+
+.star-rating:hover::after {
+    content: attr(data-tooltip); /* data-tooltip 속성의 값을 내용으로 가져옴 */
+    position: absolute;
+    
+    /* 위치 조정 (별점 바로 위 가운데) */
+    bottom: 120%; 
+    left: 50%;
+    transform: translateX(-50%);
+    
+    /* 디자인 */
+    background-color: #333; /* 배경색 */
+    color: #fff;             /* 글자색 */
+    padding: 5px 10px;      /* 내부 여백 */
+    border-radius: 4px;     /* 모서리 둥글게 */
+    font-size: 14px;        /* 글자 크기 */
+    white-space: nowrap;    /* 툴팁 내용이 길어져도 줄바꿈 방지 */
+    z-index: 10;            /* 다른 요소들 위에 보이도록 설정 */
+
+    /* 부드러운 애니메이션 효과 */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+}
+
+/* 마우스를 올렸을 때 툴팁을 부드럽게 표시 */
+.star-rating:hover::after {
+    opacity: 1;
+    visibility: visible;
 }
 
 .info-field select {

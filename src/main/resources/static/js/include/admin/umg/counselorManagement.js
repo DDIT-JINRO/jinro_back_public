@@ -343,8 +343,16 @@ function counselorManagement() {
 		return formatDateCal(d);
 	}
 	function starsFromRate(n) {
-		const v = Math.max(0, Math.min(5, Math.round(Number(n) || 0)));
-		return '★'.repeat(v) + '☆'.repeat(5 - v);
+		const rating = Math.max(0, Math.min(5, Number(n) || 0));
+				
+		// 평점을 퍼센트(%) 단위로 변환
+		const widthPercentage = (rating / 5) * 100;
+		
+		const formattedRating = rating.toFixed(2);
+		
+		// CSS로 제어되는 HTML 구조를 반환
+		return `<div class="star-rating" data-tooltip="${formattedRating} / 5.0"><span style="width: ${widthPercentage}%;"></span></div>`;
+			
 	}
 	function updateRateStyleByStatus(elementId, status) {
 		const el = document.getElementById(elementId);
@@ -644,7 +652,7 @@ function counselorManagement() {
                                 <td>${r.MEM_NAME ?? '-'}</td>
                                 <td>${r.COUNSEL_COUNT ?? 0}</td>
                                 <td>${r.COUNSEL_REVIEW_COUNT ?? 0}</td>
-                                <td><span class="star-rating">${stars}</span></td>
+                                <td>${stars}</td>
                             </tr>
                         `;
 					}).join('');
@@ -752,7 +760,7 @@ function counselorManagement() {
                             <td>${r.COUNSEL_CATEGORY}</td>
                             <td>${r.COUNSEL_METHOD}</td>
                             <td>${formatDate(r.COUNSEL_REQ_DATETIME)}</td>
-                            <td><span class="star-rating">${starsFromRate(r.CR_RATE)}</span></td>
+                            <td>${starsFromRate(r.CR_RATE)}</td>
                             <td>${r.COUNSEL_STATUS}</td>
                         </tr>
                     `).join('');
