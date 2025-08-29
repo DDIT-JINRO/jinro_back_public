@@ -353,7 +353,7 @@ document.addEventListener("DOMContentLoaded", function() {
 					iconSearch.remove();
 				}
 			  const opt = {
-				margin: 10,
+				margin: 5,
 			    filename: 'resume.pdf',
 			    image: { type: 'jpeg', quality: 0.98 },
 			    html2canvas: { 
