@@ -127,7 +127,7 @@ public class CareerAptitudeTestServiceImpl implements CareerAptitudeTestService 
 			long inspctSeq = resultNode.get("inspctSeq").asLong();
 			String reportUrl = resultNode.get("url").asText();
 
-			insertResultKeyword(reportUrl, memId, testNo);
+			// insertResultKeyword(reportUrl, memId, testNo);
 
 			return Map.of("msg", "success", "reportUrl", reportUrl);
 		} catch (Exception e) {
