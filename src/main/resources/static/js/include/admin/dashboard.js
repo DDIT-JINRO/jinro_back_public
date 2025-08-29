@@ -383,20 +383,24 @@ function showConfirm(message1, message2, onOk, onCancel) {
     const confirmBox = document.getElementById("customConfirm");
     const confirmMessage1 = document.getElementById("confirmMessage1");
     const confirmMessage2 = document.getElementById("confirmMessage2");
+	const overlay = document.querySelector('.custom-confirm-overlay');
     confirmMessage1.innerHTML = message1; // 메시지 표시
     confirmMessage2.innerHTML = message2; // 메시지 표시
     confirmBox.style.display = "flex";
+	overlay.style.display = "block"
 
 	const okBtn = document.getElementById("confirmOk");
     const cancelBtn = document.getElementById("confirmCancel");
 
     okBtn.onclick = () => {
         confirmBox.style.display = "none";
+		overlay.style.display = "none"
         if (onOk) onOk();
     };
 
     cancelBtn.onclick = () => {
         confirmBox.style.display = "none";
+		overlay.style.display = "none"
         if (onCancel) onCancel();
     };
 }
@@ -405,14 +409,17 @@ function showConfirm2(message1, message2, onOk) {
     const confirmBox = document.getElementById("customConfirm2");
     const confirmMessage1 = document.getElementById("confirmMessage3");
     const confirmMessage2 = document.getElementById("confirmMessage4");
+	const overlay = document.querySelector('.custom-confirm-overlay');
     confirmMessage1.innerHTML = message1; // 메시지 표시
     confirmMessage2.innerHTML = message2; // 메시지 표시
     confirmBox.style.display = "flex";
+	overlay.style.display = "block"
 
     const okBtn = document.getElementById("confirmOk2");
 	
     okBtn.onclick = () => {
         confirmBox.style.display = "none";
+		overlay.style.display = "none"
         if (onOk) onOk();
     };
 }

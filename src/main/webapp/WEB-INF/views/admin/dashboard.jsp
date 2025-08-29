@@ -132,6 +132,8 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="custom-confirm-overlay"></div>
 </body>
 <script src="/js/include/admin/dashboard.js"></script>
 
