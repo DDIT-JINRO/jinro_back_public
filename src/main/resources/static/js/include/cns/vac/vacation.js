@@ -147,8 +147,6 @@ function confirmVacation(){
 
 	const startDate = start.value.split('.').map(v => v.trim()).join('-').slice(0,-1);
 	const endDate =  end.value.split('.').map(v => v.trim()).join('-').slice(0,-1);
-	console.log(startDate);
-
 
 	const fd = new FormData();
 	fd.append('vaConfirm', 'S03001');

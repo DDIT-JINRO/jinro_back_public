@@ -199,8 +199,8 @@
         </choose>
     </select>
 	
-	<!-- 
-	// 구독자 수 
+	<!--
+	// 구독자 수
 	public List<Map<String, Object>> selectSubscriberCountStats(Map<String, Object> params);
 	 -->
 	<select id="selectSubscriberCountStats" parameterType="map" resultType="map">
@@ -256,6 +256,17 @@
 	            AND M.MEM_BIRTH IS NOT NULL
 	            AND TRUNC(MONTHS_BETWEEN(P.PAY_DATE, M.MEM_BIRTH) / 12) <![CDATA[ >= ]]> 20
 	          </if>
+			    AND NOT EXISTS (
+			      SELECT 1
+			      FROM PAYMENT P2
+			      JOIN MEMBER_SUBSCRIPTION MS2 ON P2.MS_ID = MS2.MS_ID
+			      WHERE MS2.MEM_ID = MS.MEM_ID
+			        AND TRUNC(P2.PAY_DATE, 'Q') = TRUNC(P.PAY_DATE, 'Q')
+			        AND (
+			              P2.PAY_DATE <![CDATA[ < ]]> P.PAY_DATE
+			              OR (P2.PAY_DATE = P.PAY_DATE AND P2.MS_ID <![CDATA[ < ]]> P.MS_ID)  <!-- 동시 결제 타이브레이커 -->
+			            )
+			    )
 	        GROUP BY
 	          <choose>
 	            <when test="period == 'monthly'">TRUNC(P.PAY_DATE, 'MM')</when>
@@ -296,6 +307,17 @@
 	            AND M.MEM_BIRTH IS NOT NULL
 	            AND TRUNC(MONTHS_BETWEEN(P.PAY_DATE, M.MEM_BIRTH) / 12) <![CDATA[ >= ]]> 20
 	          </if>
+				  AND NOT EXISTS (
+				    SELECT 1
+				    FROM PAYMENT P2
+				    JOIN MEMBER_SUBSCRIPTION MS2 ON P2.MS_ID = MS2.MS_ID
+				    WHERE MS2.MEM_ID = MS.MEM_ID
+				      AND TRUNC(P2.PAY_DATE, 'Q') = TRUNC(P.PAY_DATE, 'Q')
+				      AND (
+				            P2.PAY_DATE <![CDATA[ < ]]> P.PAY_DATE
+				            OR (P2.PAY_DATE = P.PAY_DATE AND P2.MS_ID <![CDATA[ < ]]> P.MS_ID)
+				          )
+				  )
 	        GROUP BY
 	          <choose>
 	            <when test="period == 'monthly'">TRUNC(P.PAY_DATE, 'MM')</when>
@@ -326,8 +348,8 @@
 	    <otherwise>
 	      SELECT
 	        <choose>
-	          <when test="period == 'monthly'">TO_CHAR(p.PAY_DATE, 'YYYY-MM')</when> 
-	          <when test="period == 'quarterly' or period == null or period == ''">TO_CHAR(p.PAY_DATE, 'YYYY') || '-Q' || TO_CHAR(TRUNC(p.PAY_DATE, 'Q'), 'Q')</when> 
+	          <when test="period == 'monthly'">TO_CHAR(p.PAY_DATE, 'YYYY-MM')</when>
+	          <when test="period == 'quarterly' or period == null or period == ''">TO_CHAR(p.PAY_DATE, 'YYYY') || '-Q' || TO_CHAR(TRUNC(p.PAY_DATE, 'Q'), 'Q')</when>
 	          <otherwise>TO_CHAR(p.PAY_DATE, 'YYYY-MM-DD')</otherwise>
 	        </choose> AS "dt",
 	        COUNT(*) AS "count"
@@ -345,10 +367,23 @@
 	          AND M.MEM_BIRTH IS NOT NULL
 	          AND TRUNC(MONTHS_BETWEEN(P.PAY_DATE, M.MEM_BIRTH) / 12) <![CDATA[ >= ]]> 20
 	        </if>
+	        <if test="'quarterly'.equals(period)">
+			  AND NOT EXISTS (
+			    SELECT 1
+			    FROM PAYMENT P2
+			    JOIN MEMBER_SUBSCRIPTION MS2 ON P2.MS_ID = MS2.MS_ID
+			    WHERE MS2.MEM_ID = MS.MEM_ID
+			      AND TRUNC(P2.PAY_DATE, 'Q') = TRUNC(P.PAY_DATE, 'Q')
+			      AND (
+			            P2.PAY_DATE <![CDATA[ < ]]> P.PAY_DATE
+			            OR (P2.PAY_DATE = P.PAY_DATE AND P2.MS_ID <![CDATA[ < ]]> P.MS_ID)
+			          )
+			  )
+			</if>
 	      GROUP BY
 	        <choose>
-	          <when test="period == 'monthly'">TO_CHAR(p.PAY_DATE, 'YYYY-MM')</when> 
-	          <when test="period == 'quarterly' or period == null or period == ''">TO_CHAR(p.PAY_DATE, 'YYYY') || '-Q' || TO_CHAR(TRUNC(p.PAY_DATE, 'Q'), 'Q')</when> 
+	          <when test="period == 'monthly'">TO_CHAR(p.PAY_DATE, 'YYYY-MM')</when>
+	          <when test="period == 'quarterly' or period == null or period == ''">TO_CHAR(p.PAY_DATE, 'YYYY') || '-Q' || TO_CHAR(TRUNC(p.PAY_DATE, 'Q'), 'Q')</when>
 	          <otherwise>TO_CHAR(p.PAY_DATE, 'YYYY-MM-DD')</otherwise>
 	        </choose>
 	      ORDER BY "dt" ASC

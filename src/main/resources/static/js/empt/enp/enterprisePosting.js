@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// 2. 선택된 필터 태그를 업데이트하는 함수
 	const updateSelectedFiltersDisplay = () => {
-		console.log('asdfasf');
 		if (!selectedFiltersContainer) return;
 	    selectedFiltersContainer.innerHTML = '';
 

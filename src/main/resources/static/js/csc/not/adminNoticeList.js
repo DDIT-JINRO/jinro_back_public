@@ -76,7 +76,6 @@ function bindNoticeEvents() {
 	}
 
 	const frm = document.querySelector('form[action="/csc/admin/noticeList.do"]');
-	console.log(frm);
 	if (frm) {
 		frm.addEventListener('submit', function(e){
 			e.preventDefault();

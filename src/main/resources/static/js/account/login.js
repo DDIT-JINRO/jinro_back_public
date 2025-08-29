@@ -27,7 +27,6 @@ async function kakaoLogin() {
     });
 
     const kakaoAuthURL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&prompt=login`;
-    console.log("kakaoAuthURL", kakaoAuthURL);
     window.location.href = kakaoAuthURL;
 }
 
@@ -83,7 +82,6 @@ function loginBtn() {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
         if (data.status == 'success') {
             const redirectUrl = sessionStorage.getItem("redirectUrl");
             if (redirectUrl) {

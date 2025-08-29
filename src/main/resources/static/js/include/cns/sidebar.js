@@ -14,8 +14,6 @@ function sidebar(){
 
 		      const pageUrl = this.dataset.page;
 
-		      console.log(pageUrl);
-
 			  removeOldFiles();
 			  
 		      fetch(pageUrl)
@@ -68,7 +66,6 @@ function removeOldFiles() {
     allLinks.forEach(link => {
         if (removableFiles.some(file => link.href.includes(file))) {
             link.remove();
-            console.log(`Removed CSS: ${link.href}`);
         }
     });
 
@@ -77,7 +74,6 @@ function removeOldFiles() {
         // src 속성이 있고, 제거 대상 목록에 포함된 스크립트만 제거
         if (script.src && removableFiles.some(file => script.src.includes(file))) {
             script.remove();
-            console.log(`Removed JS: ${script.src}`);
         }
     });
 }

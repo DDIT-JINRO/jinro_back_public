@@ -39,7 +39,6 @@ function loginBtn(){
 
 	const emailInput = document.getElementById('login-user-email');
 	const pwInput = document.getElementById('login-user-password');
-	console.log(emailInput);
 	emailInput.addEventListener('keydown', function(e){
 		if(e.code === 'Enter') loginBtn();
 	})
