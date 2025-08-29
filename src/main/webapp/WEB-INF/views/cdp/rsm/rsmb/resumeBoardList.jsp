@@ -143,7 +143,7 @@
 						<div class="content-list__col content-list__col--likes" data-label="좋아요">${commBoardVO.boardLikeCnt}</div>
 						<div class="content-list__col content-list__col--reply-cnt" data-label="댓글수">${commBoardVO.boardReplyCnt}</div>
 						<div class="content-list__col content-list__col--bookmark" data-label="북마크">
-							<button class="bookmark-button ${commBoardVO.isBookmark == commBoardVO.boardId ? 'is-active' : ''}" data-category-id="G03005" data-target-id="${commBoardVO.boardId}">
+							<button class="bookmark-button ${commBoardVO.isBookmark == '1' ? 'is-active' : ''}" data-category-id="G03005" data-target-id="${commBoardVO.boardId}">
 								<span class="bookmark-button__icon--active">
 									<img src="/images/bookmark-btn-active.png" alt="활성 북마크">
 								</span>
