@@ -28,8 +28,8 @@
       <div class="footer__nav-group">
         <h4 class="footer__nav-title">정책</h4>
         <ul class="footer__nav-list">
-          <li class="footer__nav-item"><div id="openPrivacyPolicy" class="footer__nav-link">이용약관</div></li>
-          <li class="footer__nav-item"><div id="openShowTermsOfService" class="footer__nav-link">개인정보처리방침</div></li>
+          <li class="footer__nav-item"><div id="openShowTermsOfService" class="footer__nav-link">이용약관</div></li>
+          <li class="footer__nav-item"><div id="openPrivacyPolicy" class="footer__nav-link">개인정보처리방침</div></li>
           <li class="footer__nav-item"><div id="youthProtectionPolicy" class="footer__nav-link">청소년 보호정책</div></li>
         </ul>
       </div>

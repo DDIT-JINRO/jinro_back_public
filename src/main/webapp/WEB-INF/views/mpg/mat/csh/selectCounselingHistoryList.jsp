@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/views/include/header.jsp"%>
 <link rel="stylesheet" href="/css/mpg/mat/csh/selectCounselingHistoryList.css">
-<section class="channel">
+<section class="channel myPage">
 	<div class="channel-title">
 		<div class="channel-title-text">마이페이지</div>
 	</div>

@@ -389,6 +389,22 @@ body {
     }
 }
 
+/* 마이페이지 */
+.channel.myPage {
+    background-color: #E8DEE0;
+    background-image: url('/images/main/mascot/mascot-mypage1.png'), url('/images/main/mascot/mascot-mypage2.png');
+    background-position: 200px 10px, right 250px top 10px;
+    background-size: 160px, 200px;
+    background-repeat: no-repeat;
+}
+
+
+@media (max-width: 1918px), (min-width: 1922px) {
+    .channel.myPage {
+        background-image: none;
+    }
+}
+
 
 /* ==========================================================================
    소메뉴 탭 설정
