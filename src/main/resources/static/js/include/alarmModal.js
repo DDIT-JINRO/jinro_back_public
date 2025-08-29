@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			}
 		})
 		.catch(err =>{
-			// console.error(err);
+			 console.error(err);
 		})
 
 		// SSE 연결
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function(){
 		}
 
 		eventSource.onerror = (e) =>{
-			console.error("error : ", e);
+			// console.error("error : ", e);
 		}
 
 		// 알림 전체삭제 요청 버튼 이벤트 추가

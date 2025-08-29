@@ -34,11 +34,11 @@ public class MemberVO {
 	private Long fileSub;
 	private Long fileBadge;
 	private String rnum;
-	
+
 	private String activityStatus;
-	
+
 	private int memAge;
-	
+
 	private List<ComCodeVO> interests;
 	private String subName;
 	private String subDetail;
@@ -50,11 +50,11 @@ public class MemberVO {
 	private Integer mockRemain;
 	private Integer serviceTotal;
 
-	
+
 	private Date veriCreatedAt;
 	private String veriStatus;
 	private String veriReason;
-	
+
 	private String profileFilePath;
 	private String badgeFilePath;
 	private String subFilePath;
@@ -63,7 +63,7 @@ public class MemberVO {
 		return memId + "";
 	}
 
-	private String keyword;	 
+	private String keyword;
 	private String status;
 
 	private int currentPage;
@@ -78,5 +78,7 @@ public class MemberVO {
 	public int getEndNo() {
 		return this.currentPage * size;
 	}
+
+	private String saveId;
 
 }

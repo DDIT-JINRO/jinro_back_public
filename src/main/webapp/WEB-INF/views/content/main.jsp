@@ -233,8 +233,8 @@
 						</p>
 						<p>선택의 순간마다,<br /> 당신의 직업 가치관이 드러납니다<br /> 직업 월드컵을 통해 꿈을 찾아보세요!
 						</p>
-						<button class="promo-card__button" id="worldcupBtn">직업 이상형 월드컵</button>
 					</div>
+						<button class="promo-card__button" id="worldcupBtn">직업 이상형 월드컵</button>
 				</div>
 			</div>
 			<div class="promo-card">
@@ -249,8 +249,8 @@
 						</p>
 						<p>자신이 선호하는 직업이 무엇인지,<br /> 자신에게 적합한 진로를 탐색해 보세요
 						</p>
-						<button class="promo-card__button" onclick="location.href='/pse/cat/careerAptitudeTest.do'">진로 심리 검사</button>
 					</div>
+						<button class="promo-card__button" onclick="location.href='/pse/cat/careerAptitudeTest.do'">진로 심리 검사</button>
 				</div>
 			</div>
 		</div>

@@ -156,7 +156,6 @@
 							</div>
 						</div>
 
-						<div class="page-break"></div>
 					</div>
 				</c:if>
 				<c:if test="${not empty resumeVO}">

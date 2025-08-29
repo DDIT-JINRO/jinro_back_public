@@ -283,6 +283,9 @@
 	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 	transition: transform 0.3s ease, box-shadow 0.3s ease;
 	overflow: visible;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
 }
 
 .promo-card__body:hover {
@@ -337,7 +340,7 @@
 }
 
 .promo-card__button {
-	margin-top: 20px;
+	width: fit-content;
 	padding: 12px 24px;
 	border: 2px solid black;
 	background: white;
