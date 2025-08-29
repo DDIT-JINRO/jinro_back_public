@@ -74,7 +74,8 @@ public class ChatRoomSessionManager {
                 roomSessionMap.put(memId, crId);
 //                System.out.println("########[채팅방구독] " + memId + " ---→ 채팅방 : " + crId);
             } catch (NumberFormatException e) {
-                System.out.println("구독 파싱 오류: " + destination);
+                log.error("구독 파싱 오류: {}", destination);
+                log.error("구독 파싱 오류 에러 메시지: {}", e);
             }
         }
 
@@ -191,12 +192,12 @@ public class ChatRoomSessionManager {
     }
 
     public void printAll() {
-    	System.out.println("===========================상태관리 체크===============================");
-    	System.out.println("roomSessionMap : " + getRoomSessionMap());
-    	System.out.println("modalOpenedUsers : " + getModalOpenedUsersSnapshot());
-    	System.out.println("sessionToUserMap : " + getSessionToUserMapSnapshot());
-    	System.out.println("sessionSubscriptions : " + getSessionSubscriptionsSnapshot());
-    	System.out.println("====================================================================");
+    	log.info("===========================상태관리 체크===============================");
+    	log.info("roomSessionMap : {}", getRoomSessionMap());
+    	log.info("modalOpenedUsers : {}", getModalOpenedUsersSnapshot());
+    	log.info("sessionToUserMap : {} ", getSessionToUserMapSnapshot());
+    	log.info("sessionSubscriptions : {}", getSessionSubscriptionsSnapshot());
+    	log.info("====================================================================");
     }
 
 }

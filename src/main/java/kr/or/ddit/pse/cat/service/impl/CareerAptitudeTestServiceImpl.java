@@ -383,10 +383,7 @@ public class CareerAptitudeTestServiceImpl implements CareerAptitudeTestService 
             recommendKeywordVO.setMemId(Integer.parseInt(memId));
             recommendKeywordVO.setRkName(rkName);
             
-            this.careerAptitudeTestMapper.insertRecommendKeyword(recommendKeywordVO);
-            
-            System.out.println("비동기 키워드 추천 및 저장 완료: " + rkName); // 로그 추가
-            
+            this.careerAptitudeTestMapper.insertRecommendKeyword(recommendKeywordVO);            
         } catch (ServerException e) {
             log.error("Google GenAI API를 호출하는 중 서버 에러(503 등)가 발생했습니다. 추천 키워드 생성을 건너뜁니다.", e);
         } catch (Exception e) {
