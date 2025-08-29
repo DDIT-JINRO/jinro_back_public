@@ -368,6 +368,8 @@
 		</div>
 	</div>
 
+	<div class="custom-confirm-overlay"></div>
+
 	<%@ include file="/WEB-INF/views/include/chatModal.jsp"%>
 	<%@ include file="/WEB-INF/views/include/alarmModal.jsp"%>
 </body>

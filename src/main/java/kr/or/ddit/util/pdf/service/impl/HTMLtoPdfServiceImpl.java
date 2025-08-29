@@ -35,9 +35,6 @@ public class HTMLtoPdfServiceImpl implements HTMLtoPdfService {
 
 			// 완전한 HTML 문서로 변환
 			String fullHtml = buildFullHtmlDocument(htmlContent, cssContent);
-			System.out.println("==============fullHtml=================");		// 완성된 html 소스 확인
-			System.out.println(fullHtml);
-			System.out.println("=========================================");
 
 			// Flying Saucer 렌더러 생성
 			ITextRenderer renderer = new ITextRenderer();
@@ -170,10 +167,8 @@ public class HTMLtoPdfServiceImpl implements HTMLtoPdfService {
 
 	                // 리소스가 존재하는지 확인
 	                if (resource.exists()) {
-	                    System.out.println("✅ 폰트 로드 시도: " + path);
 	                    // 폰트 경로 문자열을 직접 전달하여 폰트 등록
 	                    fontResolver.addFont(path, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-	                    System.out.println("✅ 폰트 로드 성공: " + path);
 	                } else {
 	                    System.err.println("❌ 리소스 폰트 파일을 찾을 수 없음: " + path);
 	                }

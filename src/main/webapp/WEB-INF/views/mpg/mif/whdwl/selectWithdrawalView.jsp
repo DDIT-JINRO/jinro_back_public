@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/views/include/header.jsp"%>
 <link rel="stylesheet" href="/css/mpg/mif/whdwl/selectWithdrawalView.css">
-<section class="channel" data-success-message="${successMessage}" data-error-message="${errorMessage}">
+<section class="channel myPage" data-success-message="${successMessage}" data-error-message="${errorMessage}">
 	<!-- 	여기가 네비게이션 역할을 합니다.  -->
 	<div class="channel-title">
 		<!-- 대분류 -->

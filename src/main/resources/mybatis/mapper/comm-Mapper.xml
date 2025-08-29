@@ -80,11 +80,13 @@
 					<if test="memId != null and memId != ''">
 					, (
 						SELECT
-							BM_TARGET_ID
+							'1'
 						FROM
 							BOOKMARK
 						WHERE
 							MEM_ID = #{memId}
+						AND
+							BM_CATEGORY_ID = 'G03005'
 						AND
 							BM_TARGET_ID = B.BOARD_ID
 					) AS IS_BOOKMARK

@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/views/include/header.jsp"%>
 <link rel="stylesheet" href="/css/common/listCard.css">
 
-<section class="channel">
+<section class="channel myPage">
 	<div class="channel-title">
 		<div class="channel-title-text">마이페이지</div>
 	</div>

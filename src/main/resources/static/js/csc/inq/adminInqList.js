@@ -101,23 +101,6 @@ function bindInqEvents() { // bindFaqEvents -> bindInqEvents로 변경
     }
 }
 
-// 페이지네이션 이벤트 위임 (기존 로직 유지)
-if (!window._paginationDelegated) {
-    window._paginationDelegated = true;
-
-    document.addEventListener('click', e => {
-        const a = e.target.closest('.pagination a[data-page]');
-        if (!a) return;
-
-        e.preventDefault();
-        const page = parseInt(a.dataset.page, 10);
-        if (isNaN(page) || page < 1) return;
-
-        window.currentPage = page;
-        fetchInqs(page); // fetchFaqs -> fetchInqs로 변경
-    });
-}
-
 // DOM이 준비된 후 1:1 문의 데이터 불러오기
 function initAdminInqPage() { // waitForInit -> initAdminInqPage로 변경
     fetchInqs(1);        // 1:1 문의 목록 불러오기

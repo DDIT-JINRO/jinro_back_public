@@ -91,7 +91,7 @@
 			        LEFT JOIN com_code b ON a.cp_scale = b.cc_id
 			        LEFT JOIN (SELECT DISTINCT cp_id FROM hire) c ON a.cp_id = c.cp_id
 			        <if test="memId != null and memId != ''">
-			        LEFT JOIN (SELECT BM_ID, BM_TARGET_ID FROM BOOKMARK WHERE BM_CATEGORY_ID='G03002' AND MEM_ID=#{memId})d ON a.cp_id = d.BM_TARGET_ID
+			        LEFT JOIN (SELECT '1' as BM_ID, BM_TARGET_ID FROM BOOKMARK WHERE BM_CATEGORY_ID='G03002' AND MEM_ID=#{memId})d ON a.cp_id = d.BM_TARGET_ID
 			        </if>
 			        LEFT JOIN (SELECT DISTINCT target_id FROM INTERVIEW_REVIEW WHERE ir_type = 'G02002') i ON a.cp_id = i.target_id
 			        WHERE 1=1
@@ -135,7 +135,7 @@
 			         		,REVIEW_AVG DESC ,REVIEW_CNT DESC
 			         	</when>
 			         </choose>
-			         ,a.cp_id 
+			         ,a.cp_id
 			    ) sub
 			    WHERE ROWNUM <![CDATA[<]]>= #{endNo}
 			)
