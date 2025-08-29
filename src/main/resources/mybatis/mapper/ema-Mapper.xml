@@ -30,7 +30,7 @@
 	                JOIN COM_CODE c ON a.HIRE_TYPE = c.CC_ID
 	                LEFT JOIN COM_CODE d ON a.HIRE_CLASS_CODE = d.CC_ID
 	                <if test="memId != null and memId != ''">
-	            	LEFT JOIN (SELECT BM_ID, BM_TARGET_ID FROM BOOKMARK WHERE BM_CATEGORY_ID='G03003' AND MEM_ID=#{memId})e ON a.HIRE_ID = e.BM_TARGET_ID
+	            	LEFT JOIN (SELECT '1' as BM_ID, BM_TARGET_ID FROM BOOKMARK WHERE BM_CATEGORY_ID='G03003' AND MEM_ID=#{memId})e ON a.HIRE_ID = e.BM_TARGET_ID
 	            	</if>
 	            <where>
 	            	<if test="cpHiringStatus != null">
