@@ -8,10 +8,7 @@ function univManagement() {
 	function fetchUnivList(page = 1) {
 		const keyword = document.querySelector('input[name="keyword"]').value;
 		const status = document.querySelector('select[name="status"]').value;
-
-		console.log(keyword);
-		console.log(status);
-
+		
 		axios.get('/ertds/univ/uvsrch/universities', {
 			params: {
 				currentPage: page,

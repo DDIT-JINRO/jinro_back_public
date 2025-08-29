@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function(){
 				}
 			})
 			.catch(err =>{
-				console.log(err);
+				console.error(err);
 				showConfirm2("삭제도중 문제가 발생했습니다.","관리자측 문의바랍니다.", 
 				   () => {
 				    }
@@ -479,7 +479,7 @@ function submitCreateReply(e){
 		}
 	})
 	.catch(err =>{
-		console.log(err);
+		console.error(err);
 	})
 }
 
@@ -565,7 +565,7 @@ function eventEtcContainerClicked(e){
 			}
 		})
 		.catch(err =>{
-			console.log(err);
+			console.error(err);
 		})
 	}
 	if(action == '신고'){
@@ -649,7 +649,7 @@ function modifyReplyAct(e){
 		}
 	})
 	.catch(err=>{
-		console.log(err);
+		console.error(err);
 	})
 }
 

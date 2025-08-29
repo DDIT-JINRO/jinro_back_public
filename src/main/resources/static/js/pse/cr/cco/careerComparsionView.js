@@ -68,7 +68,6 @@ const handleBookmarkToggle = (button) => {
         return response.json();
     })
     .then(data => {
-		console.log(data);
         if (data.success) {
 			showConfirm2(data.message,"", 
 			    () => {
