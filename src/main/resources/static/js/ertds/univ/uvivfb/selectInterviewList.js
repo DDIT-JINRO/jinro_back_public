@@ -7,13 +7,13 @@ document.addEventListener('DOMContentLoaded', function() {
 	if (channelSection) {
 	    const errorMessage = channelSection.dataset.errorMessage;
 	    if (errorMessage) {
-			showConfirm2(errorMessage,"", 
+			showConfirm2(errorMessage,"",
    			   () => {
 					history.back();
    			    }
    			);
+			return;
 		}
-		return;
 	}
 
 	document.getElementById('btnWrite').addEventListener('click', function() {
@@ -28,8 +28,8 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 			);
 			return;
-		} 
-	
+		}
+
 		location.href = "/ertds/univ/uvivfb/insertInterviewFeedbackView.do";
 	})
 
@@ -214,7 +214,7 @@ function deleteInterviewFeedback(irId) {
 							}
 						);
 			           } else {
-						showConfirm2("삭제 중 오류가 발생했습니다.","잠시 후 다시 시도해주세요.", 
+						showConfirm2("삭제 중 오류가 발생했습니다.","잠시 후 다시 시도해주세요.",
 			   			   () => {
 			   			    }
 			   			);
@@ -222,7 +222,7 @@ function deleteInterviewFeedback(irId) {
 			       })
 			       .catch(error => {
 			           console.error('Error:', error);
-					   showConfirm2("삭제 중 오류가 발생했습니다.","잠시 후 다시 시도해주세요.", 
+					   showConfirm2("삭제 중 오류가 발생했습니다.","잠시 후 다시 시도해주세요.",
 			   			   () => {
 			   			    }
 			   			);
@@ -232,7 +232,7 @@ function deleteInterviewFeedback(irId) {
 			return;
 		}
 	);
-	
+
 }
 
 // 페이지 로드 시 모든 카드 닫힌 상태로 초기화
