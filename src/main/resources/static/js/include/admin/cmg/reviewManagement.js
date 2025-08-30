@@ -123,9 +123,10 @@ function reviewManagement() {
 				status: status,
 			}
 		}).then(({ data }) => {
+			console.log(data);
 			// 페이지 정보
 			document.getElementById("reviewListPage").innerText = data.articlePage.currentPage;
-			document.getElementById("reviewListTotalPage").innerText = data.articlePage.totalPages;
+			document.getElementById("reviewListTotalPage").innerText = data.articlePage.totalPages != 0 ? data.articlePage.totalPages : '1';
 
 			const reviewList = document.querySelector("#reviewList");
 			const reviewListCount = document.querySelector("#reviewList-count");
@@ -138,7 +139,7 @@ function reviewManagement() {
 			let reviewListHtml = "";
 
 			if (contentList.length < 1 && keyword.trim() !== '') {
-				reviewList.innerHTML = `<tr><td colspan='2' style="text-align: center;">검색 결과를 찾을 수 없습니다.</td></tr>`;
+				reviewList.innerHTML = `<tr><td colspan='7' style="text-align: center;">검색 결과를 찾을 수 없습니다.</td></tr>`;
 			}
 
 			const optionsHtml = Object.entries(irStatusObj).map(([key, value]) => {
@@ -176,7 +177,9 @@ function reviewManagement() {
 			});
 
 			reviewListCount.innerHTML = articlePage.total;
-			reviewList.innerHTML = reviewListHtml;
+			if(contentList.length >= 1){
+				reviewList.innerHTML = reviewListHtml;
+			}
 			renderPaginationReview(data.articlePage);
 		}).catch((err) => {
 			console.error(err);
@@ -187,6 +190,7 @@ function reviewManagement() {
 		let html = `<a href="#" data-page="${startPage - 1}" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 
 		for (let p = startPage; p <= endPage; p++) {
+			if(totalPages == 0) p = 1;
 			html += `<a href="#" data-page="${p}" class="page-link ${p === currentPage ? 'active' : ''}">${p}</a>`;
 		}
 
