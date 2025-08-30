@@ -8,7 +8,7 @@ function univManagement() {
 	function fetchUnivList(page = 1) {
 		const keyword = document.querySelector('input[name="keyword"]').value;
 		const status = document.querySelector('select[name="status"]').value;
-		
+
 		axios.get('/ertds/univ/uvsrch/universities', {
 			params: {
 				currentPage: page,
@@ -20,7 +20,7 @@ function univManagement() {
 		}).then(({ data }) => {
 			// 페이지 정보
 			document.getElementById("univListPage").innerText = data.data.currentPage;
-			document.getElementById("univListTotalPage").innerText = data.data.totalPages;
+			document.getElementById("univListTotalPage").innerText = data.data.totalPages != 0 ? data.data.totalPages : '1';
 			const result = data.data;
 
 			const countEl = document.getElementById('univList-count');
@@ -52,6 +52,7 @@ function univManagement() {
 		let html = `<a href="#" data-page="${startPage - 1}" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 
 		for (let p = startPage; p <= endPage; p++) {
+			if(totalPages == 0) p = 1;
 			html += `<a href="#" data-page="${p}" class="page-link ${p === currentPage ? 'active' : ''}">${p}</a>`;
 		}
 
@@ -323,10 +324,10 @@ function univManagement() {
 								fetchUnivList(1);
 							}
 						);
-					})					
+					})
 				},
 				()=>{
-					
+
 				}
 			);
 		}
@@ -366,7 +367,7 @@ function univManagement() {
 					})
 				},
 				() => {
-					
+
 				}
 			);
 		}
@@ -412,7 +413,7 @@ function univManagement() {
 					})
 				},
 				() => {
-					
+
 				}
 			);
 		}
