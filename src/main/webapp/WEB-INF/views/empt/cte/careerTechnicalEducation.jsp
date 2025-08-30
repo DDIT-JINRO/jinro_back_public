@@ -258,6 +258,9 @@
 						</div>
 					</div>
 				</c:forEach>
+				<c:if test="${empty articlePage.content}">
+					<div class="content-list__no-results" style="grid-column: 1/-1;">검색 결과가 없습니다.</div>
+				</c:if>
 			</div>
 			<div class="pagination">
 				<a href="${articlePage.url}?currentPage=${articlePage.startPage - 5 > 0 ? articlePage.startPage - 5 : 1}&keyword=${param.keyword}&status=${param.status}&region=${param.region}&sortOrder=${param.sortOrder}" class="pagination__link ${articlePage.startPage < 6 ? 'pagination__link--disabled' : ''}"> ← Previous </a>

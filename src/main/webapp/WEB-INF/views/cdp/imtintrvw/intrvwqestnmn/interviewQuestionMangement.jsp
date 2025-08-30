@@ -142,13 +142,10 @@
 						</div>
 					</c:forEach>
 				</c:when>
-				<c:otherwise>
-					<div class="empty-state">
-						<div class="empty-state__title">작성된 면접 질문이 없습니다</div>
-						<div class="empty-state__description">새로운 면접 질문을 작성하여 면접을 대비해보세요.</div>
-					</div>
-				</c:otherwise>
 			</c:choose>
+			<c:if test="${empty articlePage.content}">
+				<div class="content-list__no-results" style="grid-column: 1/-1;">작성된 면접 질문이 없습니다.<br/><div class="empty-state__description">새로운 면접 질문을 작성하여 면접을 대비해보세요.</div></div>
+			</c:if>
 		</div>
 
 		<sec:authorize access="isAuthenticated()">

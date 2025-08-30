@@ -105,6 +105,9 @@
 					</c:forEach>
 				</c:otherwise>
 			</c:choose>
+			<c:if test="${empty articlePage.content}">
+				<div class="content-list__no-results" style="grid-column: 1/-1;">검색 결과가 없습니다.</div>
+			</c:if>
 		</div>
 
 		<c:if test="${not empty articlePage.content}">

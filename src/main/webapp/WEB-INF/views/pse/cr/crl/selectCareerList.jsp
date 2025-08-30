@@ -227,6 +227,9 @@
 							</div>
 						</c:forEach>
 					</div>
+					<c:if test="${empty articlePage.content}">
+						<div class="content-list__no-results" style="grid-column: 1/-1;">검색 결과가 없습니다.</div>
+					</c:if>
 				</c:otherwise>
 			</c:choose>
 
