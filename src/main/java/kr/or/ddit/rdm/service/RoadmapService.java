@@ -58,7 +58,7 @@ public interface RoadmapService {
 	 */
 	public String selectResultData(String memId);
 	
-	public String geminiAnalysis(RoadmapResultRequestVO roadmapResultRequest);
+	public String geminiAnalysis(RoadmapResultRequestVO roadmapResultRequest, String memId);
 	
 	public String buildPrompt(RoadmapResultRequestVO roadmapResultRequest);
 
