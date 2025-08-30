@@ -38,6 +38,7 @@ public class WithdrawalServiceImpl implements WithdrawalService {
 		MemberVO member = this.withdrawalMapper.selectDelYN(memId);
 		
 		map.put("mdCategoryList", mdCategoryList);
+		map.put("loginType", member.getLoginType());
 		
 		if ("Y".equals(member.getDelYn())) {
 			MemDelVO memDel = this.withdrawalMapper.selectMemDel(memId);

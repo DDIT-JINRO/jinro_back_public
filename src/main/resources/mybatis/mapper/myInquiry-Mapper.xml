@@ -53,7 +53,7 @@
 		  , A.MEM_GEN
 		  , A.MEM_PHONE_NUMBER
 		  , A.MEM_BIRTH
-		  , A.MEM_POINT
+		  , A.LOGIN_TYPE
 		  , S.SUB_NAME
 		  , CASE S.SUB_NAME
 		        WHEN 'BASIC' THEN SUBSTR(S.SUB_BENEFIT, 1, INSTR(S.SUB_BENEFIT, ',') - 1) || '.'
