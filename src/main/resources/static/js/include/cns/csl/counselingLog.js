@@ -98,6 +98,7 @@ function renderPagination({ startPage, endPage, currentPage, totalPages }) {
 	let html = `<a href="#" data-page="${startPage - 1}" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 
 	for (let p = startPage; p <= endPage; p++) {
+		if(totalPages == 0) p = 1;
 		html += `<a href="#" onclick="fetchCounselingLog(${p})" data-page="${p}" class="page-link ${p === currentPage ? 'active' : ''}">${p}</a>`;
 	}
 
@@ -133,7 +134,7 @@ function fetchCounselingLog(page = 1) {
 			if (!listEl) return;
 
 			if (data.content.length < 1 && keyword.trim() !== '') {
-				listEl.innerHTML = `<tr><td colspan='4' style="text-align: center;">등록되지 않은 정보입니다.</td></tr>`;
+				listEl.innerHTML = `<tr><td colspan='6' style="text-align: center;">등록되지 않은 정보입니다.</td></tr>`;
 			} else {
 				const rows = data.content.map(item => `
 					<tr data-cns-id="${item.counselId}" onclick="showDetail(${item.counselId})">
@@ -146,8 +147,8 @@ function fetchCounselingLog(page = 1) {
 					</tr>
 					`).join('');
 				listEl.innerHTML = rows;
-				renderPagination(data);
 			}
+			renderPagination(data);
 
 			const cnsIdBySchedulePage = sessionStorage.getItem('cnsIdForLog');
 			if(cnsIdBySchedulePage){
@@ -172,7 +173,7 @@ function resetAfterConfirm(){
 			resetDetail();
 		},
 		()=>{
-			
+
 		}
 	);
 }
@@ -330,7 +331,7 @@ function insertOrUpdate(action) {
 		);
 		return;
 	}
-	
+
 	if(!window.editor.getData()) {
 		showConfirm2("상담일지 내용이 없습니다.","확인해 주세요.",
 		() => {

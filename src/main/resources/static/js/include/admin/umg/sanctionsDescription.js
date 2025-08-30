@@ -529,7 +529,7 @@ function sanctionsDescription() {
 			.then(({ data }) => {
 				// 페이지 정보
 				document.getElementById("reportListPage").innerText = data.currentPage;
-				document.getElementById("reportListTotalPage").innerText = data.totalPages;
+				document.getElementById("reportListTotalPage").innerText = data.totalPages != 0 ? data.totalPages : '1';
 
 				reportListCache = data.content;
 
@@ -581,6 +581,7 @@ function sanctionsDescription() {
 		let html = `<a href="#" data-page="${startPage - 1}" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 
 		for (let p = startPage; p <= endPage; p++) {
+			if(totalPages == 0) p = 1;
 			html += `<a href="#" data-page="${p}" class="page-link ${p === currentPage ? 'active' : ''}">${p}</a>`;
 		}
 
@@ -595,6 +596,7 @@ function sanctionsDescription() {
 		let html = `<a href="#" data-page="${startPage - 1}" class="page-link-penalty ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 
 		for (let p = startPage; p <= endPage; p++) {
+			if(totalPages == 0) p = 1;
 			html += `<a href="#" data-page="${p}" class="page-link-penalty ${p === currentPage ? 'active' : ''}">${p}</a>`;
 		}
 
@@ -754,7 +756,7 @@ function sanctionsDescription() {
 		.then(({ data }) => {
 			// 페이지 정보
 			document.getElementById("penaltyListPage").innerText = data.currentPage;
-			document.getElementById("penaltyListTotalPage").innerText = data.totalPages;
+			document.getElementById("penaltyListTotalPage").innerText = data.totalPages != 0  ? data.totalPages : '1';
 
 	        const countEl = document.getElementById('penaltyList-count');
 	        if (countEl) countEl.textContent = parseInt(data.total, 10).toLocaleString();

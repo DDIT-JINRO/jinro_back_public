@@ -129,6 +129,7 @@ function renderPagination({ startPage, endPage, currentPage, totalPages }) {
 	let html = `<a href="#" data-page="${startPage - 1}" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 
 	for (let p = startPage; p <= endPage; p++) {
+		if(totalPages == 0) p = 1;
 		html += `<a href="#" onclick="fetchCounselingLog(${p})" data-page="${p}" class="page-link ${p === currentPage ? 'active' : ''}">${p}</a>`;
 	}
 
@@ -177,8 +178,8 @@ function fetchCounselingLog(page = 1) {
 					`).join('');
 				listEl.innerHTML = rows;
 				window.currentPage = page;
-				renderPagination(data);
 			}
+			renderPagination(data);
 		})
 		.catch(err => console.error('상담완료이력 조회 중 에러:', err));
 }
@@ -196,7 +197,7 @@ function resetAfterConfirm(){
 			resetDetail();
 		},
 		()=>{
-			
+
 		}
 	);
 }
@@ -355,7 +356,7 @@ function updateConfirmation(action) {
 				() => {
 				}
 			);
-			return;			
+			return;
 		}
 		// 반려코드 세팅
 		fd.set('clConfirm', 'S03002');
@@ -384,7 +385,7 @@ function updateConfirmation(action) {
 					const counselId = document.getElementById('counselId').value;
 					const targetTr = document.querySelector(`#notice-list tr[data-cns-id='${counselId}']`);
 					targetTr.click();
-					return;					
+					return;
 				}
 			);
 		}else{

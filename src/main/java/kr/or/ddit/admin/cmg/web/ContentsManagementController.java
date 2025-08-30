@@ -37,19 +37,19 @@ public class ContentsManagementController {
 
 	@Autowired
 	ContentsManagementService contentsManagementService;
-	
+
 	@Autowired
 	private ActivityVolunteerService activityVolunteerService;
-	
+
 	@Autowired
 	private ContestService contestService;
-	
+
 	@Autowired
 	private FileServiceImpl fileServiceImpl;
-	
+
 	@Autowired
 	private ActivityCareerExpService activityCareerExpService;
-	
+
 	@Autowired
 	private ActivitySupportersService activitySupportersService;
 
@@ -66,7 +66,7 @@ public class ContentsManagementController {
 
 		return contentsManagementService.entDetail(id);
 	}
-	
+
 	@GetMapping("/selectActList.do")
 	public ResponseEntity<Map<String, Object>> selectActList(
 			@RequestParam(defaultValue = "10") int size,
@@ -77,7 +77,7 @@ public class ContentsManagementController {
 			@RequestParam(required = false) List<String> contestTargetFilter,
 			@RequestParam(required = false) List<String> contestStatusFilter) {
 		Map<String, Object> response = new HashMap<>();
-		
+
 		ActivityVO activityVO = new ActivityVO();
 		activityVO.setKeyword(keyword);
 		activityVO.setCurrentPage(currentPage);
@@ -86,10 +86,10 @@ public class ContentsManagementController {
 		activityVO.setContestTargetFilter(contestTargetFilter);
 		activityVO.setContestStatusFilter(contestStatusFilter);
 		activityVO.setSortOrder("id");
-		
+
 		List<ActivityVO> activityList = new ArrayList<>();
 		int total = 0;
-		
+
 		switch (category) {
 		case "vol": {
 			total = activityVolunteerService.selectVolCount(activityVO);
@@ -109,50 +109,50 @@ public class ContentsManagementController {
 		default:
 			throw new IllegalArgumentException("Unexpected value: " + category);
 		}
-		
-		if(activityList == null || activityList.isEmpty()) {
-			response.put("success", false);
-			response.put("message", "리스트 로딩 중 에러 발생");
-			return ResponseEntity.ok(response);
-		}
+
+//		if(activityList == null || activityList.isEmpty()) {
+//			response.put("success", false);
+//			response.put("message", "리스트 로딩 중 에러 발생");
+//			return ResponseEntity.ok(response);
+//		}
 
 		// 공모전과 동일하게 모집대상(청년/청소년)을 사용하는것이니 만들어둔 매소드를 활용한다
 		List<ComCodeVO> contestTargetList = contestService.getContestTargetList();
 		List<ComCodeVO> contestTypeList = contestService.getContestTypeList();
-		
+
 		ArticlePage<ActivityVO> articlePage = new ArticlePage<>(total, currentPage, 10, activityList, keyword);
 		response.put("success", true);
 		response.put("contestTargetList", contestTargetList);
 		response.put("articlePage", articlePage);
 		response.put("activityVO", activityVO);
 		response.put("contestTypeList", contestTypeList);
-		
+
 		return ResponseEntity.ok(response);
 	}
-	
+
 	@PostMapping("/selectActDetail.do")
 	public ResponseEntity<Map<String, Object>> selectActDetail(@RequestParam String id) {
 		Map<String, Object> response = new HashMap<>();
-	
+
 		ActivityVO activity = activityVolunteerService.selectVolDetail(id);
-		
+
 		if(activity == null) {
 			response.put("success", false);
 			response.put("message", "데이터 로딩 중 에러 발생");
 			return ResponseEntity.ok(response);
 		}
-		
+
 		Long fileId = activity.getFileGroupId();
 		FileDetailVO fileDetail = fileServiceImpl.getFileDetail(fileId, 1);
 		String savePath = fileServiceImpl.getSavePath(fileDetail);
 		activity.setSavePath(savePath);
-		
+
 		response.put("success", true);
 		response.put("activity", activity);
-		
+
 		return ResponseEntity.ok(response);
 	}
-	
+
 	@GetMapping("/selectCttList.do")
 	public ResponseEntity<Map<String, Object>> selectCttList(
 			@RequestParam(defaultValue = "10") int size,
@@ -163,7 +163,7 @@ public class ContentsManagementController {
 			@RequestParam(required = false) List<String> contestTypeFilter,
 			@RequestParam(required = false) List<String> contestStatusFilter) {
 		Map<String, Object> response = new HashMap<>();
-	
+
 		ContestVO contestVO = new ContestVO();
 		contestVO.setKeyword(keyword);
 		contestVO.setCurrentPage(currentPage);
@@ -175,13 +175,13 @@ public class ContentsManagementController {
 		contestVO.setSortOrder("id");
 
 		List<ContestVO> contestList = contestService.selectCttList(contestVO);
-		
+
 //		if(contestList == null || contestList.isEmpty()) {
 //			response.put("success", false);
 //			response.put("message", "리스트 불러오는 중 에러 발생");
 //			return ResponseEntity.ok(response);
 //		}
-		
+
 		int total = contestService.selectCttCount(contestVO);
 		List<ComCodeVO> contestTypeList = contestService.getContestTypeList();
 		List<ComCodeVO> contestTargetList = contestService.getContestTargetList();
@@ -194,62 +194,62 @@ public class ContentsManagementController {
 
 		return ResponseEntity.ok(response);
 	}
-	
+
 	@PostMapping("/selectCctDetail.do")
 	public ResponseEntity<Map<String, Object>> selectCctDetail(@RequestParam String id) {
 		Map<String, Object> response = new HashMap<>();
 		ContestVO cttDetail = contestService.selectCttDetail(id);
-		
+
 		if(cttDetail == null) {
 			response.put("success", false);
 			response.put("message", "데이터 로딩 중 에러 발생");
 			return ResponseEntity.ok(response);
 		}
-		
+
 		Long fileId = cttDetail.getFileGroupId();
 		FileDetailVO fileDetail = fileServiceImpl.getFileDetail(fileId, 1);
 		String savePath = fileServiceImpl.getSavePath(fileDetail);
 		cttDetail.setSavePath(savePath);
-		
+
 		response.put("success", true);
 		response.put("cttDetail", cttDetail);
-		
+
 		return ResponseEntity.ok(response);
 	}
-	
+
 	@GetMapping("/selectReviewList")
 	public ResponseEntity<Map<String, Object>> selectReviewList(@ModelAttribute InterviewReviewVO interviewReviewVO) {
 		Map<String, Object> response = new HashMap<>();
-		
+
 		ArticlePage<InterviewReviewVO> articlePage = contentsManagementService.selectReviewList(interviewReviewVO);
 		Map<String, String> irStatus = contentsManagementService.selectIrStatusList();
-		
+
 		response.put("articlePage", articlePage);
 		response.put("irStatus", irStatus);
-		
+
 		return ResponseEntity.ok(response);
 	}
-	
+
 	@GetMapping("/selectReviewDetail")
 	public ResponseEntity<InterviewReviewVO> selectReviewDetail(@RequestParam String irId) {
-		
+
 		InterviewReviewVO interviewReview = contentsManagementService.selectReviewDetail(irId);
-		
+
 		return ResponseEntity.ok(interviewReview);
 	}
-	
+
 	@PostMapping("/updateReviewDetail")
 	public ResponseEntity<Map<String, Object>> updateReviewDetail(@RequestBody InterviewReviewVO interviewReviewVO) {
 	    Map<String, Object> response = new HashMap<>();
-	    
+
 	    int result = contentsManagementService.updateReviewDetail(interviewReviewVO);
-	    
+
 	    if (result > 0) {
 	        response.put("success", true);
 	    } else {
 	        response.put("success", false);
 	    }
-	    
+
 	    return ResponseEntity.ok(response);
 	}
 }

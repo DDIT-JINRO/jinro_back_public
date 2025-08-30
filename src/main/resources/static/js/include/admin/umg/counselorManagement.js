@@ -668,6 +668,7 @@ function counselorManagement() {
 				let html = '';
 				html += `<a href="#" data-page="${startPage - 1}" class="${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 				for (let p = startPage; p <= endPage; p++) {
+					if(totalPages == 0) p = 1;
 					html += `<a href="#" data-page="${p}" class="${p === currentPage ? 'active' : ''}">${p}</a>`;
 				}
 				html += `<a href="#" data-page="${endPage + 1}" class="${endPage >= totalPages ? 'disabled' : ''}">Next →</a>`;
@@ -756,7 +757,7 @@ function counselorManagement() {
 					// 페이지 정보
 					document.querySelector(".pageCnt").style.display = "block";
 					document.getElementById("couListPage").innerText = data.currentPage;
-					document.getElementById("couListTotalPage").innerText = data.totalPages;
+					document.getElementById("couListTotalPage").innerText = data.totalPages != 0 ? data.totalPages : '1';
 
 					tbodyHistory.innerHTML = data.content.map(r => `
                         <tr>
@@ -778,6 +779,7 @@ function counselorManagement() {
 				let html = '';
 				html += `<a href="#" data-page="${startPage - 1}" class="${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 				for (let p = startPage; p <= endPage; p++) {
+					if(totalPages == 0) p = 1;
 					html += `<a href="#" data-page="${p}" class="${p === currentPage ? 'active' : ''}">${p}</a>`;
 				}
 				html += `<a href="#" data-page="${endPage + 1}" class="${endPage >= totalPages ? 'disabled' : ''}">Next →</a>`;

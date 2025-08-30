@@ -20,38 +20,36 @@ function activityManagementInit () {
 		}).then(({data}) => {
 			// 페이지 정보
 			document.getElementById("actListPage").innerText = data.articlePage.currentPage;
-			document.getElementById("actListTotalPage").innerText = data.articlePage.totalPages;
+			document.getElementById("actListTotalPage").innerText = data.articlePage.totalPages != 0 ? data.articlePage.totalPages : '1' ;
 
 			const {articlePage} = data;
 
-			if(data.success) {
-				const countEl = document.getElementById('actList-count');
-				if (countEl) {
-					countEl.textContent = parseInt(articlePage.total, 10).toLocaleString();
-				}
-
-				const listEl = document.getElementById('actList');
-				if (!listEl) return;
-
-				if (articlePage.content.length < 1 && keyword.trim() !== '') {
-					listEl.innerHTML = `<tr><td colspan='2' style="text-align: center;">검색 결과를 찾을 수 없습니다.</td></tr>`;
-				} else {
-					const rows = articlePage.content.map(item =>{
-
-						const formattedDate = formatDateOne(item.contestCreatedAt);
-
-						return `<tr>
-									<td style="display:none;">${item.contestId}</td>
-									<td>${item.rnum}</td>
-									<td class="actContestTitle">${item.contestTitle}</td>
-									<td>${formattedDate}</td>
-									<td class="actContestHost">${item.contestHost}</td>
-								</tr>`;
-						}).join('');
-					listEl.innerHTML = rows;
-				}
-				renderPaginationAct(data.articlePage);
+			const countEl = document.getElementById('actList-count');
+			if (countEl) {
+				countEl.textContent = parseInt(articlePage.total, 10).toLocaleString();
 			}
+
+			const listEl = document.getElementById('actList');
+			if (!listEl) return;
+
+			if (articlePage.content.length < 1 && keyword.trim() !== '') {
+				listEl.innerHTML = `<tr><td colspan='4' style="text-align: center;">검색 결과를 찾을 수 없습니다.</td></tr>`;
+			} else {
+				const rows = articlePage.content.map(item =>{
+
+					const formattedDate = formatDateOne(item.contestCreatedAt);
+
+					return `<tr>
+								<td style="display:none;">${item.contestId}</td>
+								<td>${item.rnum}</td>
+								<td class="actContestTitle">${item.contestTitle}</td>
+								<td>${formattedDate}</td>
+								<td class="actContestHost">${item.contestHost}</td>
+							</tr>`;
+					}).join('');
+				listEl.innerHTML = rows;
+			}
+			renderPaginationAct(data.articlePage);
 		})
 		.catch(err => console.error('목록 조회 중 에러:', err));
 	}
@@ -60,6 +58,7 @@ function activityManagementInit () {
 		let html = `<a href="#" data-page="${startPage - 1}" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 
 		for (let p = startPage; p <= endPage; p++) {
+			if(totalPages == 0) p = 1;
 			html += `<a href="#" data-page="${p}" class="page-link ${p === currentPage ? 'active' : ''}">${p}</a>`;
 		}
 
