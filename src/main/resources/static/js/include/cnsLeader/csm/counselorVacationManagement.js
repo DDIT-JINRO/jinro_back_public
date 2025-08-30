@@ -90,6 +90,7 @@ function renderPagination({ startPage, endPage, currentPage, totalPages }) {
 	let html = `<a href="#" data-page="${startPage - 1}" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 
 	for (let p = startPage; p <= endPage; p++) {
+		if(totalPages == 0) p = 1;
 		html += `<a href="#" onclick="fetchVacationList(${p})" data-page="${p}" class="page-link ${p === currentPage ? 'active' : ''}">${p}</a>`;
 	}
 
@@ -124,7 +125,7 @@ function fetchVacationList(page = 1) {
 			if (!listEl) return;
 
 			if (data.content.length < 1 && keyword.trim() !== '') {
-				listEl.innerHTML = `<tr><td colspan='6' style="text-align: center;">등록되지 않은 정보입니다.</td></tr>`;
+				listEl.innerHTML = `<tr><td colspan='7' style="text-align: center;">등록되지 않은 정보입니다.</td></tr>`;
 			} else {
 				const rows = data.content.map(item => `
 					<tr data-va-id="${item.vaId}" onclick="showDetail(${item.vaId})">
@@ -139,8 +140,8 @@ function fetchVacationList(page = 1) {
 					`).join('');
 				listEl.innerHTML = rows;
 				window.currentPage = page;
-				renderPagination(data);
 			}
+			renderPagination(data);
 		})
 		.catch(err => console.error('상담완료이력 조회 중 에러:', err));
 }
@@ -158,7 +159,7 @@ function resetAfterConfirm(){
 			resetDetail();
 		},
 		()=>{
-			
+
 		}
 	);
 }
@@ -309,7 +310,7 @@ function updateConfirmation(action) {
 				() => {
 				}
 			);
-			return;						
+			return;
 		}
 		// 반려코드 세팅
 		fd.set('vaConfirm', 'S03002');
@@ -356,7 +357,7 @@ function updateConfirmation(action) {
 										fetchVacationList(window.currentPage);
 										const vaId = document.getElementById('vaId').value;
 										const targetTr = document.querySelector(`#notice-list tr[data-va-id='${vaId}']`);
-										targetTr.click();					
+										targetTr.click();
 									}
 								);
 							}else{
@@ -371,7 +372,7 @@ function updateConfirmation(action) {
 						})
 					},
 					()=>{
-						return;	
+						return;
 					}
 				);
 			}
@@ -379,7 +380,7 @@ function updateConfirmation(action) {
 		() => {
 			return;
 		}
-	);	
+	);
 }
 
 function waitForInit() {
