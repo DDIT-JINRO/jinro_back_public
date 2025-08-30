@@ -248,6 +248,9 @@
 							</c:if>
 						</c:forEach>
 					</c:url>
+					<c:if test="${articlePage.total == 0 }">
+						<c:set var="pNo" value="1"></c:set>
+					</c:if>
 					<a href="${pageUrl}" class="pagination__link ${pNo == articlePage.currentPage ? 'pagination__link--active' : ''}"> ${pNo} </a>
 				</c:forEach>
 

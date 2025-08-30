@@ -198,7 +198,6 @@
 				<div class="content-list__no-results" style="grid-column: 1/-1;">검색 결과가 없습니다.</div>
 			</c:if>
 		</div>
-		<c:if test="${not empty articlePage.content}">
 			<ul class="pagination">
 				<li>
 					<c:url value="/prg/ctt/cttList.do" var="prevUrl">
@@ -239,8 +238,10 @@
 							<c:forEach var="filter" items="${checkedFilters.contestStatusFilter}">
 								<c:param name="contestStatusFilter" value="${filter}" />
 							</c:forEach>
-						</c:url>
-						<a href="${pageUrl}" class="pagination__link ${pNo == articlePage.currentPage ? 'pagination__link--active' : ''}">${pNo}</a>
+						</c:url> 
+						<c:if test="${articlePage.total == 0 }">
+							<c:set var="pNo" value="1"></c:set>
+						</c:if> <a href="${pageUrl}" class="pagination__link ${pNo == articlePage.currentPage ? 'pagination__link--active' : ''}">${pNo}</a>
 					</li>
 				</c:forEach>
 
@@ -265,7 +266,6 @@
 					<a href="${nextUrl}" class="pagination__link ${articlePage.endPage >= articlePage.totalPages ? 'pagination__link--disabled' : ''}">Next →</a>
 				</li>
 			</ul>
-		</c:if>
 	</div>
 </div>
 <script src="/js/prg/ctt/cttList.js"></script>

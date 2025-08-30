@@ -142,12 +142,11 @@
 					</c:forEach>
 				</c:when>
 				<c:otherwise>
-					<div class="empty-state">
-						<div class="empty-state__title">작성된 자기소개서가 없습니다</div>
-						<div class="empty-state__description">새로운 자기소개서를 작성하여 취업 활동을 시작해보세요.</div>
-					</div>
 				</c:otherwise>
 			</c:choose>
+			<c:if test="${empty articlePage.content}">
+				<div class="content-list__no-results" style="grid-column: 1/-1;">작성된 자기소개서가 없습니다.<br/><div class="empty-state__description">새로운 자기소개서를 작성하여 취업 활동을 시작해보세요.</div></div>
+			</c:if>
 		</div>
 
 		<sec:authorize access="isAuthenticated()">
@@ -162,6 +161,9 @@
 					<a href="${articlePage.url}?currentPage=${articlePage.startPage - 5}&keyword=${param.keyword}&status=${param.status}&sortOrder=${paramValues.sortOrder[0]}" class="pagination__link <c:if test='${articlePage.startPage < 6}'>pagination__link--disabled</c:if>"> ← Previous </a>
 				</li>
 				<c:forEach var="pNo" begin="${articlePage.startPage}" end="${articlePage.endPage}">
+					<c:if test="${articlePage.total == 0 }">
+						<c:set var="pNo" value="1"></c:set>
+					</c:if>
 					<li>
 						<a href="${articlePage.url}?currentPage=${pNo}&keyword=${param.keyword}&status=${param.status}&sortOrder=${paramValues.sortOrder[0]}" class="pagination__link <c:if test='${pNo == articlePage.currentPage}'>pagination__link--active</c:if>"> ${pNo} </a>
 					</li>
