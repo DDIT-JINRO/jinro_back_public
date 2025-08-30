@@ -340,17 +340,17 @@ function sanctionsDescription() {
 				formData.append('reportId', selectedReportId);
 				formData.append('mpType', selectedPenaltyType);
 				formData.append('mpWarnReason', reason);
-	
+
 				if(selectedPenaltyType == 'G14002'){
 					formData.append('penaltyStart', hiddenStart.value);
 					formData.append('penaltyEnd', hiddenEnd.value);
 				}
-	
+
 				for (let i = 0; i < files.length; i++) {
 					formData.append('evidenceFiles', files[i]);
 				}
-	
-				penaltySubmit(formData);				
+
+				penaltySubmit(formData);
 			},
 			() => {
 				return;
@@ -973,7 +973,7 @@ function sanctionsDescription() {
 					() => {
 					}
 				);
-				
+
 				// 변경된 상태를 상세에 다시 로딩 시켜주기 위해서 목록에서 찾아서 다시 클릭
 				const trs = document.getElementById('penaltyList').querySelectorAll('tr');
 				trs.forEach(tr =>{
@@ -1145,7 +1145,7 @@ function sanctionsDescription() {
 
 	reportModifyBtn.addEventListener('click', function() {
 
-		const mpId = document.getElementById('report-detail-mpId').innerText;
+		const mpId = document.getElementById('report-detail-mpId').value;
 		const mpStat = document.getElementById('report-detail-status').value;
 
 		let form = new FormData();
