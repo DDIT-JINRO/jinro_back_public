@@ -85,7 +85,6 @@ function loginBtn() {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
         if (data.status == 'success') {
             const redirectUrl = sessionStorage.getItem("redirectUrl");
             if (redirectUrl) {

@@ -18,7 +18,6 @@ function activityManagementInit () {
 		axios.get('/admin/cmg/selectActList.do', {
 			params: paramData
 		}).then(({data}) => {
-			console.log(data);
 			// 페이지 정보
 			document.getElementById("actListPage").innerText = data.articlePage.currentPage;
 			document.getElementById("actListTotalPage").innerText = data.articlePage.totalPages != 0 ? data.articlePage.totalPages : '1' ;
