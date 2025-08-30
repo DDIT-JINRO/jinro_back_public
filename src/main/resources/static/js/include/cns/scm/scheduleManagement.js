@@ -280,6 +280,7 @@ function statusBtn(status, id, method, date, url ,memId) {
 				})
 		});
 
+		updatedCancelBtn.textContent = '상담취소';
 		updatedCancelBtn.style.display = 'block';
 		updatedCancelBtn.addEventListener("click",async function() {
 			const payVO = await axios.get('/cnslt/resve/checkSubscription',{
