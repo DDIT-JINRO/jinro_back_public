@@ -167,8 +167,14 @@ function eventBinding(){
 }
 
 function resetAfterConfirm(){
-	if(!confirm('저장되지 하지 않은 정보는 복구되지 않습니다.\n계속하시겠습니까?')) return;
-	resetDetail();
+	showConfirm("저장하지 않은 정보는 복구되지 않습니다.","계속하시겠습니까?",
+		()=>{
+			resetDetail();
+		},
+		()=>{
+			
+		}
+	);
 }
 
 // 상세 내용 비우기
@@ -311,18 +317,26 @@ function insertOrUpdate(action) {
 		showConfirm2("상담난이도를 선택해주세요.","",
 			() => {
 				clDifficultySelectEl.focus();
-				return;
 			}
 		);
+		return;
 	}
 
 	const clContinueRadioEl = document.querySelector('input[name="clContinue"]:checked');
 	if(!clContinueRadioEl){
 		showConfirm2("추가상담여부를 선택해주세요.","",
 			() => {
-				return;
 			}
 		);
+		return;
+	}
+	
+	if(!window.editor.getData()) {
+		showConfirm2("상담일지 내용이 없습니다.","확인해 주세요.",
+		() => {
+			}
+		);
+		return;
 	}
 
 	fd.set('clContent', window.editor?.getData() || '');
@@ -341,7 +355,6 @@ function insertOrUpdate(action) {
 			const data = resp.data;
 			showConfirm2(data,"",
 				() => {
-					return;
 				}
 			);
 			showDetail(document.getElementById('counselId').value);

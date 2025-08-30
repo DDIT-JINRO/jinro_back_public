@@ -481,9 +481,9 @@ function counselorManagement() {
 			if (!memId) { 
 				showConfirm2("대상이 없습니다.","",
 					() => {
-					    return;
 					}
 				); 
+			    return;
 			}
 			const fd = new FormData();
 			fd.set('memId', memId);
@@ -495,7 +495,6 @@ function counselorManagement() {
 				if (res.data !== 1) throw new Error('fail');
 				showConfirm2("저장되었습니다.","",
 					() => {
-					    
 					}
 				);
 				await loadDetail();
@@ -504,7 +503,6 @@ function counselorManagement() {
 				console.error(err);
 				showConfirm2("저장 실패","",
 					() => {
-					    return;
 					}
 				);
 			}

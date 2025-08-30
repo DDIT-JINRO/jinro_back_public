@@ -19,9 +19,9 @@ document.addEventListener('DOMContentLoaded', function(){
 			if(msg==null || msg==''){
 				showConfirm2("메시지를 입력해주세요.","",
 					() => {
-						return;						
 					}
 				);
+				return;
 			}
 			sendMessage(crId, msg);
 		})

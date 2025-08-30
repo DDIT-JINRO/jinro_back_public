@@ -256,14 +256,13 @@ function activityManagementInit () {
 			axios.post('/prg/ctt/contestUpdate.do', data).then(res => {
 				showConfirm2("등록/수정 완료","",
 					() => {
-						fetchActList();
 					}
 				);
+				fetchActList();
 			}).catch(err => {
 				console.error("저장 실패", err);
 				showConfirm2("등록/수정 실패","",
 					() => {
-						return;
 					}
 				);
 			});
@@ -284,14 +283,13 @@ function activityManagementInit () {
 			axios.post('/prg/ctt/contestDelete.do', data).then(res => {
 				showConfirm2("삭제 완료","",
 					() => {
-						fetchActList();
 					}
 				);
+				fetchActList();
 			}).catch(err => {
 				console.error("삭제 실패", err);
 				showConfirm2("삭제 실패","",
 					() => {
-						return;
 					}
 				);
 			});

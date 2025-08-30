@@ -272,15 +272,12 @@ function entSave() {
 		axios.post('/empt/enp/enterprisePostingUpdate.do', form).then(res => {
 			showConfirm2("등록/수정 완료","",
 				() => {
-					return;
 				}
 			);
-
 		}).catch(err => {
 			console.error("저장 실패", err);
 			showConfirm2("등록/수정 실패","",
 				() => {
-					return;
 				}
 			);
 		});

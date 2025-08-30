@@ -48,6 +48,37 @@ document.addEventListener('DOMContentLoaded', function () {
 	</ul>
 </aside>
 
+<!-- 모달 -->
+	<div id="customConfirm" class="custom-confirm" style="display: none;">
+		<div class="custom-confirm__content">
+			<h4>알 림</h4>
+			<div class="pData">
+				<p id="confirmMessage1"></p>
+				<p id="confirmMessage2"></p>
+			</div>
+			<div class="custom-confirm__buttons">
+				<button id="confirmCancel">취소</button>
+				<button id="confirmOk" class="confirmOk">확인</button>
+			</div>
+		</div>
+	</div>
+
+	<div id="customConfirm2" class="custom-confirm" style="display: none;">
+
+		<div class="custom-confirm__content">
+			<h4>알 림</h4>
+			<div class="pData">
+				<p id="confirmMessage3"></p>
+				<p id="confirmMessage4"></p>
+			</div>
+			<div class="custom-confirm__buttons">
+				<button id="confirmOk2" class="confirmOk">확인</button>
+			</div>
+		</div>
+	</div>
+	
+	<div class="custom-confirm-overlay"></div>
+
 <script>
 function toggleSubmenu(id) {
   const submenu = document.getElementById(id);
