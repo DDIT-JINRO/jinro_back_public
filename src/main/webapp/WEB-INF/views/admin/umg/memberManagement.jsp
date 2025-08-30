@@ -469,7 +469,7 @@
 			<div class="middleTitle">페이지 방문 조회</div>
 
 			<div class="search-filter-bar">
-				<p class="ptag-list pageLogCount">총<span id="pageLog-count"></span>건 <span class="pageCnt" style="margin-top: 20px;">
+				<p class="ptag-list pageLogCount" style="display: none">총<span id="pageLog-count"></span>건 <span class="pageCnt" style="margin-top: 20px;">
 						(Page
 						<span id=memPageVisitPage></span>
 						/
