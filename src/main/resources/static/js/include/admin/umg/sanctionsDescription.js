@@ -272,17 +272,8 @@ function sanctionsDescription() {
 			});
 	}
 
-
-
-
 	dashboardStats();
 	penaltyStats();
-
-
-
-
-
-
 
 	window.currentPage = 1;
 	const openNewPenaltyModalBtn = document.getElementById('openNewPenaltyModalBtn');
@@ -298,18 +289,18 @@ function sanctionsDescription() {
 		if (!selectedReportId) {
 			showConfirm2("신고대상자를 선택해주세요.","",
 				() => {
-				    return;
 				}
 			);
+		    return;
 		}
 
 		const selectedPenaltyTypeEl = document.querySelector('#modalPenaltyType .penalty-type-label.active');
 		if (!selectedPenaltyTypeEl) {
 			showConfirm2("제재 유형을 선택해주세요.","",
 				() => {
-				    return;
 				}
 			);
+		    return;
 		}
 		const selectedPenaltyType = selectedPenaltyTypeEl.getAttribute('data-type');
 		const hiddenStart = document.getElementById('penaltyStart');
@@ -317,9 +308,9 @@ function sanctionsDescription() {
 		if (selectedPenaltyType == 'G14002' && (!hiddenStart.value || !hiddenEnd.value)) {
 			showConfirm2("정지 기간을 선택해주세요.","",
 				() => {
-				    return;
 				}
 			);
+		    return;
 		}
 
 		const reasonInput = document.getElementById('modalReason');
@@ -327,10 +318,10 @@ function sanctionsDescription() {
 		if (!reason) {
 			showConfirm2("제재 사유를 입력해주세요.","",
 				() => {
-					reasonInput.focus();
-				    return;
 				}
 			);
+			reasonInput.focus();
+		    return;
 		}
 
 		const evidenceInput = document.getElementById('evidenceFile');
@@ -338,28 +329,33 @@ function sanctionsDescription() {
 		if (files.length === 0) {
 			showConfirm2("증빙 자료를 첨부해주세요.","",
 				() => {
-				    return;
 				}
 			);
+		    return;
 		}
 
-		if (confirm('정말로 제재하시겠습니까?')) {
-			const formData = new FormData();
-			formData.append('reportId', selectedReportId);
-			formData.append('mpType', selectedPenaltyType);
-			formData.append('mpWarnReason', reason);
+		showConfirm("정말로 제재하시겠습니까?", "",
+			() => {
+				const formData = new FormData();
+				formData.append('reportId', selectedReportId);
+				formData.append('mpType', selectedPenaltyType);
+				formData.append('mpWarnReason', reason);
 
-			if(selectedPenaltyType == 'G14002'){
-				formData.append('penaltyStart', hiddenStart.value);
-				formData.append('penaltyEnd', hiddenEnd.value);
+				if(selectedPenaltyType == 'G14002'){
+					formData.append('penaltyStart', hiddenStart.value);
+					formData.append('penaltyEnd', hiddenEnd.value);
+				}
+
+				for (let i = 0; i < files.length; i++) {
+					formData.append('evidenceFiles', files[i]);
+				}
+
+				penaltySubmit(formData);
+			},
+			() => {
+				return;
 			}
-
-			for (let i = 0; i < files.length; i++) {
-				formData.append('evidenceFiles', files[i]);
-			}
-
-			penaltySubmit(formData);
-		}
+		)
 	});
 
 		// 신규 제재 등록 모달 -> 제재 유형 선택 이벤트
@@ -421,7 +417,6 @@ function sanctionsDescription() {
 	  return inclusive ? diffDays + 1 : diffDays;
 	}
 
-
 	function penaltySubmit(formData) {
 		axios.post('/admin/umg/submitPenalty.do', formData, {
 			headers: {
@@ -441,9 +436,8 @@ function sanctionsDescription() {
 				console.error(err);
 				showConfirm2("제재 처리 중 오류가 발생했습니다.","",
 					() => {
-						return;
 					}
-				);				
+				);
 			});
 	}
 
@@ -701,7 +695,6 @@ function sanctionsDescription() {
 
 					const ext = filePath.split('.').pop().toLowerCase();
 
-
 					fileContainer.innerHTML = `<a href="${filePath}" download>${fileOrgName}</a>`;
 
 				}
@@ -954,9 +947,9 @@ function sanctionsDescription() {
 			&& hiddenEnd.value == hiddenCal.value?.split(" to ")[1]?.trim()) && mpType == 'G14002'){
 				showConfirm2("정지 기간이 선택되지 않았습니다.","",
 					() => {
-						return;
 					}
 				);
+				return;
 		}
 		const formData = new FormData();
 		formData.append('mpId',mpId);
@@ -972,15 +965,15 @@ function sanctionsDescription() {
 				if(res.status != 200){
 					showConfirm2("수정중 오류가 생겼습니다.","잠시후에 다시 시도해주세요.",
 						() => {
-							return;
 						}
 					);
+					return;
 				}
 				showConfirm2("정상적으로 수정되었습니다.","",
 					() => {
-						return;
 					}
 				);
+
 				// 변경된 상태를 상세에 다시 로딩 시켜주기 위해서 목록에서 찾아서 다시 클릭
 				const trs = document.getElementById('penaltyList').querySelectorAll('tr');
 				trs.forEach(tr =>{
@@ -1087,9 +1080,9 @@ function sanctionsDescription() {
 		if(!mpId || !memId){
 			showConfirm2("대상을 선택해주세요.","",
 				() => {
-					return;
 				}
 			);
+			return;
 		}
 
 		const formData = new FormData();
@@ -1101,14 +1094,13 @@ function sanctionsDescription() {
 				if(res.status != 200){
 					showConfirm2("취소중 오류가 생겼습니다.","잠시후에 다시 시도해주세요.",
 						() => {
-							return;
 						}
 					);
+					return;
 				}
 
 				showConfirm2("정상적으로 취소되었습니다.","",
 					() => {
-						return;
 					}
 				);
 				// 목록에서 지우기
@@ -1153,7 +1145,7 @@ function sanctionsDescription() {
 
 	reportModifyBtn.addEventListener('click', function() {
 
-		const mpId = document.getElementById('report-detail-mpId').innerText;
+		const mpId = document.getElementById('report-detail-mpId').value;
 		const mpStat = document.getElementById('report-detail-status').value;
 
 		let form = new FormData();
@@ -1163,9 +1155,9 @@ function sanctionsDescription() {
 		if (mpStat === 'S03003') {
 			showConfirm2("승인은 직접 변경할 수 없습니다.","제재등록 바랍니다.",
 				() => {
-					return;
 				}
 			);
+			return;
 		}
 
 		axios.post('/admin/umg/reportModify.do', form)
@@ -1173,13 +1165,12 @@ function sanctionsDescription() {
 				if (res.data == 1) {
 					showConfirm2("수정 완료","",
 						() => {
-							fetchReportList(1);
 						}
 					);
+					fetchReportList(1);
 				} else {
 					showConfirm2("수정 오류 발생","",
 						() => {
-							return;
 						}
 					);
 				}

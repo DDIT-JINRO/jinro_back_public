@@ -88,9 +88,9 @@ function memberManagement() {
 		if (!userId) {
 			showConfirm2("회원을 선택하세요.", "",
 				() => {
-					return;
 				}
 			);
+			return;
 		}
 	})
 
@@ -143,9 +143,9 @@ function memberManagement() {
 		if (!userId) {
 			showConfirm2("회원을 선택하세요.", "",
 				() => {
-					return;
 				}
 			);
+			return;
 		}
 	})
 	boardListSortOrder.addEventListener('change', function(e) {
@@ -233,9 +233,9 @@ function memberManagement() {
 			if (userId == null || userId == "") {
 				showConfirm2("회원을 선택하세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			handleBoardSortClick("boardId", userId, this);
 		});
@@ -247,9 +247,9 @@ function memberManagement() {
 			if (userId == null || userId == "") {
 				showConfirm2("회원을 선택하세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			handleBoardSortClick("boardDelYn", userId, this);
 		});
@@ -261,9 +261,9 @@ function memberManagement() {
 			if (userId == null || userId == "") {
 				showConfirm2("회원을 선택하세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			handleBoardSortClick("boardCreatedAt", userId, this);
 		});
@@ -276,9 +276,9 @@ function memberManagement() {
 			if (userId == null || userId == "") {
 				showConfirm2("회원을 선택하세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			handleReplySortClick("replyId", userId, this);
 		});
@@ -290,9 +290,9 @@ function memberManagement() {
 			if (userId == null || userId == "") {
 				showConfirm2("회원을 선택하세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			handleReplySortClick("replyDelYn", userId, this);
 		});
@@ -304,9 +304,9 @@ function memberManagement() {
 			if (userId == null || userId == "") {
 				showConfirm2("회원을 선택하세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			handleReplySortClick("replyCreatedAt", userId, this);
 		});
@@ -384,9 +384,9 @@ function memberManagement() {
 			if (file.type !== "image/jpeg" && file.type !== "image/png") {
 				showConfirm2("파일은 png 또는 jpg 형식만 가능합니다.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			if (!file) {
 				return;
@@ -711,44 +711,44 @@ function memberManagement() {
 			if (!emailRegex.test(email)) {
 				showConfirm2("올바른 이메일 형식을 입력해주세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			if (!nameRegex.test(name)) {
 				showConfirm2("닉네임을 입력해주세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			if (!nickname) {
 				showConfirm2("닉네임을 입력해주세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			if (!nicknameRegex.test(nickname)) {
 				showConfirm2("닉네임은 한글, 영문, 숫자 조합", "2~10자로 입력해주세요.",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			if (!passwordRegex.test(password)) {
 				showConfirm2("비밀번호는 영문, 숫자, 특수문자로", "8~16자로 입력해주세요.",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			if (!phoneRegex.test(phone)) {
 				showConfirm2("010-XXXX-XXXX 형식으로 입력해주세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			formData.append('memRole', role);
 			formData.append('memName', name);
@@ -763,9 +763,9 @@ function memberManagement() {
 				if (profileFile.type !== "image/jpeg" && profileFile.type !== "image/png") {
 					showConfirm2("파일은 png 또는 jpg 형식만 가능합니다.", "",
 						() => {
-							return;
 						}
 					);
+					return;
 				}
 			}
 			if (profileFile) {
@@ -777,13 +777,11 @@ function memberManagement() {
 				if (res.data == 'success') {
 					showConfirm2("유저 등록 성공", "",
 						() => {
-							return;
 						}
 					);
 				} else {
 					showConfirm2("등록 중 오류 발생", "",
 						() => {
-							return;
 						}
 					);
 				}
@@ -801,9 +799,9 @@ function memberManagement() {
 					if (memId == null || memId == "") {
 						showConfirm2("수정할 대상이 없습니다.", "",
 							() => {
-								return;
 							}
 						);
+						return;
 					}
 					const memName = document.getElementById('mem-name').value;
 					const memNickname = document.getElementById('mem-nickname').value;
@@ -820,7 +818,6 @@ function memberManagement() {
 							if (res.data != 1) {
 								showConfirm2("수정 실패", "",
 									() => {
-										return;
 									}
 								);
 							} else {
@@ -830,7 +827,6 @@ function memberManagement() {
 								fetchUserList();
 								showConfirm2("수정 완료", "",
 									() => {
-										return;
 									}
 								);
 							}
@@ -852,15 +848,15 @@ function memberManagement() {
 			if (email == null || email == "") {
 				showConfirm2("이메일을 입력하세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			} else if (!emailRegex.test(email)) {
 				showConfirm2("올바른 이메일 형식을 입력하세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			let formData = new FormData();
 			formData.set("email", email);
@@ -868,7 +864,6 @@ function memberManagement() {
 				.then(res => {
 					showConfirm2(res.data, "",
 						() => {
-							return;
 						}
 					);
 				})
@@ -884,15 +879,15 @@ function memberManagement() {
 			if (nickname == null || nickname == "") {
 				showConfirm2("닉네임을 입력하세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			} else if (!nicknameRegex.test(nickname)) {
 				showConfirm2("닉네임은 한글, 영문, 숫자 조합", "2~10자로 입력해주세요.",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			let formData = new FormData();
 			formData.set("nickname", nickname);
@@ -900,7 +895,6 @@ function memberManagement() {
 				.then(res => {
 					showConfirm2(res.data, "",
 						() => {
-							return;
 						}
 					);
 				})

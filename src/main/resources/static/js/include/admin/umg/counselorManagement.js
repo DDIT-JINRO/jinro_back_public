@@ -344,15 +344,15 @@ function counselorManagement() {
 	}
 	function starsFromRate(n) {
 		const rating = Math.max(0, Math.min(5, Number(n) || 0));
-				
+
 		// 평점을 퍼센트(%) 단위로 변환
 		const widthPercentage = (rating / 5) * 100;
-		
+
 		const formattedRating = rating.toFixed(2);
-		
+
 		// CSS로 제어되는 HTML 구조를 반환
 		return `<div class="star-rating" data-tooltip="${formattedRating} / 5.0"><span style="width: ${widthPercentage}%;"></span></div>`;
-			
+
 	}
 	function updateRateStyleByStatus(elementId, status) {
 		const el = document.getElementById(elementId);
@@ -476,38 +476,42 @@ function counselorManagement() {
 
 		// 상세 저장
 		btnModify && btnModify.addEventListener('click', async () => {
-			if (!confirm('정말로 저장하시겠습니까?')) return;
-			const memId = (inputCnsId?.value || inputMemId?.value || '').trim();
-			if (!memId) { 
-				showConfirm2("대상이 없습니다.","",
-					() => {
+			showConfirm("정말로 저장하시겠습니까?",
+				"",
+				async ()=>{
+					const memId = (inputCnsId?.value || inputMemId?.value || '').trim();
+					if (!memId) {
+						showConfirm2("대상이 없습니다.","",
+							() => {
+							}
+						);
 					    return;
 					}
-				); 
-			}
-			const fd = new FormData();
-			fd.set('memId', memId);
-			fd.set('memName', inputName?.value || '');
-			fd.set('memNickname', inputNick?.value || '');
-			fd.set('memRole', selRole?.value || '');
-			try {
-				const res = await axios.post('/admin/umg/updateMemberInfo.do', fd);
-				if (res.data !== 1) throw new Error('fail');
-				showConfirm2("저장되었습니다.","",
-					() => {
-					    
+					const fd = new FormData();
+					fd.set('memId', memId);
+					fd.set('memName', inputName?.value || '');
+					fd.set('memNickname', inputNick?.value || '');
+					fd.set('memRole', selRole?.value || '');
+					try {
+						const res = await axios.post('/admin/umg/updateMemberInfo.do', fd);
+						if (res.data !== 1) throw new Error('fail');
+						showConfirm2("저장되었습니다.","",
+							() => {
+							}
+						);
+						await loadDetail();
+						await fetchList(state.list.page);
+					} catch (err) {
+						console.error(err);
+						showConfirm2("저장 실패","",
+							() => {
+							}
+						);
 					}
-				);
-				await loadDetail();
-				await fetchList(state.list.page);
-			} catch (err) {
-				console.error(err);
-				showConfirm2("저장 실패","",
-					() => {
-					    return;
-					}
-				);
-			}
+				},
+				()=>{return;}
+			)
+
 		});
 
 	}

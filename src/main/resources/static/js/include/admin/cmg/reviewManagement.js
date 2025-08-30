@@ -32,22 +32,21 @@ function reviewManagement() {
 	            if (response.data.success) {
 					showConfirm2("후기 정보가 성공적으로 수정되었습니다","",
 						() => {
-			                selectReviewList();
 						}
 					);
+	                selectReviewList();
 	            } else {
 					showConfirm2("후기 정보 수정에 실패했습니다.","",
 						() => {
-			                return;
 						}
 					);
+	                return;
 	            }
 	        })
 	        .catch(error => {
 	            console.error('수정 요청 중 오류 발생:', error);
 				showConfirm2("후기 정보 수정 중 문제가 발생했습니다.","",
 					() => {
-		                return;
 					}
 				);
 	        });
@@ -107,7 +106,6 @@ function reviewManagement() {
 				console.error("데이터를 가져오는 중 오류 발생:", error);
 				showConfirm2("후기 상세 정보를 불러오는 데 실패했습니다.","",
 					() => {
-		                return;
 					}
 				);
 			});
