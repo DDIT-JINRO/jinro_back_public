@@ -203,7 +203,7 @@
 												<a href="/cnslt/rvw/cnsReview.do" class="btn btn-primary">후기 작성하기</a>
 											</c:when>
 											<c:when test="${content.counselStatus == 'S04004'}">
-												<a href="/cnslt/rvw/cnsReview.do" class="btn btn-primary">완료됨</a>
+												<span class="btn btn-danger">완료됨</span>
 											</c:when>
 										</c:choose>
 									</div>
