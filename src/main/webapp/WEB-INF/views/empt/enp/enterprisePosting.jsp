@@ -257,6 +257,9 @@
 				" class="pagination__link <c:if test='${articlePage.startPage < 6}'>pagination__link--disabled</c:if>"> ← Previous </a>
 
 				<c:forEach var="pNo" begin="${articlePage.startPage}" end="${articlePage.endPage}">
+					<c:if test="${articlePage.total == 0 }">
+						<c:set var="pNo" value="1"></c:set>
+					</c:if>
 					<a href="${articlePage.url}?currentPage=${pNo}&keyword=${articlePage.keyword}
 					<c:forEach var='scaleId' items='${paramValues.scaleId}'>&scaleId=${scaleId}</c:forEach>
 					<c:forEach var='regionId' items='${paramValues.regionId}'>&regionId=${regionId}</c:forEach>

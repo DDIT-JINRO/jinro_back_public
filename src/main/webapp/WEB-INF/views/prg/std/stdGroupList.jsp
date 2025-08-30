@@ -321,6 +321,9 @@
 				</li>
 				<c:forEach var="pNo" begin="${articlePage.startPage}" end="${articlePage.endPage}">
 					<li>
+						<c:if test="${articlePage.total == 0 }">
+							<c:set var="pNo" value="1"></c:set>
+						</c:if>
 						<a href="${articlePage.url}&currentPage=${pNo}" class="pagination__link ${pNo == articlePage.currentPage ? 'pagination__link--active' : ''}"> ${pNo} </a>
 					</li>
 				</c:forEach>

@@ -189,7 +189,6 @@
 				</c:if>
 			</div>
 
-			<c:if test="${not empty articlePage.content}">
 				<ul class="pagination">
 					<li>
 						<c:url value="/prg/act/sup/supList.do" var="prevUrl">
@@ -219,6 +218,9 @@
 									<c:param name="contestStatusFilter" value="${filter}" />
 								</c:forEach>
 							</c:url>
+							<c:if test="${articlePage.total == 0 }">
+								<c:set var="pNo" value="1"></c:set>
+							</c:if>
 							<a href="${pageUrl}" class="pagination__link ${pNo == articlePage.currentPage ? 'pagination__link--active' : ''}">${pNo}</a>
 						</li>
 					</c:forEach>
@@ -238,7 +240,6 @@
 						<a href="${nextUrl}" class="pagination__link ${articlePage.endPage >= articlePage.totalPages ? 'pagination__link--disabled' : ''}">Next →</a>
 					</li>
 				</ul>
-			</c:if>
 		</div>
 	</div>
 </div>
