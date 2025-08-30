@@ -18,6 +18,7 @@
 <script src="https://cdn.jsdelivr.net/npm/hangul-js@0.2.6/hangul.min.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="진로 탐색부터 취업, 경력 관리까지. AI가 설계해주는 나만의 커리어 로드맵, 커리어패스에서 시작하세요.)">
 <title>CareerPath</title>
 <script src="/js/include/header.js"></script>
 <script>

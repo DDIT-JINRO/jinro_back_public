@@ -128,6 +128,13 @@ public class CareerAptitudeTestServiceImpl implements CareerAptitudeTestService 
 			String reportUrl = resultNode.get("url").asText();
 
 			// insertResultKeyword(reportUrl, memId, testNo);
+			
+			AptitudeTestVO aptitudeTestVO = AptitudeTestVO.builder().memId(Integer.parseInt(memId))
+					.atTestNo(Integer.parseInt(testNo))
+					.atResultUrl(reportUrl)
+					.build();
+			
+			this.careerAptitudeTestMapper.insertAptitudeResult(aptitudeTestVO);
 
 			return Map.of("msg", "success", "reportUrl", reportUrl);
 		} catch (Exception e) {
