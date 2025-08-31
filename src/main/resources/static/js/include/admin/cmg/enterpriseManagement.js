@@ -19,7 +19,7 @@ function fetchEntList(page = 1) {
 		.then(({ data }) => {
 			// 페이지 정보
 			document.getElementById("entListPage").innerText = data.currentPage;
-			document.getElementById("entListTotalPage").innerText = data.totalPages;
+			document.getElementById("entListTotalPage").innerText = data.totalPages != 0 ? data.totalPages : '1';
 
 			const countEl = document.getElementById('entList-count');
 			if (countEl) countEl.textContent = parseInt(data.total, 10).toLocaleString();
@@ -28,7 +28,7 @@ function fetchEntList(page = 1) {
 			if (!listEl) return;
 
 			if (data.content.length < 1 && keyword.trim() !== '') {
-				listEl.innerHTML = `<tr><td colspan='2' style="text-align: center;">검색 결과를 찾을 수 없습니다.</td></tr>`;
+				listEl.innerHTML = `<tr><td colspan='4' style="text-align: center;">검색 결과를 찾을 수 없습니다.</td></tr>`;
 			} else {
 				const rows = data.content.map(item => `
 								  <tr>
@@ -50,6 +50,7 @@ function renderPaginationEnt({ startPage, endPage, currentPage, totalPages }) {
 	let html = `<a href="#" data-page="${startPage - 1}" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 
 	for (let p = startPage; p <= endPage; p++) {
+		if(totalPages == 0) p = 1;
 		html += `<a href="#" data-page="${p}" class="page-link ${p === currentPage ? 'active' : ''}">${p}</a>`;
 	}
 
@@ -272,15 +273,12 @@ function entSave() {
 		axios.post('/empt/enp/enterprisePostingUpdate.do', form).then(res => {
 			showConfirm2("등록/수정 완료","",
 				() => {
-					return;
 				}
 			);
-
 		}).catch(err => {
 			console.error("저장 실패", err);
 			showConfirm2("등록/수정 실패","",
 				() => {
-					return;
 				}
 			);
 		});

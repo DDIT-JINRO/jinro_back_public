@@ -185,9 +185,6 @@
 							</a>
 						</c:forEach>
 					</c:if>
-					<c:if test="${empty articlePage.content}">
-						<div style="text-align: center; padding: 50px;">검색 결과가 없습니다.</div>
-					</c:if>
 				</div>
 			</div>
 
@@ -195,7 +192,6 @@
 				<div class="content-list__no-results" style="grid-column: 1/-1;">검색 결과가 없습니다.</div>
 			</c:if>
 
-			<c:if test="${not empty articlePage.content}">
 				<ul class="pagination">
 					<li>
 						<c:url value="/prg/act/cr/crList.do" var="prevUrl">
@@ -213,6 +209,9 @@
 					</li>
 
 					<c:forEach var="pNo" begin="${articlePage.startPage}" end="${articlePage.endPage}">
+						<c:if test="${articlePage.total == 0 }">
+							<c:set var="pNo" value="1"></c:set>
+						</c:if>
 						<li>
 							<c:url value="/prg/act/cr/crList.do" var="pageUrl">
 								<c:param name="currentPage" value="${pNo}" />
@@ -244,7 +243,6 @@
 						<a href="${nextUrl}" class="pagination__link ${articlePage.endPage >= articlePage.totalPages ? 'pagination__link--disabled' : ''}">Next →</a>
 					</li>
 				</ul>
-			</c:if>
 		</div>
 	</div>
 </div>

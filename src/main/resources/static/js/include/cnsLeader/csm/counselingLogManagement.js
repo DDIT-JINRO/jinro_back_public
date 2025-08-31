@@ -129,6 +129,7 @@ function renderPagination({ startPage, endPage, currentPage, totalPages }) {
 	let html = `<a href="#" data-page="${startPage - 1}" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 
 	for (let p = startPage; p <= endPage; p++) {
+		if(totalPages == 0) p = 1;
 		html += `<a href="#" onclick="fetchCounselingLog(${p})" data-page="${p}" class="page-link ${p === currentPage ? 'active' : ''}">${p}</a>`;
 	}
 
@@ -157,7 +158,7 @@ function fetchCounselingLog(page = 1) {
 		.then(({ data }) => {
 			const countEl = document.getElementById('notice-count');
 			let cnt = (page-1) * pageSize +1;
-			/*if (countEl) countEl.textContent = parseInt(data.total, 10).toLocaleString();*/
+			if (countEl) countEl.textContent = parseInt(data.total, 10).toLocaleString();
 
 			const listEl = document.getElementById('notice-list');
 			if (!listEl) return;
@@ -177,8 +178,8 @@ function fetchCounselingLog(page = 1) {
 					`).join('');
 				listEl.innerHTML = rows;
 				window.currentPage = page;
-				renderPagination(data);
 			}
+			renderPagination(data);
 		})
 		.catch(err => console.error('상담완료이력 조회 중 에러:', err));
 }
@@ -191,8 +192,14 @@ function eventBinding(){
 }
 
 function resetAfterConfirm(){
-	if(!confirm('저장되지 하지 않은 정보는 복구되지 않습니다.\n계속하시겠습니까?')) return;
-	resetDetail();
+	showConfirm("저장하지 않은 정보는 복구되지 않습니다.","계속하시겠습니까?",
+		()=>{
+			resetDetail();
+		},
+		()=>{
+
+		}
+	);
 }
 
 // 상세 내용 비우기
@@ -347,9 +354,9 @@ function updateConfirmation(action) {
 		if(!etc){
 			showConfirm2("반려시 사유 입력은 필수입니다.","",
 				() => {
-					return;						
 				}
 			);
+			return;
 		}
 		// 반려코드 세팅
 		fd.set('clConfirm', 'S03002');
@@ -372,19 +379,18 @@ function updateConfirmation(action) {
 	.then(resp =>{
 		const result = resp.data;
 		if(result){
-			showConfirm2("정상적으로 ${actionStr}되었습니다","",
+			showConfirm2(`정상적으로 ${actionStr}되었습니다`,"",
 				() => {
 					fetchCounselingLog(window.currentPage);
 					const counselId = document.getElementById('counselId').value;
 					const targetTr = document.querySelector(`#notice-list tr[data-cns-id='${counselId}']`);
 					targetTr.click();
-					return;						
+					return;
 				}
 			);
 		}else{
-			showConfirm2("${actionStr}처리 도중 문제가 발생했습니다.","다시 시도해주세요.",
+			showConfirm2(`${actionStr}처리 도중 문제가 발생했습니다.`,"다시 시도해주세요.",
 				() => {
-					return;						
 				}
 			);
 		}

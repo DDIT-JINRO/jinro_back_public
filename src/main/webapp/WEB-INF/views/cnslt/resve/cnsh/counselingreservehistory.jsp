@@ -202,10 +202,16 @@
 											<c:when test="${content.counselReviewd == 'N' && content.counselStatus == 'S04004'}">
 												<a href="/cnslt/rvw/cnsReview.do" class="btn btn-primary">후기 작성하기</a>
 											</c:when>
+											<c:when test="${content.counselStatus == 'S04004'}">
+												<span class="btn btn-danger">완료됨</span>
+											</c:when>
 										</c:choose>
 									</div>
 								</div>
 							</c:forEach>
+							<c:if test="${empty articlePage.content}">
+								<div class="content-list__no-results" style="grid-column: 1/-1;">검색 결과가 없습니다.</div>
+							</c:if>
 						</div>
 					</c:otherwise>
 				</c:choose>
@@ -216,6 +222,9 @@
 					</li>
 
 					<c:forEach var="pNo" begin="${articlePage.startPage}" end="${articlePage.endPage}">
+						<c:if test="${articlePage.total == 0 }">
+							<c:set var="pNo" value="1"></c:set>
+						</c:if>
 						<li class="pagination__item">
 							<a href="${articlePage.url}?currentPage=${pNo}&keyword=${param.keyword}&status=${param.status}&counselStatus=${param.counselStatus}&counselCategory=${param.counselCategory}&counselMethod=${param.counselMethod}&sortOrder=${paramValues.sortOrder[0]}" class="pagination__link <c:if test='${pNo == articlePage.currentPage}'>pagination__link--active</c:if>"> ${pNo} </a>
 						</li>

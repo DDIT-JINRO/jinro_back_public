@@ -132,7 +132,7 @@
 									<c:if test="${pageContext.request.userPrincipal.principal != content.memId}">${content.memNickname}</c:if>
 								</div>
 								<div class="accordion-list__col accordion-list__date" data-label="작성일">
-									<fmt:formatDate value="${content.irModAt}" pattern="yyyy. M. d." />
+									<fmt:formatDate value="${content.irCreatedAt}" pattern="yyyy. M. d." />
 								</div>
 								<div class="accordion-list__col accordion-list__rating" data-label="평점">
 									<span class="rating__stars">
@@ -248,6 +248,9 @@
 							</c:if>
 						</c:forEach>
 					</c:url>
+					<c:if test="${articlePage.total == 0 }">
+						<c:set var="pNo" value="1"></c:set>
+					</c:if>
 					<a href="${pageUrl}" class="pagination__link ${pNo == articlePage.currentPage ? 'pagination__link--active' : ''}"> ${pNo} </a>
 				</c:forEach>
 

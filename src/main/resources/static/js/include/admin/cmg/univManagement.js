@@ -8,7 +8,7 @@ function univManagement() {
 	function fetchUnivList(page = 1) {
 		const keyword = document.querySelector('input[name="keyword"]').value;
 		const status = document.querySelector('select[name="status"]').value;
-		
+
 		axios.get('/ertds/univ/uvsrch/universities', {
 			params: {
 				currentPage: page,
@@ -20,7 +20,7 @@ function univManagement() {
 		}).then(({ data }) => {
 			// 페이지 정보
 			document.getElementById("univListPage").innerText = data.data.currentPage;
-			document.getElementById("univListTotalPage").innerText = data.data.totalPages;
+			document.getElementById("univListTotalPage").innerText = data.data.totalPages != 0 ? data.data.totalPages : '1';
 			const result = data.data;
 
 			const countEl = document.getElementById('univList-count');
@@ -52,6 +52,7 @@ function univManagement() {
 		let html = `<a href="#" data-page="${startPage - 1}" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 
 		for (let p = startPage; p <= endPage; p++) {
+			if(totalPages == 0) p = 1;
 			html += `<a href="#" data-page="${p}" class="page-link ${p === currentPage ? 'active' : ''}">${p}</a>`;
 		}
 
@@ -289,17 +290,17 @@ function univManagement() {
 			axios.post('/ertds/univ/uvsrch/universities', formData).then(res => {
 				showConfirm2("등록이 완료되었습니다.","",
 					() => {
-						fetchUnivList(1);
 					}
 				);
+				fetchUnivList(1);
 			})
 		} else {
 			axios.put(`/ertds/univ/uvsrch/universities/${inputUnivId}`, formData).then(res => {
 				showConfirm2("수정이 완료되었습니다.","",
 					() => {
-						fetchUnivList(1);
 					}
 				);
+				fetchUnivList(1);
 			})
 		}
 	})
@@ -311,19 +312,24 @@ function univManagement() {
 		if (univId == null || univId == '') {
 			showConfirm2("삭제할 대학을 선택하세요.","",
 				() => {
-				    return;
 				}
 			);
+		    return;
 		} else {
-			if (confirm('삭제된 데이터는 복구할 수 없으며, 모든 정보가 삭제됩니다.\n정말로 삭제하시겠습니까?')) {
-				axios.delete(`/ertds/univ/uvsrch/universities/${univId}`).then(res => {
-					showConfirm2(res.data.message,"",
-						() => {
-							fetchUnivList(1);
-						}
-					);
-				})
-			}
+			showConfirm("삭제된 데이터는 복구할 수 없으며, <br>모든 정보가 삭제됩니다.","정말로 삭제하시겠습니까?",
+				()=>{
+					axios.delete(`/ertds/univ/uvsrch/universities/${univId}`).then(res => {
+						showConfirm2(res.data.message,"",
+							() => {
+								fetchUnivList(1);
+							}
+						);
+					})
+				},
+				()=>{
+
+				}
+			);
 		}
 
 	})
@@ -346,9 +352,9 @@ function univManagement() {
 		if (udId == null || udId == '') {
 			showConfirm2("삭제할 학과를 선택하세요.","",
 				() => {
-				    return;
 				}
 			);
+		    return;
 		} else {
 			showConfirm("삭제된 데이터는 복구할 수 없으며, <br>모든 정보가 삭제됩니다.","정말로 삭제하시겠습니까?",
 				() => {
@@ -361,7 +367,7 @@ function univManagement() {
 					})
 				},
 				() => {
-					
+
 				}
 			);
 		}
@@ -375,9 +381,9 @@ function univManagement() {
 		if (udId == null || udId == '') {
 			showConfirm2("수정할 학과를 선택하세요.","",
 				() => {
-				    return;
 				}
 			);
+		    return;
 		} else {
 			showConfirm("정말로 수정하시겠습니까?","",
 				() => {
@@ -407,7 +413,7 @@ function univManagement() {
 					})
 				},
 				() => {
-					
+
 				}
 			);
 		}
@@ -421,9 +427,9 @@ function univManagement() {
 		if (document.getElementById('univ-detail-univId').value == null || document.getElementById('univ-detail-univId').value == "") {
 			showConfirm2("학과를 추가할 대학을 선택해주세요.","",
 				() => {
-				    return;
 				}
 			);
+		    return;
 		}
 
 		document.getElementById('showUvName').value = document.getElementById('univ-detail-univName').value;
@@ -466,9 +472,9 @@ function univManagement() {
 		axios.post(`/ertds/univ/uvsrch/universities/${univId}/departments`, form).then(res => {
 			showConfirm2(res.data.message,"",
 				() => {
-				    return;
 				}
 			);
+		    return;
 		})
 	})
 	const inputKeyword = document.querySelector("input[name='keyword']");

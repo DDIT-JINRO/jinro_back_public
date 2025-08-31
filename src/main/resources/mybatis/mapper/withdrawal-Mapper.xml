@@ -17,6 +17,7 @@
 			DEL_YN
 			, MEM_ID
 			, MEM_EMAIL
+			, LOGIN_TYPE
 		FROM
 			MEMBER
 		WHERE

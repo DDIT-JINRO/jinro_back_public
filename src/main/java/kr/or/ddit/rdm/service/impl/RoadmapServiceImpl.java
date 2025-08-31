@@ -16,6 +16,7 @@ import com.google.genai.types.GenerateContentResponse;
 
 import kr.or.ddit.exception.CustomException;
 import kr.or.ddit.exception.ErrorCode;
+import kr.or.ddit.pse.cat.service.impl.CareerAptitudeTestServiceImpl;
 import kr.or.ddit.rdm.service.RoadmapResultRequestVO;
 import kr.or.ddit.rdm.service.RoadmapService;
 import kr.or.ddit.rdm.service.RoadmapStepVO;
@@ -41,7 +42,10 @@ public class RoadmapServiceImpl implements RoadmapService {
 	private String geminiApiKey;
 
 	@Autowired
-	RoadmapMapper roadmapMapper;
+	private RoadmapMapper roadmapMapper;
+	
+	@Autowired
+	private CareerAptitudeTestServiceImpl careerAptitudeTestServiceImpl;
 
 	/**
 	 * {@inheritDoc}
@@ -233,7 +237,7 @@ public class RoadmapServiceImpl implements RoadmapService {
 		}
 
 		RoadmapResultRequestVO roadmapResultRequestVO = this.roadmapMapper.selectResultData(memId);
-		String result = geminiAnalysis(roadmapResultRequestVO);
+		String result = geminiAnalysis(roadmapResultRequestVO, memIdStr);
 
 		if (result == null) {
 			throw new CustomException(ErrorCode.USER_NOT_FOUND);
@@ -245,13 +249,15 @@ public class RoadmapServiceImpl implements RoadmapService {
 	}
 
 	@Override
-    public String geminiAnalysis(RoadmapResultRequestVO roadmapResultRequest) {
+    public String geminiAnalysis(RoadmapResultRequestVO roadmapResultRequest, String memIdStr) {
 		Client client = Client.builder().apiKey(geminiApiKey).build();
 
 		String prompt = buildPrompt(roadmapResultRequest);
 
 		GenerateContentResponse response = client.models.generateContent("gemini-2.0-flash", prompt, null);
-
+		
+		careerAptitudeTestServiceImpl.insertRecommendKeyword(response.text(), memIdStr);
+		
     	return response.text();
     }
 
@@ -269,7 +275,7 @@ public class RoadmapServiceImpl implements RoadmapService {
     		  .append("2. SELF_INTRO : 상담 대상이 작성했던 자기소개서의 질문 항목에 대한 내용 ::: " + roadmapResultRequest.getSiqJob() + "\n")
     		  .append("3. WORLDCUP : 상담 대상이 직업 월드컵의 우승 결과로 선택된 선호하는 직업 ::: " + roadmapResultRequest.getWdResult() + "\n")
     		  .append("4. BOOKMARK : 상담 대상이 평소에 즐겨 찾던 직업명 ::: " + roadmapResultRequest.getBookmarkJob() + "\n")
-    		  .append("5. APTITUDE_TEST : " + roadmapResultRequest.getAptitudeTestName() + "의 검사 결과 데이터 :::" + roadmapResultRequest.getAptitudeResult() + "\n")
+    		  // .append("5. APTITUDE_TEST : " + roadmapResultRequest.getAptitudeTestName() + "의 검사 결과 데이터 :::" + roadmapResultRequest.getAptitudeResult() + "\n")
     		  .append("6. RECOMMEND_KEYWORD : 상담 대상의 기존 추천 직업 키워드 :::" + roadmapResultRequest.getRecommendKeyword() + "\n")
     		  .append("======== 상담 대상의 상담 결과 도출을 위한 데이터 종료 ======= \n\n")
     		  .append("당신은 위와 같은 데이터를 바탕으로 3가지 분석 결과를 도출 하려고 합니다. \n")
@@ -330,7 +336,7 @@ public class RoadmapServiceImpl implements RoadmapService {
 		prompt.append("- 구체적이고 실행 가능한 개선 방안 제시\n");
 		prompt.append("- JSON 형식을 정확히 준수 (문법 오류 금지)\n");
 		prompt.append("- 상담 대상에게 전하는 추가 제언은 각 planner, experience, enhance별로 200자 제한으로 상세하게 적어주세요.\n");
-		prompt.append("- interestDataType의 경우 INTEREST_CN뿐만이 아니라 다양한 데이터의 분석을 통하여 결정되어야 합니다.\n");
+		prompt.append("- 제가 요청한 json 형식의 데이터는 절대로 데이터가 빠지면 안됩니다.\n");
 
 		// 메시지 포멧 사용 방법이 아래와 같이 있습니다.
 //		MessageFormat.format(prompt.toString(), roadmapResultRequest.getMemName());

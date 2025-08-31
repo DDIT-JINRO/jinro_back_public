@@ -90,6 +90,7 @@ function renderPagination({ startPage, endPage, currentPage, totalPages }) {
 	let html = `<a href="#" data-page="${startPage - 1}" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 
 	for (let p = startPage; p <= endPage; p++) {
+		if(totalPages == 0) p = 1;
 		html += `<a href="#" onclick="fetchVacationList(${p})" data-page="${p}" class="page-link ${p === currentPage ? 'active' : ''}">${p}</a>`;
 	}
 
@@ -124,7 +125,7 @@ function fetchVacationList(page = 1) {
 			if (!listEl) return;
 
 			if (data.content.length < 1 && keyword.trim() !== '') {
-				listEl.innerHTML = `<tr><td colspan='6' style="text-align: center;">등록되지 않은 정보입니다.</td></tr>`;
+				listEl.innerHTML = `<tr><td colspan='7' style="text-align: center;">등록되지 않은 정보입니다.</td></tr>`;
 			} else {
 				const rows = data.content.map(item => `
 					<tr data-va-id="${item.vaId}" onclick="showDetail(${item.vaId})">
@@ -139,8 +140,8 @@ function fetchVacationList(page = 1) {
 					`).join('');
 				listEl.innerHTML = rows;
 				window.currentPage = page;
-				renderPagination(data);
 			}
+			renderPagination(data);
 		})
 		.catch(err => console.error('상담완료이력 조회 중 에러:', err));
 }
@@ -153,8 +154,14 @@ function eventBinding(){
 }
 
 function resetAfterConfirm(){
-	if(!confirm('저장되지 하지 않은 정보는 복구되지 않습니다.\n계속하시겠습니까?')) return;
-	resetDetail();
+	showConfirm("저장하지 않은 정보는 복구되지 않습니다.","계속하시겠습니까?",
+		()=>{
+			resetDetail();
+		},
+		()=>{
+
+		}
+	);
 }
 
 // 상세 내용 비우기
@@ -286,7 +293,7 @@ function showDetail(vaId) {
 }
 
 // 반려 혹은 승인처리 update
-async function updateConfirmation(action) {
+function updateConfirmation(action) {
 
 	const fd = new FormData();
 	let actionStr = '';
@@ -301,9 +308,9 @@ async function updateConfirmation(action) {
 		if(!etc){
 			showConfirm2("반려시 사유 입력은 필수입니다.","",
 				() => {
-					return;						
 				}
 			);
+			return;
 		}
 		// 반려코드 세팅
 		fd.set('vaConfirm', 'S03002');
@@ -322,53 +329,58 @@ async function updateConfirmation(action) {
 	}
 
 	// 반려/승인 처리 전 확인
-	if(!confirm(`${actionStr} 처리 진행하시겠습니까?`)) return;
-	
-	// 승인인 경우 이미 예약이 존재하는지 한번더 체크
-	if(action == 'confirm'){
-		const resp = await axios.get('/api/cnsld/checkCounselList.do?vaId='+vaId);
-		const counselList = resp.data;
-		let alertStr = '';
-		if(counselList && counselList.length > 0){
-			alertStr += '해당 휴가 기간에 상담예약이 존재합니다.\n';
-			counselList.forEach(c =>{
-				const date = new Date(c.counselReqDatetime);
-				const dateStr = `${date.getFullYear()}. ${date.getMonth()+1}. ${date.getDate()}. ${date.getHours()}시${date.getMinutes()}분 상담`;
-				alertStr += `${c.memName}님 ${dateStr}\n`;
-			})
-			alertStr += '전체 예약 취소하고 승인 진행하시겠습니까?';
+	showConfirm(`${actionStr} 처리 진행하시겠습니까?`,"",
+		async () => {
+			// 승인인 경우 이미 예약이 존재하는지 한번더 체크
+			const resp = await axios.get('/api/cnsld/checkCounselList.do?vaId='+vaId);
+			const counselList = resp.data;
+			let alertStr = '';
+			if(counselList && counselList.length > 0){
+				alertStr += '해당 휴가 기간에 상담예약이 존재합니다.<br>';
+				counselList.forEach(c =>{
+					const date = new Date(c.counselReqDatetime);
+					const dateStr = `${date.getFullYear()}. ${date.getMonth()+1}. ${date.getDate()}. ${date.getHours()}시${date.getMinutes()}분 상담`;
+					alertStr += `${c.memName}님 ${dateStr}<br>`;
+				})
+				alertStr += '전체 예약 취소하고 승인 진행하시겠습니까?';
+			}
+			if(alertStr != ''){
+				showConfirm(alertStr,"",
+					()=>{
+						// 업데이트처리
+						axios.post('/api/cnsld/updateVacation.do',fd)
+						.then(resp =>{
+							const result = resp.data;
+							if(result){
+								showConfirm2(`정상적으로 ${actionStr}되었습니다.`,"",
+									() => {
+										fetchVacationList(window.currentPage);
+										const vaId = document.getElementById('vaId').value;
+										const targetTr = document.querySelector(`#notice-list tr[data-va-id='${vaId}']`);
+										targetTr.click();
+									}
+								);
+							}else{
+								showConfirm2(`${actionStr}처리 도중 문제가 발생했습니다.`,"다시 시도해주세요.",
+									() => {
+									}
+								);
+							}
+						})
+						.catch(err =>{
+							console.error('err : ',err);
+						})
+					},
+					()=>{
+						return;
+					}
+				);
+			}
+		},
+		() => {
+			return;
 		}
-		if(alertStr != ''){
-			const lastCheck = confirm(alertStr);
-			if(!lastCheck) return;
-		}
-	}
-
-
-	// 업데이트처리
-	axios.post('/api/cnsld/updateVacation.do',fd)
-	.then(resp =>{
-		const result = resp.data;
-		if(result){
-			showConfirm2("정상적으로 ${actionStr}되었습니다.","",
-				() => {
-					fetchVacationList(window.currentPage);
-					const vaId = document.getElementById('vaId').value;
-					const targetTr = document.querySelector(`#notice-list tr[data-va-id='${vaId}']`);
-					targetTr.click();					
-				}
-			);
-		}else{
-			showConfirm2("${actionStr}처리 도중 문제가 발생했습니다.","다시 시도해주세요.",
-				() => {
-					return;				
-				}
-			);
-		}
-	})
-	.catch(err =>{
-		console.error('err : ',err);
-	})
+	);
 }
 
 function waitForInit() {

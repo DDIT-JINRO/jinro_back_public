@@ -178,6 +178,9 @@
 						</div>
 					</div>
 				</c:forEach>
+				<c:if test="${empty articlePage.content}">
+					<div class="content-list__no-results" style="grid-column: 1/-1;">검색 결과가 없습니다.</div>
+				</c:if>
 			</div>
 
 			<div class="pagination">
@@ -216,6 +219,9 @@
 						</c:forEach>
 						<c:param name="sortOrder" value="${paramValues.sortOrder[0] }" />
 					</c:url>
+					<c:if test="${articlePage.total == 0 }">
+						<c:set var="pNo" value="1"></c:set>
+					</c:if>
 					<a href="${pageUrl}" class="pagination__link ${pNo == articlePage.currentPage ? 'pagination__link--active' : ''}"> ${pNo} </a>
 				</c:forEach>
 

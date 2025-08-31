@@ -44,8 +44,8 @@ function fetchInqs(page = 1) { // fetchFaqs -> fetchInqs로 변경
                     <td class="${item.contactReply != null ? '' : 'status-pending'}">${item.contactReply != null ? '답변 완료' : '답변 대기'}</td>
                 </tr>`).join('');
             listEl.innerHTML = rows;
-            renderPagination(data);
         }
+        renderPagination(data);
     })
     .catch(err => console.error('1:1 문의 목록 조회 중 에러:', err));
 }
@@ -55,6 +55,7 @@ function renderPagination({ startPage, endPage, currentPage, totalPages }) {
     let html = `<a href="#" data-page="${startPage - 1}" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 
     for (let p = startPage; p <= endPage; p++) {
+		if(totalPages == 0) p = 1;
         html += `<a href="#" data-page="${p}" class="page-link ${p === currentPage ? 'active' : ''}">${p}</a>`;
     }
 

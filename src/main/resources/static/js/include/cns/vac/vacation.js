@@ -126,23 +126,23 @@ function confirmVacation(){
 	if(start.value == null || start.value==''){
 		showConfirm2("시작 날짜를 지정해주세요.","",
 			() => {
-				return;
 			}
 		);
+		return;
 	}
 	if(end.value == null || end.value==''){
 		showConfirm2("종료 날짜를 지정해주세요.","",
 			() => {
-				return;
 			}
 		);
+		return;
 	}
 	if(reason == null || reason==''){
 		showConfirm2("사유를 입력해주세요.","",
 			() => {
-				return;
 			}
 		);
+		return;
 	}
 
 	const startDate = start.value.split('.').map(v => v.trim()).join('-').slice(0,-1);

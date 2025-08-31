@@ -269,6 +269,7 @@ function renderPagination({ startPage, endPage, currentPage, totalPages, counsel
 	let html = `<a href="#" data-page="${startPage - 1}" onclick="selectCounselSchedules('${counselReqDatetime}',${startPage - 1})" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 
 	for (let p = startPage; p <= endPage; p++) {
+		if(totalPages == 0) p = 1;
 		html += `<a href="#" onclick="selectCounselSchedules('${counselReqDatetime}',${p})" data-page="${p}" class="page-link ${p === currentPage ? 'active' : ''}">${p}</a>`;
 	}
 
@@ -326,7 +327,6 @@ function counselDetail(counselId) {
 			console.error('error : ',error);
 			showConfirm2("상담 정보를 불러오는 데 실패했습니다.","",
 				() => {
-					return;				
 				}
 			);
 		});

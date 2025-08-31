@@ -88,9 +88,9 @@ function memberManagement() {
 		if (!userId) {
 			showConfirm2("회원을 선택하세요.", "",
 				() => {
-					return;
 				}
 			);
+			return;
 		}
 	})
 
@@ -143,9 +143,9 @@ function memberManagement() {
 		if (!userId) {
 			showConfirm2("회원을 선택하세요.", "",
 				() => {
-					return;
 				}
 			);
+			return;
 		}
 	})
 	boardListSortOrder.addEventListener('change', function(e) {
@@ -233,9 +233,9 @@ function memberManagement() {
 			if (userId == null || userId == "") {
 				showConfirm2("회원을 선택하세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			handleBoardSortClick("boardId", userId, this);
 		});
@@ -247,9 +247,9 @@ function memberManagement() {
 			if (userId == null || userId == "") {
 				showConfirm2("회원을 선택하세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			handleBoardSortClick("boardDelYn", userId, this);
 		});
@@ -261,9 +261,9 @@ function memberManagement() {
 			if (userId == null || userId == "") {
 				showConfirm2("회원을 선택하세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			handleBoardSortClick("boardCreatedAt", userId, this);
 		});
@@ -276,9 +276,9 @@ function memberManagement() {
 			if (userId == null || userId == "") {
 				showConfirm2("회원을 선택하세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			handleReplySortClick("replyId", userId, this);
 		});
@@ -290,9 +290,9 @@ function memberManagement() {
 			if (userId == null || userId == "") {
 				showConfirm2("회원을 선택하세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			handleReplySortClick("replyDelYn", userId, this);
 		});
@@ -304,9 +304,9 @@ function memberManagement() {
 			if (userId == null || userId == "") {
 				showConfirm2("회원을 선택하세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			handleReplySortClick("replyCreatedAt", userId, this);
 		});
@@ -384,9 +384,9 @@ function memberManagement() {
 			if (file.type !== "image/jpeg" && file.type !== "image/png") {
 				showConfirm2("파일은 png 또는 jpg 형식만 가능합니다.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			if (!file) {
 				return;
@@ -425,7 +425,7 @@ function memberManagement() {
 			}) => {
 				// 페이지 정보
 				document.getElementById("memListPage").innerText = data.currentPage;
-				document.getElementById("memListTotalPage").innerText = data.totalPages;
+				document.getElementById("memListTotalPage").innerText = data.totalPages? data.totalPages :  1;
 
 				const countEl = document.getElementById('userList-count');
 				if (countEl) countEl.textContent = parseInt(data.total, 10).toLocaleString();
@@ -490,6 +490,7 @@ function memberManagement() {
 	}) {
 		let html = `<a href="#" data-page="${startPage - 1}" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 		for (let p = startPage; p <= endPage; p++) {
+			if(totalPages == 0) p =1;
 			html += `<a href="#" data-page="${p}" class="page-link ${p === currentPage ? 'active' : ''}">${p}</a>`;
 		}
 		html += `<a href="#" data-page="${endPage + 1}" class="page-link ${endPage >= totalPages ? 'disabled' : ''}">Next →</a>`;
@@ -711,44 +712,44 @@ function memberManagement() {
 			if (!emailRegex.test(email)) {
 				showConfirm2("올바른 이메일 형식을 입력해주세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			if (!nameRegex.test(name)) {
 				showConfirm2("닉네임을 입력해주세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			if (!nickname) {
 				showConfirm2("닉네임을 입력해주세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			if (!nicknameRegex.test(nickname)) {
 				showConfirm2("닉네임은 한글, 영문, 숫자 조합", "2~10자로 입력해주세요.",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			if (!passwordRegex.test(password)) {
 				showConfirm2("비밀번호는 영문, 숫자, 특수문자로", "8~16자로 입력해주세요.",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			if (!phoneRegex.test(phone)) {
 				showConfirm2("010-XXXX-XXXX 형식으로 입력해주세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			formData.append('memRole', role);
 			formData.append('memName', name);
@@ -763,9 +764,9 @@ function memberManagement() {
 				if (profileFile.type !== "image/jpeg" && profileFile.type !== "image/png") {
 					showConfirm2("파일은 png 또는 jpg 형식만 가능합니다.", "",
 						() => {
-							return;
 						}
 					);
+					return;
 				}
 			}
 			if (profileFile) {
@@ -777,13 +778,11 @@ function memberManagement() {
 				if (res.data == 'success') {
 					showConfirm2("유저 등록 성공", "",
 						() => {
-							return;
 						}
 					);
 				} else {
 					showConfirm2("등록 중 오류 발생", "",
 						() => {
-							return;
 						}
 					);
 				}
@@ -801,9 +800,9 @@ function memberManagement() {
 					if (memId == null || memId == "") {
 						showConfirm2("수정할 대상이 없습니다.", "",
 							() => {
-								return;
 							}
 						);
+						return;
 					}
 					const memName = document.getElementById('mem-name').value;
 					const memNickname = document.getElementById('mem-nickname').value;
@@ -820,7 +819,6 @@ function memberManagement() {
 							if (res.data != 1) {
 								showConfirm2("수정 실패", "",
 									() => {
-										return;
 									}
 								);
 							} else {
@@ -830,7 +828,6 @@ function memberManagement() {
 								fetchUserList();
 								showConfirm2("수정 완료", "",
 									() => {
-										return;
 									}
 								);
 							}
@@ -852,15 +849,15 @@ function memberManagement() {
 			if (email == null || email == "") {
 				showConfirm2("이메일을 입력하세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			} else if (!emailRegex.test(email)) {
 				showConfirm2("올바른 이메일 형식을 입력하세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			let formData = new FormData();
 			formData.set("email", email);
@@ -868,7 +865,6 @@ function memberManagement() {
 				.then(res => {
 					showConfirm2(res.data, "",
 						() => {
-							return;
 						}
 					);
 				})
@@ -884,15 +880,15 @@ function memberManagement() {
 			if (nickname == null || nickname == "") {
 				showConfirm2("닉네임을 입력하세요.", "",
 					() => {
-						return;
 					}
 				);
+				return;
 			} else if (!nicknameRegex.test(nickname)) {
 				showConfirm2("닉네임은 한글, 영문, 숫자 조합", "2~10자로 입력해주세요.",
 					() => {
-						return;
 					}
 				);
+				return;
 			}
 			let formData = new FormData();
 			formData.set("nickname", nickname);
@@ -900,7 +896,6 @@ function memberManagement() {
 				.then(res => {
 					showConfirm2(res.data, "",
 						() => {
-							return;
 						}
 					);
 				})
@@ -1024,6 +1019,7 @@ function memberManagement() {
 			if (boardPaginationEl) {
 				let paginationHtml = `<a href="#" data-page="${startPage - 1}" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 				for (let p = startPage; p <= endPage; p++) {
+					if(totalPages == 0) p=1;
 					paginationHtml += `<a href="#" data-page="${p}" class="page-link ${p === currentPage ? 'active' : ''}">${p}</a>`;
 				}
 				paginationHtml += `<a href="#" data-page="${endPage + 1}" class="page-link ${endPage >= totalPages ? 'disabled' : ''}">Next →</a>`;
@@ -1359,14 +1355,14 @@ function memberManagement() {
 		axios.get('/admin/las/userInquiry.do', { params })
 		    .then(res => {
 		        const responseData = res.data;
-		        
+
 		        // 데이터셋 분리 및 라벨 생성
 		        let labels;
 		        let currentPeriodData;
 		        let previousPeriodData;
 		        let currentLabel;
 		        let previousLabel;
-		        
+
 		        // dateValue에 따라 데이터 처리 로직 분기
 		        switch (dateValue) {
 		            case 'monthly':
@@ -1379,7 +1375,7 @@ function memberManagement() {
 		            case 'selectDays':
 		                currentPeriodData = responseData.filter(item => item.periodType === 'THIS_YEAR');
 		                previousPeriodData = responseData.filter(item => item.periodType === 'LAST_YEAR');
-		                
+
 		                // 라벨을 위해 모든 날짜를 합치고 정렬
 		                let allDates = Array.from(new Set(currentPeriodData.map(item => item.loginDate)
 		                    .concat(previousPeriodData.map(item => item.loginDate))));
@@ -1398,30 +1394,30 @@ function memberManagement() {
 		                previousLabel = '지난주 접속자 수';
 		                break;
 		        }
-		        
+
 		        const currentValues = currentPeriodData.map(item => item.userCount);
 		        const previousValues = previousPeriodData.map(item => item.userCount);
-		        
+
 		        if (userOnlineChartInstance) {
 		            userOnlineChartInstance.destroy();
 		        }
-		        
+
 		        // 데이터셋의 모든 값에서 최대값을 찾습니다.
 		        const allDataValues = [...currentValues, ...previousValues];
 		        const maxDataValue = Math.max(...allDataValues, 0); // 0과 비교하여 음수 값이 없을 때도 최소 0 이상이 되도록 보장
-		        
+
 		        // suggestedMax를 최대값의 두 배로 설정합니다.
 		        const suggestedMax = maxDataValue * 1.5;
 
 		        // 그라데이션 생성 (이번주/올해 데이터용 - 푸른색 계열)
 		        const thisPeriodGradient = ctx.createLinearGradient(0, 0, 0, 400);
-		        thisPeriodGradient.addColorStop(0, 'rgba(54, 162, 235, 0.5)'); 
-		        thisPeriodGradient.addColorStop(1, 'rgba(54, 162, 235, 0)');   
-		        
+		        thisPeriodGradient.addColorStop(0, 'rgba(54, 162, 235, 0.5)');
+		        thisPeriodGradient.addColorStop(1, 'rgba(54, 162, 235, 0)');
+
 		        // 그라데이션 생성 (지난주/작년 데이터용 - 붉은색 계열)
 		        const lastPeriodGradient = ctx.createLinearGradient(0, 0, 0, 400);
-		        lastPeriodGradient.addColorStop(0, 'rgba(255, 99, 132, 0.5)'); 
-		        lastPeriodGradient.addColorStop(1, 'rgba(255, 99, 132, 0)');   
+		        lastPeriodGradient.addColorStop(0, 'rgba(255, 99, 132, 0.5)');
+		        lastPeriodGradient.addColorStop(1, 'rgba(255, 99, 132, 0)');
 
 		        userOnlineChartInstance = new Chart(ctx, {
 		            type: 'line',
@@ -1432,7 +1428,7 @@ function memberManagement() {
 		                    data: currentValues,
 		                    fill: true,
 		                    borderColor: 'rgb(54, 162, 235)',
-		                    backgroundColor: thisPeriodGradient, 
+		                    backgroundColor: thisPeriodGradient,
 		                    tension: 0.4,
 		                    pointRadius: 3,
 		                    pointHoverRadius: 6,
@@ -1440,9 +1436,9 @@ function memberManagement() {
 		                }, {
 		                    label: previousLabel,
 		                    data: previousValues,
-		                    fill: true, 
+		                    fill: true,
 		                    borderColor: 'rgb(255, 99, 132)',
-		                    backgroundColor: lastPeriodGradient, 
+		                    backgroundColor: lastPeriodGradient,
 		                    tension: 0.4,
 		                    pointRadius: 3,
 		                    pointHoverRadius: 6,
@@ -1657,8 +1653,9 @@ function memberManagement() {
 				const { content, total, currentPage, startPage, endPage, totalPages } = res.data;
 
 				// 페이지 정보
+				document.querySelector('.ptag-list.pageLogCount').style.display = 'block'
 				document.getElementById("memPageVisitPage").innerText = currentPage;
-				document.getElementById("memPageVisitTotalPage").innerText = totalPages;
+				document.getElementById("memPageVisitTotalPage").innerText = totalPages != 0 ? totalPages : '1';
 
 				pageLogCountEl.textContent = total.toLocaleString();
 
@@ -1680,6 +1677,9 @@ function memberManagement() {
 				// 페이지네이션 렌더링
 				let paginationHtml = `<a href="#" data-page="${startPage - 1}" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 				for (let p = startPage; p <= endPage; p++) {
+					if(totalPages === 0){
+						p = 1;
+					}
 					paginationHtml += `<a href="#" data-page="${p}" class="page-link ${p === currentPage ? 'active' : ''}">${p}</a>`;
 				}
 				paginationHtml += `<a href="#" data-page="${endPage + 1}" class="page-link ${endPage >= totalPages ? 'disabled' : ''}">Next →</a>`;

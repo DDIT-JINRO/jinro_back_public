@@ -456,7 +456,7 @@ function textLengthOverCut(txt, len, lastTxt) {
 }
 
 // 임시로 주석처리 중
-// yotubeInMain();
+yotubeInMain();
 
 getKeywordBtn.addEventListener("click", function() {
     const jobCode = this.value;

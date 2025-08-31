@@ -125,6 +125,9 @@
 						</div>
 					</div>
 				</c:forEach>
+				<c:if test="${empty articlePage.content}">
+					<div class="content-list__no-results" style="grid-column: 1/-1;">검색 결과가 없습니다.</div>
+				</c:if>
 			</div>
 
 			<!-- 선택된 질문 패널 -->
@@ -150,6 +153,9 @@
 
 			<!-- Page Numbers -->
 			<c:forEach var="pNo" begin="${articlePage.startPage}" end="${articlePage.endPage}">
+				<c:if test="${articlePage.total == 0 }">
+					<c:set var="pNo" value="1"></c:set>
+				</c:if>
 				<li class="pagination__item">
 					<a href="${articlePage.url}?currentPage=${pNo}&keyword=${articlePage.keyword}<c:forEach var='filter' items='${paramValues.siqJobFilter}'>&siqJobFilter=${filter}</c:forEach>" class="pagination__link <c:if test='${pNo == articlePage.currentPage}'>pagination__link--active</c:if>"> ${pNo} </a>
 				</li>

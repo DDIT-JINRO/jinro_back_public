@@ -19,7 +19,7 @@ function contestManagementInit () {
 
 			// 페이지 정보
 			document.getElementById("cctListPage").innerText = data.articlePage.currentPage;
-			document.getElementById("cctListTotalPage").innerText = data.articlePage.totalPages;
+			document.getElementById("cctListTotalPage").innerText = data.articlePage.totalPages != 0 ? data.articlePage.totalPages : '1';
 
 			const {articlePage, contestTypeList} = data;
 
@@ -66,6 +66,7 @@ function contestManagementInit () {
 		let html = `<a href="#" data-page="${startPage - 1}" class="page-link ${startPage <= 1 ? 'disabled' : ''}">← Previous</a>`;
 
 		for (let p = startPage; p <= endPage; p++) {
+			if(totalPages == 0) p = 1;
 			html += `<a href="#" data-page="${p}" class="page-link ${p === currentPage ? 'active' : ''}">${p}</a>`;
 		}
 
@@ -244,14 +245,13 @@ function contestManagementInit () {
 	        axios.post('/prg/ctt/contestUpdate.do', form).then(res => {
 				showConfirm2("등록/수정 완료","",
 					() => {
-						fetchCctList();
 					}
 				);
+				fetchCctList();
 	        }).catch(err => {
 	            console.error("저장 실패", err);
 				showConfirm2("등록/수정 실패","",
 					() => {
-						return;
 					}
 				);
 	        });
@@ -271,14 +271,13 @@ function contestManagementInit () {
 			axios.post('/prg/ctt/contestDelete.do', data).then(res => {
 				showConfirm2("삭제 완료","",
 					() => {
-						fetchCctList();
 					}
 				);
+				fetchCctList();
 			}).catch(err => {
 				console.error("삭제 실패", err);
 				showConfirm2("삭제 실패","",
 					() => {
-						return;
 					}
 				);
 			});

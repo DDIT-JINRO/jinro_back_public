@@ -24,6 +24,21 @@ document.addEventListener("DOMContentLoaded", () => {
 			return;
 		}
     }
+	
+	const movePasswordLink = document.querySelector("#movePassword");
+
+	movePasswordLink.addEventListener("click", (e) => {
+		e.preventDefault();
+		
+		const loginType = movePasswordLink.dataset.loginType;
+		if (loginType != "G33001") {
+			showConfirm2("소셜로그인 계정은 비밀번호를 변경 할 수 없습니다.","",()=>{});
+			return;
+		}
+		
+		location.href = "/mpg/mif/pswdchg/selectPasswordChangeView.do";
+	})
+	
     const withdrawalForm = document.querySelector(".withdrawal-form");
 	const passwordCheckMessage = document.getElementById("password-check-message");
 
