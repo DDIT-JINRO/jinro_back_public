@@ -160,10 +160,6 @@
 	</select>
 
 	<update id="updateInterviewFeedback" parameterType="kr.or.ddit.empt.enp.service.InterviewReviewVO">
-	    <selectKey keyProperty="irId" resultType="int" order="BEFORE">
-	      SELECT NVL(MAX(IR_ID), 0) + 1 AS IR_ID FROM INTERVIEW_REVIEW
-	    </selectKey>
-
 		MERGE INTO
 			INTERVIEW_REVIEW A
 		USING DUAL
@@ -187,7 +183,7 @@
 				    , IR_INTERVIEW_AT
 				    , IR_STATUS
 				) VALUES (
-					#{irId}
+					(SELECT NVL(MAX(IR_ID), 0) + 1 FROM INTERVIEW_REVIEW)
 					, #{memId}
 					, #{irType}
 					, #{targetId}
