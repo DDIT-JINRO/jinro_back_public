@@ -181,7 +181,6 @@ const handleBookmarkToggle = (button) => {
 
 // 경쟁률 비교 처리 함수
 function processCompetitionRates() {
-    // 모든 경쟁률 항목 찾기
     const competitionItems = document.querySelectorAll('.dept-competition .value-comparison');
     
     competitionItems.forEach(item => {
@@ -190,24 +189,32 @@ function processCompetitionRates() {
         
         if (!currentValueSpan || !avgValueSpan) return;
         
-        // 텍스트에서 숫자 추출
-        const currentText = currentValueSpan.textContent.trim();
+        // 원본 텍스트 저장 (data attribute 사용)
+        let originalText = currentValueSpan.dataset.originalValue;
+        if (!originalText) {
+            originalText = currentValueSpan.textContent.trim().replace(/\s*[↑↓]\s*$/, ''); // 기존 화살표 제거
+            currentValueSpan.dataset.originalValue = originalText; // 원본 저장
+        }
+        
         const avgText = avgValueSpan.textContent.trim();
         
-        // "16.4:1" 또는 "16.4 : 1" 형태에서 숫자 추출
-        const currentRate = extractCompetitionRate(currentText);
+        const currentRate = extractCompetitionRate(originalText);
         const avgRate = extractCompetitionRate(avgText);
         
         if (currentRate !== null && avgRate !== null) {
+            // 기존 클래스 제거
+            currentValueSpan.classList.remove('higher', 'lower', 'equal');
+            
             // 비교 및 클래스 적용
             if (currentRate > avgRate) {
                 currentValueSpan.classList.add('higher');
-                currentValueSpan.textContent = currentText + ' ↑';
+                currentValueSpan.textContent = originalText + ' ↑';
             } else if (currentRate < avgRate) {
                 currentValueSpan.classList.add('lower');
-                currentValueSpan.textContent = currentText + ' ↓';
+                currentValueSpan.textContent = originalText + ' ↓';
             } else {
                 currentValueSpan.classList.add('equal');
+                currentValueSpan.textContent = originalText;
             }
         }
     });
