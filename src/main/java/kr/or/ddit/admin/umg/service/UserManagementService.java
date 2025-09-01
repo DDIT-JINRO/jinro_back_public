@@ -51,4 +51,7 @@ public interface UserManagementService {
 
 	int penaltyCancel(MemberPenaltyVO penaltyVO);
 
+	// 스케줄링 돌려서 로그인 후 시간이 너무 길면 로그아웃처리
+	void logoutManaging();
+
 }

@@ -12,4 +12,5 @@ public class LoginLogVO {
 	private Date llCreatedAt;
 	private String llStatus;
 
+	private String memName;
 }

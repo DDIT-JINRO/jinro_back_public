@@ -8,12 +8,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import kr.or.ddit.account.lgn.service.LoginLogVO;
 import kr.or.ddit.account.lgn.service.MemberPenaltyVO;
+import kr.or.ddit.account.lgn.service.impl.LoginMapper;
 import kr.or.ddit.admin.las.service.PageLogVO;
 import kr.or.ddit.admin.umg.service.MemberPenaltyCountVO;
 import kr.or.ddit.admin.umg.service.UserManagementService;
@@ -34,6 +37,9 @@ public class UserManagementServiceImpl implements UserManagementService {
 	private FileService fileService;
 	@Autowired
 	private UserManagementMapper userManagementMapper;
+
+	@Autowired
+	private LoginMapper loginMapper;
 
 	private final BCryptPasswordEncoder passwordEncoder;
 
@@ -534,6 +540,15 @@ public class UserManagementServiceImpl implements UserManagementService {
 			this.userManagementMapper.resetReportStatus(penaltyVO.getReportId());
 		}
 		return result;
+	}
+
+	@Override
+	@Scheduled(cron = "0 0 0/3 * * ?")
+	public void logoutManaging() {
+		List<LoginLogVO> list = this.userManagementMapper.selectLogoutNeededMemberList();
+		for(LoginLogVO l : list) {
+			loginMapper.insertLogoutLog(l.getMemId());
+		}
 	}
 
 }
