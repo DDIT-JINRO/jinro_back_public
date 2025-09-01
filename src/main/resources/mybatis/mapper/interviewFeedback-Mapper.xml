@@ -74,7 +74,7 @@
 					IR_RATING DESC
 				</when>
 				<otherwise>
-					IR_INTERVIEW_AT DESC, IR_CREATED_AT DESC
+					IR_CREATED_AT DESC, IR_INTERVIEW_AT DESC 
 				</otherwise>
 			</choose>
 		OFFSET
