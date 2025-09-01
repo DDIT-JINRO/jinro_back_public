@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import kr.or.ddit.account.lgn.service.LoginLogVO;
 import kr.or.ddit.account.lgn.service.MemberPenaltyVO;
 import kr.or.ddit.admin.las.service.PageLogVO;
 import kr.or.ddit.admin.umg.service.MemberPenaltyCountVO;
@@ -117,4 +118,6 @@ public interface UserManagementMapper {
 	int penaltyCancel(MemberPenaltyVO penaltyVO);
 
 	int resetReportStatus(int reportId);
+
+	List<LoginLogVO> selectLogoutNeededMemberList();
 }

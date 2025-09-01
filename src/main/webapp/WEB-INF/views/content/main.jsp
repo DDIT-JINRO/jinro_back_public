@@ -168,7 +168,7 @@
 
 			<div class="ai-shortcuts__grid">
 				<!-- 1. AI 모의면접 -->
-				<a class="ai-card" href="/cdp/imtintrvw/aiimtintrvw/aiImitationInterview.do" aria-label="AI 모의면접 바로가기"> 
+				<a class="ai-card" href="/cdp/imtintrvw/aiimtintrvw/aiImitationInterview.do" aria-label="AI 모의면접 바로가기">
 					<img class="ai-card__icon" src="/images/main/charactor5-aimockintrv.png" alt="" />
 					<div class="ai-card__body">
 						<h3 class="ai-card__title">AI 모의면접</h3>
@@ -177,7 +177,7 @@
 				</a>
 
 				<!-- 2. AI 이력서 -->
-				<a class="ai-card" href="/cdp/aifdbck/rsm/aiFeedbackResumeList.do" aria-label="AI 이력서 바로가기"> 
+				<a class="ai-card" href="/cdp/aifdbck/rsm/aiFeedbackResumeList.do" aria-label="AI 이력서 바로가기">
 					<img class="ai-card__icon" src="/images/main/charactor6-airesume.png" alt="" />
 					<div class="ai-card__body">
 						<h3 class="ai-card__title">AI 이력서 첨삭</h3>
@@ -186,7 +186,7 @@
 				</a>
 
 				<!-- 3. AI 자소서 -->
-				<a class="ai-card" href="/cdp/aifdbck/sint/aiFeedbackSelfIntroList.do" aria-label="AI 자소서 바로가기"> 
+				<a class="ai-card" href="/cdp/aifdbck/sint/aiFeedbackSelfIntroList.do" aria-label="AI 자소서 바로가기">
 					<img class="ai-card__icon" src="/images/main/charactor7-aiselfintro.png" alt="" />
 					<div class="ai-card__body">
 						<h3 class="ai-card__title">AI 자소서 첨삭</h3>
@@ -195,7 +195,7 @@
 				</a>
 
 				<!-- 4. AI 상담 -->
-				<a class="ai-card" href="/cnslt/aicns/aicns.do" aria-label="AI 상담 바로가기"> 
+				<a class="ai-card" href="/cnslt/aicns/aicns.do" aria-label="AI 상담 바로가기">
 					<img class="ai-card__icon" src="/images/main/charactor8-aicounsel.png" alt="" />
 					<div class="ai-card__body">
 						<h3 class="ai-card__title">AI 24시 상담</h3>
@@ -263,14 +263,14 @@
 		<div>
 			<div class="goToTest" id="nonKeyword">
 				<p>* 맞춤 영상을 제공받고 싶다면?</p>
-				<button onclick="location.href='/pse/cat/careerAptitudeTest.do'">진로검사 시작하기</button>
+				<button id="goToRoadMapBtn">로드맵 완료하기</button>
 			</div>
 			<div class="goToTest" id="getKeyword">
 				<p>*<span id="goToTestJobName" style="font: bold; font-weight: 600"></span>의 직업이 궁금하다면?</p>
 				<button id="getKeywordBtn">직업정보 확인하기</button>
 			</div>
 			<div class="content-showcase__list">
-				
+
 			</div>
 			<div class="content-showcase__header" style="margin-top: 10px;">
 				<h3>커리어패스는 회원님의 진로 및 관심사에 맞춰 맞춤 동영상을 제공합니다!</h3>

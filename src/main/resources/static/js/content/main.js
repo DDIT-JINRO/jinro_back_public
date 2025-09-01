@@ -78,9 +78,9 @@ function resetSlideTimer() {
 }
 
 const slideColors = [
-    '#CCDCFE', 
-    '#FFF4CC', 
-    '#FFE5E5', 
+    '#CCDCFE',
+    '#FFF4CC',
+    '#FFE5E5',
 
 ];
 const banner = document.querySelector('.main-banner');
@@ -96,7 +96,7 @@ function showSlide(index) {
     if (dotIndex < 0) dotIndex = totalSlides - 1;
     if (dotIndex >= totalSlides) dotIndex = 0;
     if (dots[dotIndex]) dots[dotIndex].classList.add("active");
-	
+
 	if (slideColors[dotIndex]) {
 	       banner.style.backgroundColor = slideColors[dotIndex];
 	}
@@ -183,13 +183,13 @@ const fn_init = () => {
 	const roadmap = document.querySelector('.roadmapBtn');
 	roadmap.addEventListener("click", () => {
 		if(!memId || memId=='anonymousUser') {
-			showConfirm("로그인 후 이용 가능합니다.","로그인하시겠습니까?", 
+			showConfirm("로그인 후 이용 가능합니다.","로그인하시겠습니까?",
 			    () => {
 			        sessionStorage.setItem("redirectUrl", location.href);
 			        location.href = "/login";
 			    },
 			    () => {
-			        
+
 			    }
 			);
 		} else {
@@ -234,6 +234,11 @@ const fn_init = () => {
 			window.open(worldcupUrl, 'worldcup', `width=\${width}, height=\${height}, left=\${left}, top=\${top}`);
 		}
 	});
+
+	const goToRoadMapBtn = document.getElementById('goToRoadMapBtn');
+	if(goToRoadMapBtn){
+		goToRoadMapBtn.addEventListener('click', roadmapPopup);
+	}
 }
 
 const roadmapPopup = () => {
@@ -347,7 +352,7 @@ const fn_TopsWidget = () =>{
 	};
 
 	widgets.forEach(initWidget);
-	
+
 	document.addEventListener('click', (e) => {
 	    if (!e.target.closest('.trend-widget')) {
 	        widgets.forEach(widget => {
@@ -387,7 +392,7 @@ async function yotubeInMain() {
 				jobCode = response.data.JOBCODE;
 				jobName = response.data.JOB;
 				if(result != '직업' && jobCode != null){
-					document.getElementById("goToTestJobName").innerText= jobName;					
+					document.getElementById("goToTestJobName").innerText= jobName;
 					document.getElementById("getKeyword").style.display = "flex";
 					document.getElementById("nonKeyword").style.display = "none";
 					let btn = document.getElementById("getKeywordBtn");
@@ -396,8 +401,8 @@ async function yotubeInMain() {
 					document.getElementById("getKeyword").style.display = "none";
 					document.getElementById("nonKeyword").style.display = "flex";
 				}
-				
-				
+
+
 			});
 		await axios.get('https://youtube.googleapis.com/youtube/v3/search', {
 			params: {
@@ -411,27 +416,27 @@ async function yotubeInMain() {
 			}
 		})
 			.then(response => {
-				
+
 				let html = "";
 
 				const arr = response.data.items;
 
 				arr.forEach(item => {
-					let id = item.id.videoId;			
+					let id = item.id.videoId;
 					let title = item.snippet.title;
-					
+
 					if(title.length>22){
 						if (title.indexOf("(") !== -1) {
 						    title = title.substring(0, title.indexOf("(")).trim();
 						} else if (title.indexOf("&quot;") !== -1) {
 						    title = title.substring(0, title.indexOf("&quot;")).trim();
 						}
-						title=textLengthOverCut(title, 22, "...");	
+						title=textLengthOverCut(title, 22, "...");
 					}
-				
+
 					html += `
 						<div class="content-card">
-							<p style ="margin-bottom:16px; font-size: 14px; line-height: 1.25; color: #1f2d3d; font-weight: 600;">${title}</p>			
+							<p style ="margin-bottom:16px; font-size: 14px; line-height: 1.25; color: #1f2d3d; font-weight: 600;">${title}</p>
 							<iframe width="300px" height="215px"
 						    	src="https://www.youtube.com/embed/${id}"
 						    	frameborder="0"

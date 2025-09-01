@@ -756,7 +756,7 @@
 	}
 
 	.main-banner__button {
-		width: 150px;
+		width: 180px;
 		height: 45px;
 		font-size: 14px;
 	}
@@ -947,7 +947,7 @@
 	}
 
 	.main-banner__button {
-		width: 160px;
+		width: 180px;
 		height: 50px;
 		font-size: 16px;
 	}
@@ -1076,6 +1076,7 @@
 
 	/* 유튜브 섹션 */
 	.content-showcase {
+		display: none;
 		padding: 50px 15px;
 	}
 
@@ -1123,12 +1124,12 @@
 /* 유튜브 관련 */
 .goToTest {
     margin-right: 200px;
-    top: 50%;            
+    top: 50%;
     padding: 10px;
     border-radius: 8px;
     display: flex;
-    flex-direction: column;  
-    align-items: flex-end;   
+    flex-direction: column;
+    align-items: flex-end;
  	display: none;
 }
 .goToTest button {
@@ -1141,13 +1142,13 @@
     font-weight: 700;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border: 2px solid black;
-    
+
 }
 
 .goToTest p{
 	font-size: 14px;
 	color: #778899;
-	
+
 }
 
 @media (max-width: 768px) {
@@ -1160,6 +1161,8 @@
 
     .trend-widget {
         padding: 16px 20px; /* 내부 여백을 모바일에 맞게 조정 */
+        max-width: 87%;
+        min-width: 87%;
     }
 
     .trend-title {
@@ -1169,7 +1172,7 @@
     .trend-item {
         font-size: 14px; /* 롤링되는 텍스트 폰트 크기 조정 */
     }
-	
+
 	.prev-btn {
 	    left: 5px;
 	}
