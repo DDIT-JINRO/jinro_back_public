@@ -265,7 +265,7 @@
 		                    LEFT JOIN SELF_INTRO_CONTENT B ON A.SI_ID = B.SI_ID
 		                    LEFT JOIN SELF_INTRO_Q       C ON B.SIQ_ID = C.SIQ_ID
 		                WHERE
-		                        A.MEM_ID = 1
+		                        A.MEM_ID = #{memId}
 		                    AND A.SI_STATUS = '완료'
 		                    AND C.SIQ_JOB IS NOT NULL
 		                    AND A.SI_UPDATED_AT = (
@@ -285,7 +285,7 @@
 		                 JOBS J
 		            JOIN WORLDCUP W ON J.JOB_CODE = W.WD_RESULT
 		        WHERE
-		                W.MEM_ID = 1
+		                W.MEM_ID = #{memId}
 		            AND W.WD_ID = (
 		                SELECT
 		                    MAX(WD_ID)
@@ -360,7 +360,7 @@
 		                FROM
 		                    RECOMMEND_KEYWORD
 		                WHERE
-		                    MEM_ID = 1
+		                    MEM_ID = #{memId}
 		                ORDER BY
 		                    RK_ID DESC
 		            )

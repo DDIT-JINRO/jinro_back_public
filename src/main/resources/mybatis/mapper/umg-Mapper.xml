@@ -301,7 +301,7 @@
 			<if test="filter != null and filter != ''">
 				AND t.REPORT_STATUS = #{filter}
 			</if>
-			
+
 			<!-- 키워드 검색 -->
 			<if test="keyword != null and keyword != ''">
 				<choose>
@@ -340,7 +340,7 @@
 		FROM filtered
 		WHERE RNUM BETWEEN #{startNo} AND #{endNo}
 	</select>
-	
+
 	<select id="getAllReportList"
     parameterType="kr.or.ddit.com.report.service.ReportVO"
     resultType="int">
@@ -444,7 +444,7 @@
 	    )
 	    WHERE RNUM <![CDATA[>=]]> #{startNo}
 	</select>
-	
+
 	<select id="getReportVO" parameterType="String"
 		resultType="kr.or.ddit.com.report.service.ReportVO">
 		SELECT
@@ -488,7 +488,7 @@
 		END) = M2.MEM_ID
 		WHERE REPORT_ID = #{reportId}
 	</select>
-	
+
 	<select id="getAllMemberPenaltyList" resultType="int">
 	    SELECT COUNT(*)
 	    FROM MEMBER_PENALTY MP
@@ -1134,5 +1134,26 @@
 		SET REPORT_STATUS = 'S03001'
 		WHERE REPORT_ID = #{reportId}
 	</update>
+
+	<select id="selectLogoutNeededMemberList" resultType="kr.or.ddit.account.lgn.service.LoginLogVO">
+		WITH LAST_LOG AS (
+	        SELECT
+	            MEM_ID,
+	            LL_STATUS,
+                LL_CREATED_AT,
+	            ROW_NUMBER() OVER (PARTITION BY MEM_ID ORDER BY LL_CREATED_AT DESC) AS rn
+	        FROM LOGIN_LOG
+	    )
+	    SELECT L.MEM_ID,
+               M.MEM_NAME
+               LL_STATUS,
+               LL_CREATED_AT
+	    FROM LAST_LOG L
+        JOIN MEMBER M ON L.MEM_ID = M.MEM_ID
+	    WHERE rn = 1
+	    AND LL_STATUS = 'I'
+        AND LL_CREATED_AT <![CDATA[<]]> SYSDATE - (2/24)
+        ORDER BY MEM_ID
+	</select>
 
 </mapper>
