@@ -550,8 +550,8 @@
 		#{mpType},
 		<choose>
 			<when test="mpType == 'G14002'">
-			#{penaltyStart},
-			#{penaltyEnd},
+			TO_DATE(#{penaltyStart}, 'YYYY-MM-DD'),
+			TO_DATE(#{penaltyEnd}, 'YYYY-MM-DD'),
 			</when>
 			<otherwise>
 			NULL,
