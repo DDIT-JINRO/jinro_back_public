@@ -392,7 +392,7 @@ async function yotubeInMain() {
 				jobCode = response.data.JOBCODE;
 				jobName = response.data.JOB;
 				if(result != '직업' && jobCode != null){
-					document.getElementById("goToTestJobName").innerText= jobName;
+					document.getElementById("goToTestJobName").innerText= jobName.trim();
 					document.getElementById("getKeyword").style.display = "flex";
 					document.getElementById("nonKeyword").style.display = "none";
 					let btn = document.getElementById("getKeywordBtn");

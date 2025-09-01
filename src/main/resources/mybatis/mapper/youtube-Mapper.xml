@@ -6,7 +6,7 @@
 		SELECT rk.RK_NAME AS result, jc.JOB_CODE AS jobCode, rk.RK_NAME AS JOB
 		FROM recommend_keyword rk
 		JOIN JOBS jc
-		    ON rk.RK_NAME = jc.JOB_NAME
+		    ON rk.RK_NAME like '%'|| jc.JOB_NAME || '%'
 		WHERE rk.MEM_ID = #{id}
 		ORDER BY rk.RK_CREATED_AT ASC
 		FETCH FIRST 1 ROWS ONLY
