@@ -576,61 +576,57 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 	// 자동완성 핸들러
 	function autoCompleteHandler() {
-		setTimeout(function() {
-			const autoCompleUnivInfo = { univId : 93, univName : "국립안동대학교"};
-			selectUniversityAndClose(autoCompleUnivInfo);
+		const autoCompleUnivInfo = { univId : 93, univName : "국립안동대학교"};
+		selectUniversityAndClose(autoCompleUnivInfo);
 
-			setTimeout(async function() {
-				//학과 채우기
-				document.getElementById('application').value = '컴퓨터공학과';
+		setTimeout(async function() {
+			//학과 채우기
+			document.getElementById('application').value = '컴퓨터공학과';
 
-				//면접일자 채우기
-				document.getElementById('interviewDate').value = '2025-08-04';
+			//면접일자 채우기
+			document.getElementById('interviewDate').value = '2025-08-04';
 
-				// 별점 자동 선택 (5점 만점)
-				const ratingStars = document.querySelectorAll('.rating-input__star');
-				if (ratingStars.length > 4) {
-					ratingStars[4].click();
-				}
+			// 별점 자동 선택 (5점 만점)
+			const ratingStars = document.querySelectorAll('.rating-input__star');
+			if (ratingStars.length > 4) {
+				ratingStars[4].click();
+			}
 
-				// 면접 후기 내용 자동 완성
-				const reviewContent = `면접관님께서 편안한 분위기를 만들어주셔서 긴장하지 않고 답변할 수 있었습니다. \n특히 전공 관련 질문에 대해 심도 있는 대화를 나누며 제 지식을 어필할 수 있었고, \n대학의 교육 목표와 비전에 대해 자세히 들을 수 있어 매우 유익했습니다. \n면접 이후에도 좋은 인상을 받았습니다.`;
-				document.getElementById('interviewContent').value = reviewContent;
+			// 면접 후기 내용 자동 완성
+			const reviewContent = `면접관님께서 편안한 분위기를 만들어주셔서 긴장하지 않고 답변할 수 있었습니다. \n특히 전공 관련 질문에 대해 심도 있는 대화를 나누며 제 지식을 어필할 수 있었고, \n대학의 교육 목표와 비전에 대해 자세히 들을 수 있어 매우 유익했습니다. \n면접 이후에도 좋은 인상을 받았습니다.`;
+			document.getElementById('interviewContent').value = reviewContent;
 
-				// 파일 첨부
-				const fileInput = document.getElementById('file-input');
-				const fileNameDisplay = document.querySelector('.file-uploader__filename b');
-				const fileNameContainer = document.querySelector('.file-uploader__filename');
-				//서버에 있는 더미 파일
-				const fileUrl = '/images/main/charactor4.png';
+			// 파일 첨부
+			const fileInput = document.getElementById('file-input');
+			const fileNameDisplay = document.querySelector('.file-uploader__filename b');
+			const fileNameContainer = document.querySelector('.file-uploader__filename');
+			//서버에 있는 더미 파일
+			const fileUrl = '/images/main/charactor4.png';
 
-				try {
-					// 파일을 가져와서 Blob으로 변환
-					const response = await fetch(fileUrl);
-					const blob = await response.blob();
+			try {
+				// 파일을 가져와서 Blob으로 변환
+				const response = await fetch(fileUrl);
+				const blob = await response.blob();
 
-					//Blob으로 File 객체 생성
-					const file = new File([blob], 'charactor4.png', { type: 'image/png' });
+				//Blob으로 File 객체 생성
+				const file = new File([blob], 'charactor4.png', { type: 'image/png' });
 
-					// DataTransfer 객체를 사용하여 input[type="file"]에 파일 할당
-					const dataTransfer = new DataTransfer();
-					dataTransfer.items.add(file);
-					fileInput.files = dataTransfer.files;
+				// DataTransfer 객체를 사용하여 input[type="file"]에 파일 할당
+				const dataTransfer = new DataTransfer();
+				dataTransfer.items.add(file);
+				fileInput.files = dataTransfer.files;
 
-					// 파일 이름 미리보기 UI 업데이트
-					fileNameDisplay.textContent = file.name;
-					fileNameContainer.style.display = 'block';
-				} catch (error) {
-					console.error('파일 첨부 자동완성 실패:', error);
-					showConfirm2("파일 첨부 중 오류가 발생했습니다.","",
-		   			   () => {
-		   			    }
-		   			);
-				}
-			}, 500); // 모달 열림 지연 시간
+				// 파일 이름 미리보기 UI 업데이트
+				fileNameDisplay.textContent = file.name;
+				fileNameContainer.style.display = 'block';
+			} catch (error) {
+				console.error('파일 첨부 자동완성 실패:', error);
+				showConfirm2("파일 첨부 중 오류가 발생했습니다.","",
+	   			   () => {
+	   			    }
+	   			);
+			}
 		}, 500); // 모달 열림 지연 시간
 	}
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-})
