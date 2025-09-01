@@ -276,6 +276,7 @@ document.addEventListener('DOMContentLoaded', function() {
         compareListContainer.innerHTML = "";
         sessionStorage.removeItem("deptCompareList");
         popup.classList.remove('is-open');
+		updateCompareButtonState();
     });
 
     // 비교 페이지 이동
