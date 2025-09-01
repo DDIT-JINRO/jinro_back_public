@@ -23,13 +23,13 @@ document.addEventListener("DOMContentLoaded", function() {
 		const files = document.querySelector("#file-input").files;
 
 		if (!univId) {
-			showConfirm2("대학을 선택해 주세요.","", 
+			showConfirm2("대학을 선택해 주세요.","",
    			   () => {
    			    }
    			);
 			return;
 		}
-		
+
 		if (!interviewDate) {
 			showConfirm2("면접 일자를 입력해 주세요.", "",
 			    () => {
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		}
 
 		if (interviewRating === 0) {
-			showConfirm2("대학 평가를 선택해 주세요.","", 
+			showConfirm2("대학 평가를 선택해 주세요.","",
 			    () => {
 			    }
 			);
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		}
 
 		if (!interviewDetail) {
-			showConfirm2("면접 후기를 입력해 주세요.","", 
+			showConfirm2("면접 후기를 입력해 주세요.","",
 			    () => {
 			    }
 			);
@@ -55,15 +55,15 @@ document.addEventListener("DOMContentLoaded", function() {
 		}
 
 		if (files.length === 0) {
-			showConfirm2("증빙자료를 첨부해 주세요.","", 
+			showConfirm2("증빙자료를 첨부해 주세요.","",
 			    () => {
 			    }
 			);
-			return;	
+			return;
 		}
 
 		if (files.length > 1) {
-			showConfirm2("증빙자료는 1장만 첨부해 주세요.","", 
+			showConfirm2("증빙자료는 1장만 첨부해 주세요.","",
 			    () => {
 			    }
 			);
@@ -90,13 +90,13 @@ document.addEventListener("DOMContentLoaded", function() {
 				const result = await response.json();
 
 				if (result.success) {
-					showConfirm2("후기 등록 요청이 완료되었습니다","", 
+					showConfirm2("후기 등록 요청이 완료되었습니다","",
 					    () => {
 							window.location.href = "/ertds/univ/uvivfb/selectInterviewList.do";
 					    }
 					);
 				} else {
-					showConfirm2("등록에 실패했습니다.","", 
+					showConfirm2("등록에 실패했습니다.","",
 		   			   () => {
 		   			    }
 		   			);
@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			}
 		} catch (error) {
 			console.error("등록 중 오류:", error);
-			showConfirm2("등록에 실패했습니다.","", 
+			showConfirm2("등록에 실패했습니다.","",
    			   () => {
    			    }
    			);
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			if (!text || typeof text !== 'string') {
 			    return false;
 			}
-			
+
 			const searchTerm = query.toLowerCase().trim();
 			if (!searchTerm) return true;
 
@@ -370,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		filterAndRenderUniversities('');
 	})
-	
+
 	// 모달 열기
 	searchBtn.addEventListener('click', async function() {
 		modal.classList.add('is-active');
@@ -507,7 +507,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		prevPageBtn.disabled = currentPage === 1;
 		nextPageBtn.disabled = currentPage === totalPages || filteredUniversities.length === 0;
 	}
-	
+
 	function debounceFilter(keyword) {
 		clearTimeout(searchTimeout);
 		searchTimeout = setTimeout(() => {
@@ -525,7 +525,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	searchInput.addEventListener('input', function(e) {
 		debounceFilter(e.target.value);
 	});
-	
+
 	// 한글 조합 완료시 즉시 검색
 	searchInput.addEventListener('compositionend', function(e) {
 		clearTimeout(searchTimeout);
@@ -569,43 +569,15 @@ document.addEventListener('DOMContentLoaded', function() {
 			closeModal();
 		}
 	});
-});
-
-document.addEventListener('DOMContentLoaded', function() {
 	//자동완성 기능 추가
 	const autoCompleteBtn = document.getElementById('autoCompleteBtn');
 	if (autoCompleteBtn) {
 		autoCompleteBtn.addEventListener('click', autoCompleteHandler);
 	}
-})
-// 자동완성 핸들러
-function autoCompleteHandler() {
-	// 1. '입학지원 대학 검색' 버튼 클릭 
-	document.getElementById('open-search-modal').click();
-
-	// 2. 모달이 열리는 것을 기다린 후, 대학을 선택
-	setTimeout(function() {
-		//모달에서 국립한밭대학교
-		const univListItems = document.querySelectorAll('.search-modal__list-item');
-		let selectedItem = null;
-
-		// 목록에 항목이 있는지 확인
-		if (univListItems.length > 0) {
-			// 첫 번째 항목을 선택
-			selectedItem = univListItems[0];
-			selectedItem.click();
-		}
-
-		if (selectedItem) {
-			// '선택' 버튼을 클릭하여 메인 폼에 데이터 적용
-			document.getElementById('modalConfirmBtn').click();
-		} else {
-			showConfirm2("자동완성할 대학을 찾지 못했습니다.", "목록을 다시 확인해주세요.", 
-			    () => {
-			    }
-			);
-			return;					
-		}
+	// 자동완성 핸들러
+	function autoCompleteHandler() {
+		const autoCompleUnivInfo = { univId : 93, univName : "국립안동대학교"};
+		selectUniversityAndClose(autoCompleUnivInfo);
 
 		setTimeout(async function() {
 			//학과 채우기
@@ -649,11 +621,12 @@ function autoCompleteHandler() {
 				fileNameContainer.style.display = 'block';
 			} catch (error) {
 				console.error('파일 첨부 자동완성 실패:', error);
-				showConfirm2("파일 첨부 중 오류가 발생했습니다.","", 
+				showConfirm2("파일 첨부 중 오류가 발생했습니다.","",
 	   			   () => {
 	   			    }
 	   			);
 			}
 		}, 500); // 모달 열림 지연 시간
-	}, 500); // 모달 열림 지연 시간
-}
+	}
+});
+

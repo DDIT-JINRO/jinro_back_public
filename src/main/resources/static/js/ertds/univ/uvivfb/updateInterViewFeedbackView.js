@@ -8,8 +8,8 @@ document.addEventListener("DOMContentLoaded", function() {
 					history.back();
    			    }
    			);
+			return;
 		}
-		return;
 	}
 
 	document.querySelector("#submit-btn").addEventListener("click", async function() {

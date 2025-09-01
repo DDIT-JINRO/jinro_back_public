@@ -127,7 +127,7 @@
 					${sortBy} ${order}
 				</when>
 				<otherwise>
-					IR_ID
+					IR_ID DESC
 				</otherwise>
 			</choose>
 			) X
