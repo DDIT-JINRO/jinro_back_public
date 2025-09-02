@@ -1,10 +1,13 @@
 package kr.or.ddit.pse.cat.service.impl;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import kr.or.ddit.admin.las.service.RecommendKeywordVO;
 import kr.or.ddit.pse.cat.service.AptitudeTestVO;
 import kr.or.ddit.pse.cat.service.TemporarySaveVO;
+import kr.or.ddit.worldcup.service.JobsVO;
 
 @Mapper
 public interface CareerAptitudeTestMapper {
@@ -18,6 +21,8 @@ public interface CareerAptitudeTestMapper {
 	public void insertAptitudeResult(AptitudeTestVO aptitudeTestVO);
 
 	public void insertRecommendKeyword(RecommendKeywordVO recommendKeywordVO);
+
+	public List<String> selectJobList();
 
 	
 	
