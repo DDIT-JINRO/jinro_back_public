@@ -10,4 +10,6 @@ public interface AiFeedbackResumeService {
 
 	// 횟수 차감 및 AI 피드백을 요청
 	public String deductAndGetFeedback(int payId, String html);
+
+	public PaymentVO selectLastMokPaymentInfo(MemberSubscriptionVO memberSubscriptionVO);
 }

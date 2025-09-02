@@ -14,4 +14,6 @@ public interface AiFeedbackResumeMapper {
 	// 횟수 차감 및 AI 피드백을 요청
 	public int deductAndGetFeedback(int payId);
 
+	public PaymentVO selectLastMokPaymentInfo(MemberSubscriptionVO memberSubscriptionVO);
+
 }
