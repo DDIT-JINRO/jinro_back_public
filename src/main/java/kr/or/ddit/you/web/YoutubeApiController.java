@@ -1,6 +1,8 @@
 package kr.or.ddit.you.web;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,29 +21,41 @@ public class YoutubeApiController {
 
 	@Autowired
 	YoutubeService service;
-	
-	@Value("${youtube.api.key}")
-	private String API_KEY;
+
+	@Value("${youtube.api.key1}")
+	private String API_KEY4;
+	@Value("${youtube.api.key2}")
+	private String API_KEY2;
+	@Value("${youtube.api.key3}")
+	private String API_KEY3;
+	@Value("${youtube.api.key4}")
+	private String API_KEY1;
 
 	@GetMapping("/main/youtube")
-	public Map<String, Object> youtube(@AuthenticationPrincipal String memId, Model model) {	
-		log.info(memId);	
-		
+	public Map<String, Object> youtube(@AuthenticationPrincipal String memId, Model model) {
+		log.info(memId);
+
 		// 채널 검색 ID
 		String channelId = "UC7veJl4E23uPDXoVu-0qYAA";
 		// 키워드
 		String result ="";
 		Map<String, Object> map= new HashMap<String, Object>();
-		
+
 		if(!memId.equals("anonymousUser")) {
 			map = service.getKeyword(memId);
-			
+
 		}else {
 			result ="직업";
 			map.put("RESULT",result);
 		}
 		map.put("channelId", channelId);
-		map.put("apikey", API_KEY);
+
+		List<String> apiKeys = new ArrayList<>();
+		apiKeys.add(API_KEY1);
+		apiKeys.add(API_KEY2);
+		apiKeys.add(API_KEY3);
+		apiKeys.add(API_KEY4);
+		map.put("apikeys", apiKeys);
 		return map;
 	}
 }
