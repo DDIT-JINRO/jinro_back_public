@@ -40,6 +40,10 @@ public class QuestionListController {
 			@AuthenticationPrincipal String memId) {
 		log.info("siqJobFilter : " + siqJobFilter);
 
+		if (memId == null || memId.equals("anonymousUser")) {
+			return "redirect:/login"; // 로그인 페이지로 리다이렉트
+		}
+		
 		int size = 5; // 한 페이지에 5개
 		int startRow = (currentPage - 1) * size;
 		int endRow = currentPage * size;

@@ -65,4 +65,7 @@
 		)
 	</insert>
 	
+	<select id="selectJobList" resultType="String">
+		SELECT JOB_NAME FROM JOBS
+	</select>
 </mapper>

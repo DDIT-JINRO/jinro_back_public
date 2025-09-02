@@ -4,17 +4,26 @@
 	namespace="kr.or.ddit.admin.service.impl.AdminCommonChartMapper">
 
 	<select id="liveUserCount" resultType="int">
-	    WITH LAST_LOG AS (
-	        SELECT
-	            MEM_ID,
-	            LL_STATUS,
-	            ROW_NUMBER() OVER (PARTITION BY MEM_ID ORDER BY LL_CREATED_AT DESC) AS rn
-	        FROM LOGIN_LOG
-	    )
-	    SELECT COUNT(*)
-	    FROM LAST_LOG
-	    WHERE rn = 1
-	    AND LL_STATUS = 'I'
+	    SELECT
+		    COUNT(M.MEM_ID)
+		FROM MEMBER M
+		LEFT JOIN (
+		    SELECT
+		        MEM_ID,
+		        LL_STATUS,
+		        ROW_NUMBER() OVER (PARTITION BY MEM_ID ORDER BY LL_CREATED_AT DESC) AS rn
+		    FROM LOGIN_LOG
+		) L ON M.MEM_ID = L.MEM_ID AND L.rn = 1
+		LEFT JOIN (
+		    SELECT DISTINCT MEM_ID
+		    FROM MEMBER_PENALTY
+		    WHERE MP_TYPE = 'G14002'
+		    AND MP_COMPLETE_AT > SYSDATE
+		) P ON M.MEM_ID = P.MEM_ID
+		WHERE M.DEL_YN = 'N'
+		AND M.MEM_ROLE = 'R01001'
+		AND L.LL_STATUS = 'I'
+		AND P.MEM_ID IS NULL
 	</select>
 	
 	<select id="monthUserCount" resultType="kr.or.ddit.admin.service.AdminCommonChartVO">

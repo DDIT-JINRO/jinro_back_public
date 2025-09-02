@@ -375,11 +375,32 @@ const fn_ContestBanner = async () =>{
 	slideContainer.innerHTML = banners + banners;
 }
 
+// 1) 키 순환 호출: 403/429면 다음 키로 넘어가고, 그 외 에러는 그대로 throw
+async function fetchYoutubeWithKeysOnce(params, apiKeys) {
+  for (let i = 0; i < apiKeys.length; i++) {
+    try {
+      const res = await axios.get('https://youtube.googleapis.com/youtube/v3/search', {
+        params: { ...params, key: apiKeys[i] }
+      });
+      return res.data; // 성공 시 바로 반환
+    } catch (err) {
+      const status = err?.response?.status;
+      if (status === 403 || status === 429) {
+        // 한도/요청 과다 → 다음 키로 시도
+        continue;
+      }
+      // 파라미터 오류 등은 키 바꿔도 소용 없음 → 즉시 실패
+      throw err;
+    }
+  }
+  throw new Error('모든 API 키가 한도 초과로 실패했습니다.');
+}
+
 // 유튜브
 async function yotubeInMain() {
 	let channelId = "";
 	let result = "";
-	let apiKey = "";
+	let apiKeys = [];
 	let jobCode = "";
 	let jobName = "";
 	try {
@@ -388,7 +409,8 @@ async function yotubeInMain() {
 
 				channelId = response.data.channelId;
 				result = response.data.RESULT;
-				apiKey = response.data.apikey;
+				apiKeys = response.data.apikeys;
+
 				jobCode = response.data.JOBCODE;
 				jobName = response.data.JOB;
 				if(result != '직업' && jobCode != null){
@@ -404,52 +426,48 @@ async function yotubeInMain() {
 
 
 			});
-		await axios.get('https://youtube.googleapis.com/youtube/v3/search', {
-			params: {
-				"part": "snippet",
-				"maxResults": 4,
-				"channelId": channelId,
-				"q": result,
-				type: "video",
-				"regionCode": "kr",
-				"key": apiKey
-			}
-		})
-			.then(response => {
 
-				let html = "";
+			// 2단계: 유튜브 호출 (키 순환)
+			const data = await fetchYoutubeWithKeysOnce({
+			  part: "snippet",
+			  maxResults: 4,
+			  channelId,
+			  q: result,
+			  type: "video",
+			  regionCode: "kr"
+			}, apiKeys);
 
-				const arr = response.data.items;
+			// 렌더 (innerHTML은 한 번만 갱신)
+			let html = "";
+			(data.items || []).forEach(item => {
+			  let id = item?.id?.videoId;
+			  let title = item?.snippet?.title || "";
 
-				arr.forEach(item => {
-					let id = item.id.videoId;
-					let title = item.snippet.title;
+			  if (title.length > 22) {
+			    if (title.indexOf("(") !== -1) {
+			      title = title.substring(0, title.indexOf("(")).trim();
+			    } else if (title.indexOf("&quot;") !== -1) {
+			      title = title.substring(0, title.indexOf("&quot;")).trim();
+			    }
+			    title = textLengthOverCut(title, 22, "...");
+			  }
 
-					if(title.length>22){
-						if (title.indexOf("(") !== -1) {
-						    title = title.substring(0, title.indexOf("(")).trim();
-						} else if (title.indexOf("&quot;") !== -1) {
-						    title = title.substring(0, title.indexOf("&quot;")).trim();
-						}
-						title=textLengthOverCut(title, 22, "...");
-					}
-
-					html += `
-						<div class="content-card">
-							<p style ="margin-bottom:16px; font-size: 14px; line-height: 1.25; color: #1f2d3d; font-weight: 600;">${title}</p>
-							<iframe width="300px" height="215px"
-						    	src="https://www.youtube.com/embed/${id}"
-						    	frameborder="0"
-						    	allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-						    	allowfullscreen>
-							</iframe>
-						</div>
-					`;
-					document.querySelector(".content-showcase__list").innerHTML = html;
-				})
+			  html += `
+			    <div class="content-card">
+			      <p style="margin-bottom:16px; font-size:14px; line-height:1.25; color:#1f2d3d; font-weight:600;">${title}</p>
+			      <iframe width="300" height="215"
+			        src="https://www.youtube.com/embed/${id}"
+			        frameborder="0"
+			        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+			        allowfullscreen>
+			      </iframe>
+			    </div>
+			  `;
 			});
+		  document.querySelector(".content-showcase__list").innerHTML = html;
+
 	} catch (err) {
-		console.error("error : ", err);
+		//console.error("error : ", err);
 	}
 }
 
@@ -461,7 +479,10 @@ function textLengthOverCut(txt, len, lastTxt) {
 }
 
 // 임시로 주석처리 중
-yotubeInMain();
+if (window.innerWidth > 768) {
+	console.log("모바일 유튜브 X")
+	yotubeInMain();
+}
 
 getKeywordBtn.addEventListener("click", function() {
     const jobCode = this.value;

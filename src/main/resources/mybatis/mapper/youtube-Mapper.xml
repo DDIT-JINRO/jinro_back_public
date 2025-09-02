@@ -8,7 +8,7 @@
 		JOIN JOBS jc
 		    ON rk.RK_NAME like '%'|| jc.JOB_NAME || '%'
 		WHERE rk.MEM_ID = #{id}
-		ORDER BY rk.RK_CREATED_AT ASC
+		ORDER BY rk.RK_CREATED_AT DESC
 		FETCH FIRST 1 ROWS ONLY
 	</select>
 

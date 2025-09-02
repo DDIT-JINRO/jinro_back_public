@@ -370,27 +370,62 @@ public class CareerAptitudeTestServiceImpl implements CareerAptitudeTestService 
 	
     public void insertRecommendKeyword(String aptitudeTestResult, String memId) {
         
+    	List<String> jobList = this.careerAptitudeTestMapper.selectJobList();
+    	
         // 기존 로직은 그대로 유지합니다.
         Client client = Client.builder().apiKey(geminiApiKey).build();
 
         StringBuilder sb = new StringBuilder();
     	
-        sb.append(aptitudeTestResult).append("를 바탕으로 직업 1가지를 추천해주세요.\n");
-        sb.append("단어는 1개로 제한합니다.");
-        sb.append("앞 뒤에 대한 내용 없이 답변 하는 내용 또한 1단어로만 합니다.");
-        sb.append("직업에 대하여 전문가, 교수, CEO 등의 뭉뚱한 대답보다는 경찰, 의사처럼 특정 직업을 답변합니다.");
+        sb.append("너는 사용자의 적성 검사 결과를 분석하여, '주어진 직업 리스트' 안에서만 직업을 추천하는 AI야.\n\n"); // 역할 재정의
+
+        sb.append("### 입력 데이터:\n");
+        sb.append("1. 사용자 적성 검사 결과 (JSON):\n");
+        sb.append(aptitudeTestResult).append("\n");
+        sb.append("2. 선택 가능한 전체 직업 리스트 (이 리스트 밖의 직업은 절대 추천하면 안 됨):\n"); // 제약 조건 추가
+        sb.append(jobList).append("\n\n");
+
+        sb.append("### 과제:\n");
+        sb.append("아래 '분석 및 추천 단계'에 따라, '선택 가능한 전체 직업 리스트'에 **포함된 직업 중에서만** 가장 적합한 직업 단 1개를 선정해야 한다.\n\n");
+
+        sb.append("### 분석 및 추천 단계:\n");
+        sb.append("1. 먼저, 사용자의 적성 검사 결과에 있는 'recommendJob' 목록을 확인한다.\n");
+        sb.append("2. 'recommendJob' 목록에 있는 직업들이 '선택 가능한 전체 직업 리스트'에도 존재하는지 비교한다.\n");
+        sb.append("3. 만약 일치하는 직업이 있다면, 그중에서 사용자의 'interestKeyword'와 가장 관련성이 높은 직업 1개를 최종 선택한다.\n");
+        sb.append("4. 만약 일치하는 직업이 없다면, 'interestKeyword'와 'suggest'의 'enhance' 내용을 바탕으로 사용자의 핵심 역량을 파악하고, 이를 '선택 가능한 전체 직업 리스트' **안에서** 가장 적합한 직업 1개를 **찾아낸다**.\n\n");
+
+        sb.append("### 출력 규칙:\n");
+        sb.append("- **가장 중요한 규칙: 반드시 '선택 가능한 전체 직업 리스트'에 명시된 직업명과 100% 일치하는 단어 하나만 출력해야 한다. 리스트에 없는 직업은 절대 추천해서는 안 된다.**\n");
+        sb.append("- 반드시 구체적인 직업명 단 하나만 출력한다.\n");
+        sb.append("- 어떠한 설명이나 부가 정보도 붙이지 않는다.\n\n");
+        sb.append("최종 추천 직업명 (주어진 리스트 내):"); // 출력 지시어 수정
         
-     	String prompt = sb.toString();
+     	String basePrompt = sb.toString();
+     	String currentPrompt = basePrompt;
+     	
+        String finalRkName = null; // 최종적으로 저장할 직업명
+        boolean success = false; // 성공 여부 플래그
         
         try {
-            GenerateContentResponse response = client.models.generateContent("gemini-1.5-flash", prompt, null);
-            String rkName = response.text();
+            GenerateContentResponse response = client.models.generateContent("gemini-1.5-flash", currentPrompt, null);
+            String rkName = response.text().trim();
             
-            RecommendKeywordVO recommendKeywordVO = new RecommendKeywordVO();
-            recommendKeywordVO.setMemId(Integer.parseInt(memId));
-            recommendKeywordVO.setRkName(rkName);
+            boolean isValid = jobList.stream().anyMatch(job -> job.trim().equals(rkName.trim()));
             
-            this.careerAptitudeTestMapper.insertRecommendKeyword(recommendKeywordVO);            
+            if (isValid) {
+                finalRkName = rkName;
+                success = true;
+            } else {
+                currentPrompt = basePrompt + "\n\n이전 답변 '" + rkName + "'은(는) 주어진 목록에 없는 잘못된 답변이었습니다. 반드시 목록 안에서만 다시 추천해주세요.";
+            }
+            
+            if (success) {
+                RecommendKeywordVO recommendKeywordVO = new RecommendKeywordVO();
+                recommendKeywordVO.setMemId(Integer.parseInt(memId));
+                recommendKeywordVO.setRkName(finalRkName);
+                this.careerAptitudeTestMapper.insertRecommendKeyword(recommendKeywordVO);
+            }
+            
         } catch (ServerException e) {
             log.error("Google GenAI API를 호출하는 중 서버 에러(503 등)가 발생했습니다. 추천 키워드 생성을 건너뜁니다.", e);
         } catch (Exception e) {
