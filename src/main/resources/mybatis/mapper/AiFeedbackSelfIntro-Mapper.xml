@@ -31,4 +31,19 @@
 		AND		PAY_RESUME_CNT > 0
 	</update>
 	
+	<select id="selectLastMokPaymentInfo" parameterType="kr.or.ddit.mpg.pay.service.MemberSubscriptionVO" resultType="kr.or.ddit.mpg.pay.service.PaymentVO">
+		SELECT
+		    PAY_ID,
+		    MS_ID,
+		    PAY_DATE,
+		    PAY_MOCK_CNT
+		FROM
+		    PAYMENT
+		WHERE
+		    MS_ID = #{msId}
+		ORDER BY
+		    PAY_ID DESC
+		FETCH FIRST 1 ROW ONLY
+	</select>
+	
 </mapper>

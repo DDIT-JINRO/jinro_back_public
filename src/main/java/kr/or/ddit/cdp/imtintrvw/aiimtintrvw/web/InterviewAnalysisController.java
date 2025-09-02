@@ -3,6 +3,7 @@ package kr.or.ddit.cdp.imtintrvw.aiimtintrvw.web;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,9 +14,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import kr.or.ddit.cdp.aifdbck.rsm.service.AiFeedbackResumeService;
 import kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.AnalysisService;
 import kr.or.ddit.cdp.imtintrvw.aiimtintrvw.service.dto.AnalysisResponse;
+import kr.or.ddit.mpg.pay.service.MemberSubscriptionVO;
 import kr.or.ddit.mpg.pay.service.PaymentService;
+import kr.or.ddit.mpg.pay.service.PaymentVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,13 +32,26 @@ public class InterviewAnalysisController {
 	private final AnalysisService analysisService;
 	private final PaymentService paymentService;
 
+	@Autowired
+	private AiFeedbackResumeService aiFeedbackResumeService; 
 	/**
 	 * 면접 분석 메인 엔드포인트 (프론트엔드 연동)
 	 */
 	@PostMapping("/analyze-interview")
 	public ResponseEntity<?> analyzeInterview(@RequestBody Map<String, Object> requestData, @AuthenticationPrincipal String memId) {
 		String sessionId = null;
-
+		
+		MemberSubscriptionVO memberSubscriptionVO = paymentService.selectByMemberId(Integer.parseInt(memId));
+		if(memberSubscriptionVO == null) {
+			return ResponseEntity.badRequest().body(Map.of("success", false, "error", "Invalid session ID", "message", "구독 정보가 없습니다."));
+		} else {
+			PaymentVO paymentVO = aiFeedbackResumeService.selectLastMokPaymentInfo(memberSubscriptionVO);
+			int payMockCnt = paymentVO.getPayMockCnt();
+			if(payMockCnt <= 0) {
+				return ResponseEntity.badRequest().body(Map.of("success", false, "error", "Invalid session ID", "message", "모의면접 결과 확인가능 횟수가 없습니다."));
+			}
+		}
+		
 		try {
 			// 세션 ID 추출
 			sessionId = (String) requestData.get("sessionId");
@@ -94,8 +111,9 @@ public class InterviewAnalysisController {
 		} catch (Exception e) {
 			log.error("❌ 진행 상태 확인 실패 - 세션 ID: {}", sessionId, e);
 
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-					Map.of("sessionId", sessionId, "progress", 0, "status", "error", "message", "진행 상태 확인 실패: " + e.getMessage(), "timestamp", LocalDateTime.now().toString()));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(Map.of("sessionId", sessionId, "progress", 0, "status", "error", "message",
+							"진행 상태 확인 실패: " + e.getMessage(), "timestamp", LocalDateTime.now().toString()));
 		}
 	}
 
@@ -113,8 +131,8 @@ public class InterviewAnalysisController {
 		} catch (Exception e) {
 			log.error("❌ 분석 취소 실패 - 세션 ID: {}", sessionId, e);
 
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(Map.of("success", false, "sessionId", sessionId, "message", "취소 처리 실패: " + e.getMessage(), "timestamp", LocalDateTime.now().toString()));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("success", false, "sessionId",
+					sessionId, "message", "취소 처리 실패: " + e.getMessage(), "timestamp", LocalDateTime.now().toString()));
 		}
 	}
 
@@ -135,8 +153,8 @@ public class InterviewAnalysisController {
 		} catch (Exception e) {
 			log.error("❌ Health check 실패", e);
 
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(Map.of("status", "ERROR", "message", "Health check 실패: " + e.getMessage(), "timestamp", LocalDateTime.now().toString()));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("status", "ERROR", "message",
+					"Health check 실패: " + e.getMessage(), "timestamp", LocalDateTime.now().toString()));
 		}
 	}
 
@@ -148,13 +166,15 @@ public class InterviewAnalysisController {
 		try {
 			boolean isActive = analysisService.isSessionActive(sessionId);
 
-			return ResponseEntity.ok(Map.of("sessionId", sessionId, "isActive", isActive, "status", isActive ? "active" : "inactive", "timestamp", LocalDateTime.now().toString()));
+			return ResponseEntity.ok(Map.of("sessionId", sessionId, "isActive", isActive, "status",
+					isActive ? "active" : "inactive", "timestamp", LocalDateTime.now().toString()));
 
 		} catch (Exception e) {
 			log.error("❌ 세션 상태 확인 실패 - 세션 ID: {}", sessionId, e);
 
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-					Map.of("sessionId", sessionId, "isActive", false, "status", "error", "message", "세션 상태 확인 실패: " + e.getMessage(), "timestamp", LocalDateTime.now().toString()));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(Map.of("sessionId", sessionId, "isActive", false, "status", "error", "message",
+							"세션 상태 확인 실패: " + e.getMessage(), "timestamp", LocalDateTime.now().toString()));
 		}
 	}
 }

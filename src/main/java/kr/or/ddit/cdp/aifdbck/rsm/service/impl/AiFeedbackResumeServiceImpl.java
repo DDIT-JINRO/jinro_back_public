@@ -49,4 +49,9 @@ public class AiFeedbackResumeServiceImpl implements AiFeedbackResumeService {
 		}
 	}
 
+	@Override
+	public PaymentVO selectLastMokPaymentInfo(MemberSubscriptionVO memberSubscriptionVO) {
+		return aiFeedbackResumeMapper.selectLastMokPaymentInfo(memberSubscriptionVO);
+	}
+
 }
